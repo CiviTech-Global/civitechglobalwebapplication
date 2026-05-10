@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(node -e:*)",
+      "Bash(gh repo view:*)",
+      "Bash(where:*)",
+      "Bash(curl --version)",
+      "Bash(curl:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(npx prisma db seed:*)",
+      "Bash(npx tsx prisma/seed.ts)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx prisma generate)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx prisma db push:*)"
+    ]
+  }
+}
