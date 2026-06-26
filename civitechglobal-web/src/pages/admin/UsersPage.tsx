@@ -41,7 +41,7 @@ export default function AdminUsers() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white">{t.admin.users}</h1>
+        <h1 className="text-2xl font-bold text-white">{t.admin.users}</h1>
         <div className="w-64">
           <Input placeholder={t.search} value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         </div>

@@ -66,7 +66,7 @@ export default function ProductFormPage() {
       <Link to="/admin/products" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 mb-6">
         <BackArrow className="w-4 h-4" /> {t.products.backToProducts}
       </Link>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{isEdit ? t.admin.productForm.editTitle : t.admin.productForm.createTitle}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{isEdit ? t.admin.productForm.editTitle : t.admin.productForm.createTitle}</h1>
 
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,7 +82,7 @@ export default function ProductFormPage() {
           <Input label={t.admin.productForm.image} value={form.image} onChange={update('image')} />
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))} className="rounded" />
-            <span className="text-dark-700 dark:text-dark-300">{t.admin.productForm.isActive}</span>
+            <span className="text-dark-300">{t.admin.productForm.isActive}</span>
           </label>
           <div className="flex gap-3">
             <Button type="submit" isLoading={loading}>{isEdit ? t.edit : t.create}</Button>

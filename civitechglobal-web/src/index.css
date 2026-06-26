@@ -41,76 +41,142 @@
 }
 
 @theme {
-  /* Blue + Dark palette */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
+  /* Ocean Blue — Primary Action Color (25%) */
+  --color-ocean-50: #e6f4ff;
+  --color-ocean-100: #b3dfff;
+  --color-ocean-200: #80caff;
+  --color-ocean-300: #4db5ff;
+  --color-ocean-400: #1a9fff;
+  --color-ocean-500: #0080e6;
+  --color-ocean-600: #0066b3;
+  --color-ocean-700: #004d80;
+  --color-ocean-800: #00334d;
+  --color-ocean-900: #001a26;
+  --color-ocean-950: #000d13;
 
-  --color-dark-50: #f8fafc;
-  --color-dark-100: #f1f5f9;
-  --color-dark-200: #e2e8f0;
-  --color-dark-300: #cbd5e1;
-  --color-dark-400: #94a3b8;
-  --color-dark-500: #64748b;
-  --color-dark-600: #475569;
-  --color-dark-700: #334155;
-  --color-dark-800: #1e293b;
-  --color-dark-900: #0f172a;
-  --color-dark-950: #020617;
+  /* Evil Purple — Accent/Highlight (15%) */
+  --color-purple-50: #f3e8ff;
+  --color-purple-100: #dfc2ff;
+  --color-purple-200: #c99dff;
+  --color-purple-300: #b377ff;
+  --color-purple-400: #9d52ff;
+  --color-purple-500: #8b2cf5;
+  --color-purple-600: #7320cc;
+  --color-purple-700: #5a18a3;
+  --color-purple-800: #42107a;
+  --color-purple-900: #2a0852;
+  --color-purple-950: #1a0533;
+
+  /* Dark Grays — Backgrounds (55% white text on dark) */
+  --color-dark-50: #ebedf0;
+  --color-dark-100: #d0d4db;
+  --color-dark-200: #a8adb9;
+  --color-dark-300: #8b92a1;
+  --color-dark-400: #6e7787;
+  --color-dark-500: #525c6e;
+  --color-dark-600: #2d3444;
+  --color-dark-700: #1e2535;
+  --color-dark-800: #121826;
+  --color-dark-900: #0a0f1a;
+  --color-dark-950: #060911;
+
+  /* Luminous Glow Accents (5%) */
+  --color-glow-blue: #00d4ff;
+  --color-glow-purple: #c084fc;
+  --color-glow-cyan: #22d3ee;
+
+  /* Keep primary as an alias for ocean */
+  --color-primary-50: #e6f4ff;
+  --color-primary-100: #b3dfff;
+  --color-primary-200: #80caff;
+  --color-primary-300: #4db5ff;
+  --color-primary-400: #1a9fff;
+  --color-primary-500: #0080e6;
+  --color-primary-600: #0066b3;
+  --color-primary-700: #004d80;
+  --color-primary-800: #00334d;
+  --color-primary-900: #001a26;
+  --color-primary-950: #000d13;
 
   --font-sans: 'Vazir', 'Tahoma', 'Arial', ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Dark mode base styles */
-.dark {
-  color-scheme: dark;
-}
-
-/* Smooth scrolling */
+/* Dark-only theme */
 html {
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
-  @apply bg-white text-dark-900 dark:bg-dark-950 dark:text-dark-100 antialiased;
+  background-color: var(--color-dark-950);
+  color: var(--color-dark-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glassmorphism utility */
-.glass {
-  @apply bg-white/70 dark:bg-dark-900/70 backdrop-blur-xl border border-white/20 dark:border-dark-700/30;
+/* Glassmorphism — dark variant */
+.glass-dark {
+  background: rgba(10, 15, 26, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Custom scrollbar */
+/* Glow border effect */
+.glow-border {
+  position: relative;
+  border: 1px solid rgba(0, 128, 230, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.glow-border:hover {
+  border-color: rgba(0, 128, 230, 0.5);
+  box-shadow: 0 0 20px rgba(0, 128, 230, 0.15), 0 0 60px rgba(0, 128, 230, 0.05);
+}
+
+/* Glow text */
+.glow-text {
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+/* Neon line divider */
+.neon-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-ocean-500), var(--color-purple-500), transparent);
+  border: none;
+}
+
+/* Custom scrollbar — dark theme */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-dark-100 dark:bg-dark-900;
+  background: var(--color-dark-900);
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-dark-300 dark:bg-dark-700 rounded-full;
+  background: var(--color-dark-600);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-dark-400 dark:bg-dark-600;
+  background: var(--color-dark-500);
 }
 
-/* Ensure LTR for specific elements like code, numbers */
+/* LTR helper */
 .ltr {
   direction: ltr;
   text-align: left;
 }
 
-/* Fix input placeholder alignment to follow document direction */
+/* Fix input placeholder alignment */
 input::placeholder,
 textarea::placeholder {
   text-align: start;
+}
+
+/* Gradient text helper */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-ocean-400), var(--color-purple-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

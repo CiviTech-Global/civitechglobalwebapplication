@@ -41,22 +41,22 @@ export default function AdminDashboard() {
 
     return (
       <div>
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.admin.dashboard}</h1>
+        <h1 className="text-2xl font-bold text-white mb-6">{t.admin.dashboard}</h1>
         <Card className="mb-6">
-          <h2 className="font-semibold text-dark-900 dark:text-white mb-2">{t.admin.welcomeBack}</h2>
-          <p className="text-dark-500 text-sm">{t.admin.permissions?.description || 'Manage your assigned modules from the sidebar.'}</p>
+          <h2 className="font-semibold text-white mb-2">{t.admin.welcomeBack}</h2>
+          <p className="text-dark-400 text-sm">{t.admin.permissions?.description || 'Manage your assigned modules from the sidebar.'}</p>
         </Card>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {moduleLinks
             .filter((m) => userPerms.includes(m.perm))
             .map((m) => (
               <Link key={m.perm} to={m.to}>
-                <Card className="hover:border-primary-300 dark:hover:border-primary-700 transition-colors">
+                <Card hover>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-ocean-900/30 text-ocean-400">
                       <m.icon className="w-5 h-5" />
                     </div>
-                    <span className="font-medium text-dark-900 dark:text-white">{m.label}</span>
+                    <span className="font-medium text-white">{m.label}</span>
                   </div>
                 </Card>
               </Link>
@@ -70,19 +70,19 @@ export default function AdminDashboard() {
   if (!data) return null;
 
   const stats = [
-    { icon: Users, label: t.admin.stats.totalUsers, value: data.stats.totalUsers, color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' },
-    { icon: ShoppingCart, label: t.admin.stats.totalOrders, value: data.stats.totalOrders, color: 'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400' },
-    { icon: DollarSign, label: t.admin.stats.totalRevenue, value: formatPrice(data.stats.totalRevenue), color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400' },
-    { icon: Ticket, label: t.admin.stats.openTickets, value: data.stats.openTickets, color: 'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400' },
-    { icon: Package, label: t.admin.stats.totalProducts, value: data.stats.totalProducts, color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20 dark:text-purple-400' },
-    { icon: Wrench, label: t.admin.stats.totalServices, value: data.stats.totalServices, color: 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-400' },
-    { icon: GraduationCap, label: t.admin.stats.totalOpportunities, value: data.stats.totalOpportunities, color: 'text-pink-600 bg-pink-50 dark:bg-pink-900/20 dark:text-pink-400' },
-    { icon: AlertCircle, label: t.admin.stats.pendingApplications, value: data.stats.pendingApplications, color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400' },
+    { icon: Users, label: t.admin.stats.totalUsers, value: data.stats.totalUsers, color: 'text-blue-400 bg-blue-900/20' },
+    { icon: ShoppingCart, label: t.admin.stats.totalOrders, value: data.stats.totalOrders, color: 'text-green-400 bg-green-900/20' },
+    { icon: DollarSign, label: t.admin.stats.totalRevenue, value: formatPrice(data.stats.totalRevenue), color: 'text-emerald-400 bg-emerald-900/20' },
+    { icon: Ticket, label: t.admin.stats.openTickets, value: data.stats.openTickets, color: 'text-orange-400 bg-orange-900/20' },
+    { icon: Package, label: t.admin.stats.totalProducts, value: data.stats.totalProducts, color: 'text-purple-400 bg-purple-900/20' },
+    { icon: Wrench, label: t.admin.stats.totalServices, value: data.stats.totalServices, color: 'text-indigo-400 bg-indigo-900/20' },
+    { icon: GraduationCap, label: t.admin.stats.totalOpportunities, value: data.stats.totalOpportunities, color: 'text-pink-400 bg-pink-900/20' },
+    { icon: AlertCircle, label: t.admin.stats.pendingApplications, value: data.stats.pendingApplications, color: 'text-amber-400 bg-amber-900/20' },
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.admin.dashboard}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.dashboard}</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {stats.map((s) => (
@@ -92,8 +92,8 @@ export default function AdminDashboard() {
                 <s.icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs text-dark-500 dark:text-dark-400">{s.label}</p>
-                <p className="text-lg font-bold text-dark-900 dark:text-white">{s.value}</p>
+                <p className="text-xs text-dark-400">{s.label}</p>
+                <p className="text-lg font-bold text-white">{s.value}</p>
               </div>
             </div>
           </Card>
@@ -102,16 +102,16 @@ export default function AdminDashboard() {
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
-          <h2 className="font-semibold text-dark-900 dark:text-white mb-4">{t.admin.recentOrders}</h2>
+          <h2 className="font-semibold text-white mb-4">{t.admin.recentOrders}</h2>
           <div className="space-y-3">
             {data.recentOrders.map((o: any) => (
-              <div key={o.id} className="flex items-center justify-between py-2 border-b border-dark-100 dark:border-dark-700 last:border-0">
+              <div key={o.id} className="flex items-center justify-between py-2 border-b border-dark-700 last:border-0">
                 <div>
-                  <p className="text-sm font-medium text-dark-900 dark:text-white">{o.user?.firstName} {o.user?.lastName}</p>
+                  <p className="text-sm font-medium text-white">{o.user?.firstName} {o.user?.lastName}</p>
                   <p className="text-xs text-dark-500">{formatDate(o.createdAt)}</p>
                 </div>
                 <div className="text-end">
-                  <p className="text-sm font-medium text-dark-900 dark:text-white">{formatPrice(o.total)}</p>
+                  <p className="text-sm font-medium text-white">{formatPrice(o.total)}</p>
                   <Badge variant={o.status === 'COMPLETED' ? 'success' : 'warning'} className="text-[10px]">{t.orders.statusLabels[o.status as keyof typeof t.orders.statusLabels] || o.status}</Badge>
                 </div>
               </div>
@@ -120,12 +120,12 @@ export default function AdminDashboard() {
         </Card>
 
         <Card>
-          <h2 className="font-semibold text-dark-900 dark:text-white mb-4">{t.admin.recentTickets}</h2>
+          <h2 className="font-semibold text-white mb-4">{t.admin.recentTickets}</h2>
           <div className="space-y-3">
             {data.recentTickets.map((tk: any) => (
-              <div key={tk.id} className="flex items-center justify-between py-2 border-b border-dark-100 dark:border-dark-700 last:border-0">
+              <div key={tk.id} className="flex items-center justify-between py-2 border-b border-dark-700 last:border-0">
                 <div>
-                  <p className="text-sm font-medium text-dark-900 dark:text-white">{tk.subject}</p>
+                  <p className="text-sm font-medium text-white">{tk.subject}</p>
                   <p className="text-xs text-dark-500">{formatDate(tk.createdAt)}</p>
                 </div>
                 <Badge variant={tk.status === 'OPEN' ? 'warning' : 'info'} className="text-[10px]">{t.tickets.statusLabels[tk.status as keyof typeof t.tickets.statusLabels] || tk.status}</Badge>

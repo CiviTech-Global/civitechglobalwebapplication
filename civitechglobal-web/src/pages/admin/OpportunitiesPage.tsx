@@ -53,7 +53,7 @@ export default function AdminOpportunities() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white">{t.admin.opportunities}</h1>
+        <h1 className="text-2xl font-bold text-white">{t.admin.opportunities}</h1>
         <div className="flex gap-2">
           <Link to="/admin/opportunities/applications"><Button variant="outline" className="gap-2"><FileText className="w-4 h-4" /> {t.admin.applications}</Button></Link>
           <Link to="/admin/opportunities/new"><Button className="gap-2"><Plus className="w-4 h-4" /> {t.admin.addNew}</Button></Link>

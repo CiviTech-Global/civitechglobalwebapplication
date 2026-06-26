@@ -53,7 +53,7 @@ export default function AdminTicketDetail() {
       </Link>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white">{ticket.subject}</h1>
+        <h1 className="text-2xl font-bold text-white">{ticket.subject}</h1>
         <div className="flex gap-2">
           <Badge variant={statusVariant[ticket.status]}>{t.tickets.statusLabels[ticket.status as keyof typeof t.tickets.statusLabels]}</Badge>
           <Badge>{t.tickets.priorityLabels[ticket.priority as keyof typeof t.tickets.priorityLabels]}</Badge>
@@ -80,18 +80,18 @@ export default function AdminTicketDetail() {
 
       {/* Messages */}
       <Card className="mb-6">
-        <h2 className="font-semibold text-dark-900 dark:text-white mb-4">{t.tickets.messages}</h2>
+        <h2 className="font-semibold text-white mb-4">{t.tickets.messages}</h2>
         <div className="space-y-4 max-h-96 overflow-y-auto">
           {ticket.messages?.map((msg) => (
-            <div key={msg.id} className={`p-3 rounded-lg ${msg.isStaff ? 'bg-primary-50 dark:bg-primary-900/20 ms-8' : 'bg-dark-50 dark:bg-dark-800 me-8'}`}>
+            <div key={msg.id} className={`p-3 rounded-lg ${msg.isStaff ? 'bg-primary-900/20 ms-8' : 'bg-dark-800 me-8'}`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium text-dark-700 dark:text-dark-300">
+                <span className="text-xs font-medium text-dark-300">
                   {msg.user ? `${msg.user.firstName} ${msg.user.lastName}` : t.admin.guest}
                 </span>
                 {msg.isStaff && <Badge variant="info" className="text-[10px]">{t.tickets.staff}</Badge>}
                 <span className="text-[10px] text-dark-400">{formatDate(msg.createdAt)}</span>
               </div>
-              <p className="text-sm text-dark-600 dark:text-dark-300">{msg.content}</p>
+              <p className="text-sm text-dark-300">{msg.content}</p>
             </div>
           ))}
         </div>

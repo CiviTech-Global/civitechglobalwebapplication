@@ -23,15 +23,16 @@ export const fa = {
   sendMessageError: 'ارسال پیام ناموفق بود',
   error: 'خطایی رخ داد',
   notAvailable: 'نامشخص',
+  comingSoon: 'به زودی',
 
   // Nav
   nav: {
     home: 'خانه',
     products: 'محصولات',
     services: 'خدمات',
-    opportunities: 'فرصت‌ها',
+    careers: 'فرصت‌های شغلی',
     about: 'درباره ما',
-    support: 'پشتیبانی',
+    contact: 'تماس با ما',
     login: 'ورود',
     register: 'ثبت‌نام',
     dashboard: 'داشبورد',
@@ -41,6 +42,8 @@ export const fa = {
     lightMode: 'حالت روشن',
     darkMode: 'حالت تاریک',
     backToSite: 'بازگشت به سایت',
+    opportunities: 'فرصت‌های شغلی',
+    support: 'تماس با ما',
   },
 
   // Auth
@@ -66,16 +69,26 @@ export const fa = {
   // Home
   home: {
     badge: 'راهکارهای فناوری مدنی',
-    heroTitle: 'توانمندسازی جوامع',
-    heroTitleHighlight: 'با فناوری',
+    heroTitle: 'ساختن آینده',
+    heroTitleHighlight: 'فناوری مدنی',
     heroDescription: 'ما راهکارهای نرم‌افزاری نوآورانه‌ای می‌سازیم که پل ارتباطی بین دولت‌ها، سازمان‌ها و مردم است.',
     exploreProducts: 'مشاهده محصولات',
+    viewServices: 'خدمات ما',
     learnMore: 'بیشتر بدانید',
     whatWeDo: 'خدمات ما',
     whatWeDoDesc: 'ما در ساخت راهکارهای فناوری تخصص داریم که مشارکت مدنی و ارائه خدمات عمومی را تقویت می‌کند.',
+    ourProducts: 'محصولات ما',
+    ourProductsDesc: 'مجموعه محصولات فناوری ما را برای توانمندسازی جوامع کشف کنید.',
+    ourServices: 'خدمات ما',
+    ourServicesDesc: 'خدمات حرفه‌ای فناوری متناسب با نیازهای شما.',
+    joinTeam: 'به تیم ما بپیوندید',
+    joinTeamDesc: 'ما به دنبال افراد با استعداد هستیم تا به مأموریت ما بپیوندند.',
+    viewCareers: 'مشاهده فرصت‌ها',
+    getInTouch: 'تماس با ما',
+    getInTouchDesc: 'سؤالی دارید یا می‌خواهید درباره پروژه‌ای صحبت کنید؟ خوشحال می‌شویم از شما بشنویم.',
+    contactUs: 'تماس با ما',
     readyToTransform: 'آماده تحول در جامعه خود هستید؟',
     readyToTransformDesc: 'با ما تماس بگیرید تا درباره راهکارهای فناوری مناسب سازمان شما گفتگو کنیم.',
-    contactUs: 'تماس با ما',
     features: {
       civicEngagement: 'مشارکت مدنی',
       civicEngagementDesc: 'ساخت پلتفرم‌هایی که شهروندان را با دولت‌ها و جوامعشان متصل می‌کند.',
@@ -106,10 +119,12 @@ export const fa = {
     backToProducts: 'بازگشت به محصولات',
     features: 'ویژگی‌ها',
     viewOnGithub: 'مشاهده در GitHub',
+    viewLandingPage: 'مشاهده صفحه محصول',
     requestDemo: 'درخواست دمو',
     demoRequestSuccess: 'درخواست دمو با موفقیت ارسال شد!',
     demoRequestFailed: 'ارسال درخواست دمو ناموفق بود',
     notFound: 'محصولی یافت نشد',
+    comingSoon: 'به زودی',
   },
 
   // Services
@@ -123,18 +138,20 @@ export const fa = {
     contactUs: 'تماس با ما',
     perHour: '/ساعت',
     notFound: 'خدمتی یافت نشد',
+    freelancersCenter: 'مرکز فریلنسرها',
+    insuranceMarketplace: 'بازار بیمه',
   },
 
-  // Opportunities
-  opportunities: {
-    title: 'فرصت‌ها',
+  // Careers
+  careers: {
+    title: 'فرصت‌های شغلی',
     description: 'به تیم ما بپیوندید و در ساخت راهکارهای فناوری مدنی مشارکت کنید.',
-    backToOpportunities: 'بازگشت به فرصت‌ها',
+    backToCareers: 'بازگشت به فرصت‌ها',
     requirements: 'پیش‌نیازها',
     duration: 'مدت',
     location: 'مکان',
     type: 'نوع',
-    opportunityType: 'نوع فرصت',
+    opportunityType: 'نوع موقعیت',
     applyNow: 'ارسال درخواست',
     coverLetter: 'معرفی‌نامه',
     coverLetterPlaceholder: 'درباره خودتان و دلیل علاقه‌تان بنویسید...',
@@ -144,7 +161,37 @@ export const fa = {
     applyFailed: 'ارسال درخواست ناموفق بود',
     alreadyApplied: 'شما قبلاً درخواست داده‌اید',
     loginToApply: 'برای ارسال درخواست وارد شوید',
-    notFound: 'فرصتی یافت نشد',
+    notFound: 'موقعیتی یافت نشد',
+    open: 'باز',
+    closed: 'بسته',
+    viewDetails: 'مشاهده جزئیات',
+    all: 'همه',
+    jobs: 'فرصت‌های شغلی',
+    internshipsOnly: 'کارآموزی',
+    job: 'شغلی',
+    internship: 'کارآموزی',
+  },
+
+  // Legacy alias
+  opportunities: {
+    title: 'فرصت‌های شغلی',
+    description: 'به تیم ما بپیوندید و در ساخت راهکارهای فناوری مدنی مشارکت کنید.',
+    backToOpportunities: 'بازگشت به فرصت‌ها',
+    requirements: 'پیش‌نیازها',
+    duration: 'مدت',
+    location: 'مکان',
+    type: 'نوع',
+    opportunityType: 'نوع موقعیت',
+    applyNow: 'ارسال درخواست',
+    coverLetter: 'معرفی‌نامه',
+    coverLetterPlaceholder: 'درباره خودتان و دلیل علاقه‌تان بنویسید...',
+    resumeUrl: 'لینک رزومه',
+    resumeUrlPlaceholder: 'https://example.com/resume.pdf',
+    applySuccess: 'درخواست با موفقیت ارسال شد!',
+    applyFailed: 'ارسال درخواست ناموفق بود',
+    alreadyApplied: 'شما قبلاً درخواست داده‌اید',
+    loginToApply: 'برای ارسال درخواست وارد شوید',
+    notFound: 'موقعیتی یافت نشد',
     open: 'باز',
     closed: 'بسته',
     viewDetails: 'مشاهده جزئیات',
@@ -164,7 +211,7 @@ export const fa = {
     whoWeAre: 'ما کی هستیم',
     missionDefault: 'مأموریت ما بهره‌گیری از فناوری برای ایجاد پلتفرم‌های مشارکت مدنی شفاف‌تر، کارآمدتر و قابل دسترس‌تر برای جوامع سراسر جهان است.',
     visionDefault: 'جهانی که هر شهروند ابزار و پلتفرم لازم برای مشارکت فعال در شکل‌دهی جامعه و تصمیمات دولتی را دارد.',
-    descriptionDefault: 'رایان تمدن جهان گستر یک شرکت فناوری است که به ساخت راهکارهای نرم‌افزاری برای توانمندسازی مشارکت مدنی اختصاص یافته است. ما با باور به اینکه فناوری می‌تواند پل ارتباطی بین شهروندان و دولت‌هایشان باشد تأسیس شده‌ایم.',
+    descriptionDefault: 'رایان تمدن جهان گستر یک شرکت فناوری است که به ساخت راهکارهای نرم‌افزاری برای توانمندسازی مشارکت مدنی اختصاص یافته است.',
     values: 'ارزش‌های ما',
     innovation: 'نوآوری',
     innovationDesc: 'پیشرو در فناوری و ایده‌های نو',
@@ -176,9 +223,39 @@ export const fa = {
     excellenceDesc: 'تعهد به بالاترین کیفیت',
   },
 
-  // Support/Ticketing
+  // Contact
+  contact: {
+    title: 'تماس با ما',
+    description: 'سؤالی دارید یا می‌خواهید با ما در ارتباط باشید؟ پیامی ارسال کنید و تیم ما به زودی پاسخ خواهد داد.',
+    name: 'نام',
+    namePlaceholder: 'نام شما',
+    email: 'ایمیل',
+    emailPlaceholder: 'email@example.com',
+    subject: 'موضوع',
+    subjectPlaceholder: 'موضوع',
+    category: 'دسته‌بندی',
+    categories: {
+      SUPPORT: 'پشتیبانی',
+      SALES: 'فروش',
+      DEMO_REQUEST: 'درخواست دمو',
+      PARTNERSHIP: 'مشارکت',
+      OTHER: 'سایر',
+    },
+    message: 'پیام',
+    messagePlaceholder: 'سؤال یا درخواست خود را شرح دهید...',
+    submit: 'ارسال پیام',
+    submitSuccess: 'پیام با موفقیت ارسال شد! به زودی با شما تماس خواهیم گرفت.',
+    submitFailed: 'ارسال پیام ناموفق بود',
+    info: {
+      title: 'اطلاعات تماس',
+      email: 'info@civitechglobal.com',
+      location: 'تیم جهانی دورکار',
+    },
+  },
+
+  // Legacy alias
   support: {
-    title: 'پشتیبانی',
+    title: 'تماس با ما',
     description: 'سؤال یا مشکلی دارید؟ یک تیکت پشتیبانی ارسال کنید و تیم ما به زودی پاسخ خواهد داد.',
     name: 'نام',
     namePlaceholder: 'نام شما',
@@ -294,12 +371,16 @@ export const fa = {
     dashboard: 'داشبورد مدیریت',
     products: 'محصولات',
     services: 'خدمات',
-    opportunities: 'فرصت‌ها',
+    opportunities: 'فرصت‌های شغلی',
+    careers: 'فرصت‌های شغلی',
     orders: 'سفارش‌ها',
     tickets: 'تیکت‌ها',
     users: 'کاربران',
     content: 'محتوا',
     applications: 'درخواست‌ها',
+    roles: 'نقش‌ها',
+    admins: 'مدیران',
+    management: 'مدیریت',
     welcomeBack: 'خوش آمدید',
 
     stats: {
@@ -311,9 +392,10 @@ export const fa = {
       totalServices: 'کل خدمات',
       totalOpportunities: 'کل فرصت‌ها',
       pendingApplications: 'درخواست‌های در انتظار',
+      totalRoles: 'کل نقش‌ها',
+      totalAdmins: 'کل مدیران',
     },
 
-    // Product form
     productForm: {
       createTitle: 'ایجاد محصول',
       editTitle: 'ویرایش محصول',
@@ -327,6 +409,7 @@ export const fa = {
       slugPlaceholder: 'به‌صورت خودکار از نام تولید می‌شود',
       image: 'آدرس تصویر',
       githubUrl: 'آدرس GitHub',
+      landingPageUrl: 'آدرس صفحه محصول',
       isActive: 'فعال',
       saveSuccess: 'محصول ذخیره شد',
       saveFailed: 'ذخیره محصول ناموفق بود',
@@ -334,7 +417,6 @@ export const fa = {
       deleteFailed: 'حذف محصول ناموفق بود',
     },
 
-    // Service form
     serviceForm: {
       createTitle: 'ایجاد خدمت',
       editTitle: 'ویرایش خدمت',
@@ -343,6 +425,7 @@ export const fa = {
       description: 'توضیحات',
       price: 'قیمت (ساعتی)',
       category: 'دسته‌بندی',
+      serviceType: 'نوع خدمت',
       features: 'ویژگی‌ها (هر خط یک ویژگی)',
       slugPlaceholder: 'به‌صورت خودکار از نام تولید می‌شود',
       image: 'آدرس تصویر',
@@ -353,10 +436,9 @@ export const fa = {
       deleteFailed: 'حذف خدمت ناموفق بود',
     },
 
-    // Opportunity form
     opportunityForm: {
-      createTitle: 'ایجاد فرصت',
-      editTitle: 'ویرایش فرصت',
+      createTitle: 'ایجاد فرصت شغلی',
+      editTitle: 'ویرایش فرصت شغلی',
       title: 'عنوان',
       slug: 'اسلاگ',
       description: 'توضیحات',
@@ -368,7 +450,7 @@ export const fa = {
       type: 'نوع',
       typePlaceholder: 'دورکاری',
       slugPlaceholder: 'به‌صورت خودکار از عنوان تولید می‌شود',
-      opportunityType: 'نوع فرصت',
+      opportunityType: 'نوع موقعیت',
       isOpen: 'باز برای ثبت‌نام',
       saveSuccess: 'فرصت ذخیره شد',
       saveFailed: 'ذخیره فرصت ناموفق بود',
@@ -376,7 +458,36 @@ export const fa = {
       deleteFailed: 'حذف فرصت ناموفق بود',
     },
 
-    // Applications
+    roleForm: {
+      createTitle: 'ایجاد نقش',
+      editTitle: 'ویرایش نقش',
+      name: 'نام نقش',
+      namePlaceholder: 'مثلاً مدیر محتوا',
+      permissions: 'دسترسی‌ها',
+      saveSuccess: 'نقش ذخیره شد',
+      saveFailed: 'ذخیره نقش ناموفق بود',
+      deleteSuccess: 'نقش حذف شد',
+      deleteFailed: 'حذف نقش ناموفق بود',
+      cannotDeleteWithUsers: 'نقشی که کاربر دارد قابل حذف نیست',
+      usersAssigned: 'کاربر تخصیص داده شده',
+    },
+
+    adminForm: {
+      createTitle: 'ایجاد مدیر',
+      email: 'ایمیل',
+      emailPlaceholder: 'admin@civitechglobal.com',
+      firstName: 'نام',
+      lastName: 'نام خانوادگی',
+      role: 'تخصیص نقش',
+      selectRole: 'انتخاب نقش',
+      generatedCredentials: 'اطلاعات ورود ساخته شده',
+      username: 'نام کاربری',
+      password: 'رمز عبور',
+      copyWarning: 'لطفاً رمز عبور را اکنون کپی کنید. مجدداً نمایش داده نخواهد شد.',
+      createSuccess: 'مدیر با موفقیت ایجاد شد',
+      createFailed: 'ایجاد مدیر ناموفق بود',
+    },
+
     applicationStatus: {
       PENDING: 'در انتظار',
       REVIEWING: 'در حال بررسی',
@@ -395,7 +506,6 @@ export const fa = {
     cancelOrder: 'لغو سفارش',
     markAs: 'تغییر به',
 
-    // Users
     userManagement: {
       title: 'مدیریت کاربران',
       name: 'نام',
@@ -411,7 +521,6 @@ export const fa = {
       },
     },
 
-    // Permissions
     permissions: {
       title: 'دسترسی‌ها',
       description: 'مدیریت ماژول‌هایی که هر ادمین می‌تواند به آن‌ها دسترسی داشته باشد.',
@@ -419,7 +528,6 @@ export const fa = {
       saveFailed: 'ذخیره دسترسی‌ها ناموفق بود',
     },
 
-    // Content
     contentManagement: {
       title: 'مدیریت محتوا',
       key: 'کلید',
@@ -431,6 +539,29 @@ export const fa = {
       aboutMission: 'درباره - مأموریت',
       aboutVision: 'درباره - چشم‌انداز',
       aboutDescription: 'درباره - توضیحات',
+    },
+
+    demoData: {
+      title: 'داده‌های نمایشی',
+      description: 'مدیریت داده‌های نمایشی برای تست و نمایش. داده‌های نمونه را بارگذاری یا حذف کنید.',
+      seed: 'بارگذاری داده‌های نمایشی',
+      clear: 'حذف داده‌های نمایشی',
+      seeding: 'در حال بارگذاری...',
+      clearing: 'در حال حذف...',
+      seedSuccess: 'داده‌های نمایشی با موفقیت بارگذاری شدند',
+      seedFailed: 'بارگذاری داده‌های نمایشی ناموفق بود',
+      clearSuccess: 'داده‌های نمایشی با موفقیت حذف شدند',
+      clearFailed: 'حذف داده‌های نمایشی ناموفق بود',
+      clearConfirm: 'آیا مطمئنید که می‌خواهید تمام داده‌های نمایشی را حذف کنید؟ این عمل قابل بازگشت نیست.',
+      status: 'وضعیت داده‌های نمایشی',
+      demoUsers: 'کاربران نمایشی',
+      demoProducts: 'محصولات نمایشی',
+      demoOrders: 'سفارش‌های نمایشی',
+      demoTickets: 'تیکت‌های نمایشی',
+      demoOpportunities: 'فرصت‌های شغلی نمایشی',
+      demoServices: 'خدمات نمایشی',
+      noData: 'هیچ داده نمایشی بارگذاری نشده است.',
+      hasData: 'داده‌های نمایشی در حال حاضر بارگذاری شده‌اند.',
     },
 
     addNew: 'افزودن جدید',
@@ -456,12 +587,14 @@ export const fa = {
     legal: 'حقوقی',
     products: 'محصولات',
     services: 'خدمات',
-    opportunities: 'فرصت‌ها',
+    careers: 'فرصت‌های شغلی',
     aboutUs: 'درباره ما',
-    support: 'پشتیبانی',
+    contact: 'تماس با ما',
     privacy: 'حریم خصوصی',
     terms: 'شرایط استفاده',
     copyright: 'تمامی حقوق محفوظ است.',
     description: 'توانمندسازی جوامع از طریق راهکارهای نوآورانه فناوری مدنی.',
+    opportunities: 'فرصت‌های شغلی',
+    support: 'تماس با ما',
   },
 } as const;

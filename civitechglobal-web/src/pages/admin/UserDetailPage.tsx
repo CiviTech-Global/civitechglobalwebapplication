@@ -79,28 +79,28 @@ export default function AdminUserDetail() {
 
       <Card className="mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-            <span className="text-xl font-bold text-primary-700 dark:text-primary-400">{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</span>
+          <div className="w-16 h-16 bg-primary-900/30 rounded-full flex items-center justify-center">
+            <span className="text-xl font-bold text-primary-400">{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-dark-900 dark:text-white">{user.firstName} {user.lastName}</h1>
+            <h1 className="text-xl font-bold text-white">{user.firstName} {user.lastName}</h1>
             <p className="text-dark-500">{user.email}</p>
             <Badge variant={roleVariant[user.role]}>{t.admin.userManagement.roles[user.role as keyof typeof t.admin.userManagement.roles]}</Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div><p className="text-dark-500">{t.admin.userManagement.joinDate}</p><p className="text-dark-900 dark:text-white">{formatDate(user.createdAt)}</p></div>
-          <div><p className="text-dark-500">{t.admin.orders}</p><p className="text-dark-900 dark:text-white">{user._count?.orders || 0}</p></div>
-          <div><p className="text-dark-500">{t.admin.tickets}</p><p className="text-dark-900 dark:text-white">{user._count?.tickets || 0}</p></div>
-          <div><p className="text-dark-500">{t.admin.applications}</p><p className="text-dark-900 dark:text-white">{user._count?.opportunityApplications || 0}</p></div>
+          <div><p className="text-dark-500">{t.admin.userManagement.joinDate}</p><p className="text-white">{formatDate(user.createdAt)}</p></div>
+          <div><p className="text-dark-500">{t.admin.orders}</p><p className="text-white">{user._count?.orders || 0}</p></div>
+          <div><p className="text-dark-500">{t.admin.tickets}</p><p className="text-white">{user._count?.tickets || 0}</p></div>
+          <div><p className="text-dark-500">{t.admin.applications}</p><p className="text-white">{user._count?.opportunityApplications || 0}</p></div>
         </div>
       </Card>
 
       {isSuperAdmin && user.role === 'ADMIN' && (
         <Card className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-dark-900 dark:text-white">
+            <h2 className="font-semibold text-white">
               {t.admin.permissions?.title || 'Permissions'}
             </h2>
             {permsDirty && (
@@ -122,8 +122,8 @@ export default function AdminUserDetail() {
                   key={perm.key}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                     checked
-                      ? 'border-primary-300 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-700'
-                      : 'border-dark-200 dark:border-dark-700 hover:bg-dark-50 dark:hover:bg-dark-800'
+                      ? 'border-primary-700 bg-primary-900/20'
+                      : 'border-dark-700 hover:bg-dark-800'
                   }`}
                 >
                   <input
@@ -137,7 +137,7 @@ export default function AdminUserDetail() {
                       setLocalPerms(next);
                     }}
                   />
-                  <span className="text-sm text-dark-700 dark:text-dark-300">
+                  <span className="text-sm text-dark-300">
                     {locale === 'fa' ? perm.labelFa : perm.labelEn}
                   </span>
                 </label>
@@ -149,7 +149,7 @@ export default function AdminUserDetail() {
 
       {isSuperAdmin && user.id !== currentUser?.id && (
         <Card>
-          <h2 className="font-semibold text-dark-900 dark:text-white mb-4">{t.admin.userManagement.title}</h2>
+          <h2 className="font-semibold text-white mb-4">{t.admin.userManagement.title}</h2>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-sm text-dark-500 me-2">{t.admin.userManagement.changeRole}:</span>
             {['USER', 'ADMIN', 'SUPER_ADMIN'].map((role) => (

@@ -37,9 +37,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const icons = { success: CheckCircle, error: AlertCircle, info: Info };
   const colors = {
-    success: 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400',
-    error: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400',
-    info: 'bg-primary-50 border-primary-200 text-primary-800 dark:bg-primary-900/20 dark:border-primary-800 dark:text-primary-400',
+    success: 'bg-green-900/20 border-green-800 text-green-400',
+    error: 'bg-red-900/20 border-red-800 text-red-400',
+    info: 'bg-ocean-900/20 border-ocean-800 text-ocean-400',
   };
 
   return (
@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (
-            <div key={t.id} className={cn('flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg min-w-[300px] animate-[slideIn_0.3s_ease]', colors[t.type])}>
+            <div key={t.id} className={cn('flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg min-w-[300px] backdrop-blur-sm animate-[slideIn_0.3s_ease]', colors[t.type])}>
               <Icon className="w-5 h-5 shrink-0" />
               <p className="text-sm flex-1">{t.message}</p>
               <button onClick={() => removeToast(t.id)} className="shrink-0 hover:opacity-70">

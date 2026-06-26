@@ -21,7 +21,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       <Button variant="outline" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
         <PrevIcon className="w-4 h-4" />
       </Button>
-      <span className="text-sm text-dark-600 dark:text-dark-400 px-3">
+      <span className="text-sm text-dark-400 px-3">
         {t.page} {page} {t.of} {totalPages}
       </span>
       <Button variant="outline" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>

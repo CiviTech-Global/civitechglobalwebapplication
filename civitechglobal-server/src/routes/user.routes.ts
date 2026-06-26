@@ -4,7 +4,7 @@ import { authenticate } from '../middleware/authenticate.js';
 import { authorize } from '../middleware/authorize.js';
 import { requirePermission } from '../middleware/requirePermission.js';
 import { validate } from '../middleware/validate.js';
-import { updateProfileSchema, updateRoleSchema } from '../validators/user.schema.js';
+import { updateProfileSchema, updateRoleSchema, createAdminSchema } from '../validators/user.schema.js';
 
 const router = Router();
 
@@ -15,5 +15,7 @@ router.put('/:id', authenticate, requirePermission('users'), validate(updateProf
 router.put('/:id/role', authenticate, authorize('SUPER_ADMIN'), validate(updateRoleSchema), userController.updateRole);
 router.put('/:id/permissions', authenticate, authorize('SUPER_ADMIN'), userController.updatePermissions);
 router.delete('/:id', authenticate, authorize('SUPER_ADMIN'), userController.deleteUser);
+router.post('/admin', authenticate, authorize('SUPER_ADMIN'), validate(createAdminSchema), userController.createAdmin);
+router.put('/:id/admin-role', authenticate, authorize('SUPER_ADMIN'), userController.assignAdminRole);
 
 export default router;

@@ -54,13 +54,13 @@ export default function ContentPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.admin.contentManagement.title}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.contentManagement.title}</h1>
 
       <div className="space-y-6 max-w-3xl">
         {contentKeys.map(({ key, label }) => (
           <Card key={key}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-dark-900 dark:text-white">{label}</h3>
+              <h3 className="font-medium text-white">{label}</h3>
               <Button size="sm" className="gap-1" onClick={() => saveMut.mutate(key)} isLoading={saveMut.isPending}>
                 <Save className="w-3 h-3" /> {t.save}
               </Button>

@@ -79,7 +79,7 @@ export default function AdminPermissions() {
     <div>
       <div className="flex items-center gap-2 mb-6">
         <ShieldCheck className="w-6 h-6 text-primary-600" />
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-white">
           {t.admin.permissions?.title || 'Permissions'}
         </h1>
       </div>
@@ -94,7 +94,7 @@ export default function AdminPermissions() {
             <Card key={admin.id}>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-dark-900 dark:text-white">
+                  <h2 className="font-semibold text-white">
                     {admin.firstName} {admin.lastName}
                   </h2>
                   <p className="text-sm text-dark-500">{admin.email}</p>
@@ -119,8 +119,8 @@ export default function AdminPermissions() {
                       key={perm.key}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                         checked
-                          ? 'border-primary-300 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-700'
-                          : 'border-dark-200 dark:border-dark-700 hover:bg-dark-50 dark:hover:bg-dark-800'
+                          ? 'border-primary-700 bg-primary-900/20'
+                          : 'border-dark-700 hover:bg-dark-800'
                       }`}
                     >
                       <input
@@ -129,7 +129,7 @@ export default function AdminPermissions() {
                         checked={checked}
                         onChange={() => togglePerm(admin.id, perm.key)}
                       />
-                      <span className="text-sm text-dark-700 dark:text-dark-300">
+                      <span className="text-sm text-dark-300">
                         {locale === 'fa' ? perm.labelFa : perm.labelEn}
                       </span>
                     </label>

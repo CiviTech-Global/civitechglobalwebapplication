@@ -47,19 +47,33 @@ enum OpportunityType {
   INTERNSHIP
 }
 
+model AdminRole {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  permissions String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@map("admin_roles")
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String?  @unique
+  password    String
+  firstName   String
+  lastName    String
   role        Role     @default(USER)
   permissions String[] @default([])
   avatar      String?
   phone       String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  adminRoleId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  adminRole              AdminRole? @relation(fields: [adminRoleId], references: [id], onDelete: SetNull)
   orders                 Order[]
   tickets                Ticket[]
   ticketMessages         TicketMessage[]
@@ -77,8 +91,9 @@ model Product {
   image       String?
   category    String?
   features    String[]
-  githubUrl   String?
-  isActive    Boolean  @default(true)
+  githubUrl      String?
+  landingPageUrl String?
+  isActive       Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -95,6 +110,7 @@ model Service {
   price       Float?
   image       String?
   category    String?
+  serviceType String?  @default("CUSTOM")
   features    String[]
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

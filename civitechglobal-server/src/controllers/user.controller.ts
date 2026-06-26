@@ -44,3 +44,17 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
     successResponse(res, null, 'User deleted');
   } catch (error) { next(error); }
 }
+
+export async function createAdmin(req: Request, res: Response, next: NextFunction) {
+  try {
+    const admin = await userService.createAdmin(req.body);
+    successResponse(res, admin, 'Admin created', 201);
+  } catch (error) { next(error); }
+}
+
+export async function assignAdminRole(req: Request, res: Response, next: NextFunction) {
+  try {
+    const user = await userService.assignAdminRole(req.params.id as string, req.body.adminRoleId);
+    successResponse(res, user, 'Admin role assigned');
+  } catch (error) { next(error); }
+}

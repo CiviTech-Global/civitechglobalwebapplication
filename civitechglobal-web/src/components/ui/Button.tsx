@@ -9,10 +9,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600',
-  secondary: 'bg-dark-100 text-dark-900 hover:bg-dark-200 dark:bg-dark-800 dark:text-dark-100 dark:hover:bg-dark-700',
-  outline: 'border border-dark-300 text-dark-700 hover:bg-dark-50 dark:border-dark-600 dark:text-dark-300 dark:hover:bg-dark-800',
-  ghost: 'text-dark-600 hover:bg-dark-100 dark:text-dark-400 dark:hover:bg-dark-800',
+  primary: 'bg-gradient-to-r from-ocean-600 to-purple-600 text-white hover:from-ocean-500 hover:to-purple-500 shadow-[0_0_15px_rgba(0,128,230,0.2)]',
+  secondary: 'bg-dark-700 text-dark-100 hover:bg-dark-600',
+  outline: 'border border-dark-600 text-dark-200 hover:bg-dark-800 hover:border-dark-500',
+  ghost: 'text-dark-300 hover:bg-dark-800 hover:text-dark-100',
   danger: 'bg-red-600 text-white hover:bg-red-700',
 };
 
@@ -26,7 +26,7 @@ export function Button({ variant = 'primary', size = 'md', isLoading, className,
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ocean-500/50 disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         className

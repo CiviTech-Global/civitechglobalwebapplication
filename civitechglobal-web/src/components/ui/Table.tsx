@@ -21,27 +21,27 @@ export function Table<T extends Record<string, any>>({ columns, data, keyField =
   const { t } = useLocale();
 
   return (
-    <div className={cn('overflow-x-auto rounded-lg border border-dark-200 dark:border-dark-700', className)}>
+    <div className={cn('overflow-x-auto rounded-lg border border-dark-700', className)}>
       <table className="w-full text-sm">
-        <thead className="bg-dark-50 dark:bg-dark-800/50">
+        <thead className="bg-dark-800/50">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} className={cn('px-4 py-3 text-start font-medium text-dark-600 dark:text-dark-400', col.className)}>
+              <th key={col.key} className={cn('px-4 py-3 text-start font-medium text-dark-400', col.className)}>
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-dark-200 dark:divide-dark-700">
+        <tbody className="divide-y divide-dark-700">
           {data.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-4 py-8 text-center text-dark-500">{emptyMessage || t.noData}</td>
             </tr>
           ) : (
             data.map((item) => (
-              <tr key={String(item[keyField])} className="hover:bg-dark-50 dark:hover:bg-dark-800/30 transition-colors">
+              <tr key={String(item[keyField])} className="hover:bg-dark-800/30 transition-colors">
                 {columns.map((col) => (
-                  <td key={col.key} className={cn('px-4 py-3 text-dark-700 dark:text-dark-300', col.className)}>
+                  <td key={col.key} className={cn('px-4 py-3 text-dark-300', col.className)}>
                     {col.render ? col.render(item) : String(item[col.key] ?? '')}
                   </td>
                 ))}

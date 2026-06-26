@@ -5,15 +5,27 @@ export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type ApplicationStatus = 'PENDING' | 'REVIEWING' | 'ACCEPTED' | 'REJECTED';
 export type OpportunityType = 'JOB' | 'INTERNSHIP';
 
+export interface AdminRole {
+  id: string;
+  name: string;
+  permissions: string[];
+  createdAt: string;
+  updatedAt: string;
+  _count?: { users: number };
+}
+
 export interface User {
   id: string;
   email: string;
+  username?: string;
   firstName: string;
   lastName: string;
   role: Role;
   permissions?: string[];
   avatar?: string;
   phone?: string;
+  adminRoleId?: string;
+  adminRole?: AdminRole;
   createdAt: string;
 }
 
@@ -27,6 +39,7 @@ export interface Product {
   category?: string;
   features: string[];
   githubUrl?: string;
+  landingPageUrl?: string;
   isActive: boolean;
   createdAt: string;
 }
@@ -39,6 +52,7 @@ export interface Service {
   price?: number;
   image?: string;
   category?: string;
+  serviceType?: string;
   features: string[];
   isActive: boolean;
   createdAt: string;
@@ -144,6 +158,8 @@ export interface DashboardStats {
     pendingApplications: number;
     openTickets: number;
     totalRevenue: number;
+    totalRoles?: number;
+    totalAdmins?: number;
   };
   recentOrders: Order[];
   recentTickets: Ticket[];

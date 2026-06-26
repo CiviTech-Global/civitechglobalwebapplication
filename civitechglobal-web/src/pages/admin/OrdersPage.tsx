@@ -39,7 +39,7 @@ export default function AdminOrders() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.admin.orders}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.orders}</h1>
       <Table columns={columns} data={(data?.data || []) as any} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

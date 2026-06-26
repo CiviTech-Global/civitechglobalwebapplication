@@ -65,7 +65,7 @@ export default function OpportunityFormPage() {
       <Link to="/admin/opportunities" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 mb-6">
         <BackArrow className="w-4 h-4" /> {t.opportunities.backToOpportunities}
       </Link>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{isEdit ? t.admin.opportunityForm.editTitle : t.admin.opportunityForm.createTitle}</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">{isEdit ? t.admin.opportunityForm.editTitle : t.admin.opportunityForm.createTitle}</h1>
 
       <Card className="max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,11 +80,11 @@ export default function OpportunityFormPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input label={t.admin.opportunityForm.type} value={form.type} onChange={update('type')} placeholder={t.admin.opportunityForm.typePlaceholder} />
             <div>
-              <label className="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-1">{t.admin.opportunityForm.opportunityType}</label>
+              <label className="block text-sm font-medium text-dark-300 mb-1">{t.admin.opportunityForm.opportunityType}</label>
               <select
                 value={form.opportunityType}
                 onChange={update('opportunityType')}
-                className="w-full px-3 py-2 rounded-lg border border-dark-300 dark:border-dark-600 bg-white dark:bg-dark-800 text-dark-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                className="w-full px-3 py-2 rounded-lg border border-dark-600 bg-dark-800 text-white focus:ring-2 focus:ring-primary-500"
               >
                 <option value="INTERNSHIP">{t.opportunities.internship}</option>
                 <option value="JOB">{t.opportunities.job}</option>
@@ -93,7 +93,7 @@ export default function OpportunityFormPage() {
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.isOpen} onChange={(e) => setForm((p) => ({ ...p, isOpen: e.target.checked }))} className="rounded" />
-            <span className="text-dark-700 dark:text-dark-300">{t.admin.opportunityForm.isOpen}</span>
+            <span className="text-dark-300">{t.admin.opportunityForm.isOpen}</span>
           </label>
           <div className="flex gap-3">
             <Button type="submit" isLoading={loading}>{isEdit ? t.edit : t.create}</Button>

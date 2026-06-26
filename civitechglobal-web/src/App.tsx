@@ -15,12 +15,11 @@ import ProductsPage from './pages/public/ProductsPage';
 import ProductDetailPage from './pages/public/ProductDetailPage';
 import ServicesPage from './pages/public/ServicesPage';
 import ServiceDetailPage from './pages/public/ServiceDetailPage';
-import OpportunitiesPage from './pages/public/OpportunitiesPage';
+import CareersPage from './pages/public/CareersPage';
 import OpportunityDetailPage from './pages/public/OpportunityDetailPage';
 import AboutPage from './pages/public/AboutPage';
-import SupportPage from './pages/public/SupportPage';
+import ContactPage from './pages/public/ContactPage';
 import LoginPage from './pages/public/LoginPage';
-import RegisterPage from './pages/public/RegisterPage';
 import NotFoundPage from './pages/public/NotFoundPage';
 
 // User Dashboard Pages
@@ -49,6 +48,11 @@ import AdminUsers from './pages/admin/UsersPage';
 import AdminUserDetail from './pages/admin/UserDetailPage';
 import AdminContent from './pages/admin/ContentPage';
 import AdminPermissions from './pages/admin/PermissionsPage';
+import AdminRoles from './pages/admin/RolesPage';
+import AdminRoleForm from './pages/admin/RoleFormPage';
+import AdminAdmins from './pages/admin/AdminsPage';
+import AdminAdminForm from './pages/admin/AdminFormPage';
+import AdminDemoData from './pages/admin/DemoDataPage';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -70,12 +74,15 @@ function App() {
                     <Route path="products/:slug" element={<ProductDetailPage />} />
                     <Route path="services" element={<ServicesPage />} />
                     <Route path="services/:slug" element={<ServiceDetailPage />} />
-                    <Route path="opportunities" element={<OpportunitiesPage />} />
-                    <Route path="opportunities/:slug" element={<OpportunityDetailPage />} />
+                    <Route path="careers" element={<CareersPage />} />
+                    <Route path="careers/:slug" element={<OpportunityDetailPage />} />
                     <Route path="about" element={<AboutPage />} />
-                    <Route path="support" element={<SupportPage />} />
+                    <Route path="contact" element={<ContactPage />} />
                     <Route path="login" element={<LoginPage />} />
-                    <Route path="register" element={<RegisterPage />} />
+                    {/* Legacy redirects */}
+                    <Route path="opportunities" element={<CareersPage />} />
+                    <Route path="opportunities/:slug" element={<OpportunityDetailPage />} />
+                    <Route path="support" element={<ContactPage />} />
                   </Route>
 
                   {/* User Dashboard Routes */}
@@ -110,6 +117,12 @@ function App() {
                     <Route path="users/:id" element={<AdminUserDetail />} />
                     <Route path="content" element={<AdminContent />} />
                     <Route path="permissions" element={<AdminPermissions />} />
+                    <Route path="roles" element={<AdminRoles />} />
+                    <Route path="roles/new" element={<AdminRoleForm />} />
+                    <Route path="roles/:id/edit" element={<AdminRoleForm />} />
+                    <Route path="admins" element={<AdminAdmins />} />
+                    <Route path="admins/new" element={<AdminAdminForm />} />
+                    <Route path="demo-data" element={<AdminDemoData />} />
                   </Route>
 
                   {/* 404 */}

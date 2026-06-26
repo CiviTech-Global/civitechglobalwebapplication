@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import { env } from './config/env.js';
 import { corsOptions } from './config/cors.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { bootstrapSuperAdmin } from './config/bootstrap.js';
 import routes from './routes/index.js';
 
 const app = express();
@@ -29,8 +30,15 @@ app.use('/api', routes);
 // Error handling
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
-  console.log(`Server running on port ${env.PORT}`);
-});
+bootstrapSuperAdmin()
+  .then(() => {
+    app.listen(env.PORT, () => {
+      console.log(`Server running on port ${env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to bootstrap Super Admin:', err);
+    process.exit(1);
+  });
 
 export default app;
