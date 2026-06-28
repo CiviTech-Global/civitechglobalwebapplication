@@ -42,6 +42,8 @@ import AdminOpportunityForm from './pages/admin/OpportunityFormPage';
 import AdminApplications from './pages/admin/ApplicationsPage';
 import AdminOrders from './pages/admin/OrdersPage';
 import AdminOrderDetail from './pages/admin/OrderDetailPage';
+import AdminLeads from './pages/admin/LeadsPage';
+import AdminLeadDetail from './pages/admin/LeadDetailPage';
 import AdminTickets from './pages/admin/TicketsPage';
 import AdminTicketDetail from './pages/admin/TicketDetailPage';
 import AdminUsers from './pages/admin/UsersPage';
@@ -111,6 +113,8 @@ function App() {
                     <Route path="opportunities/applications" element={<AdminApplications />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="orders/:id" element={<AdminOrderDetail />} />
+                    <Route path="leads" element={<AdminLeads />} />
+                    <Route path="leads/:id" element={<AdminLeadDetail />} />
                     <Route path="tickets" element={<AdminTickets />} />
                     <Route path="tickets/:id" element={<AdminTicketDetail />} />
                     <Route path="users" element={<AdminUsers />} />

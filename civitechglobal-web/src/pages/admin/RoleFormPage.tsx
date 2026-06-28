@@ -74,11 +74,11 @@ export default function RoleFormPage() {
 
   return (
     <div className="max-w-2xl">
-      <button onClick={() => navigate('/admin/roles')} className="flex items-center gap-1 text-sm text-dark-500 hover:text-dark-300 mb-4">
+      <button onClick={() => navigate('/admin/roles')} className="flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary mb-4">
         <ArrowLeft className="w-4 h-4" /> {t.back}
       </button>
 
-      <h1 className="text-2xl font-bold text-white mb-6">
+      <h1 className="text-2xl font-bold text-text-primary mb-6">
         {isEdit ? t.admin.roleForm.editTitle : t.admin.roleForm.createTitle}
       </h1>
 
@@ -93,13 +93,13 @@ export default function RoleFormPage() {
 
         <div>
           <div className="flex items-center justify-between mb-3">
-            <label className="block text-sm font-medium text-dark-300">
+            <label className="block text-sm font-medium text-text-secondary">
               {t.admin.roleForm.permissions}
             </label>
             <button
               type="button"
               onClick={toggleAll}
-              className="text-xs text-ocean-400 hover:text-ocean-300"
+              className="text-xs text-brand-green-500 hover:text-brand-green-400"
             >
               {permissions.length === ALL_PERMISSIONS.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -110,8 +110,8 @@ export default function RoleFormPage() {
                 key={perm}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                   permissions.includes(perm)
-                    ? 'border-ocean-500/50 bg-ocean-900/20 text-ocean-300'
-                    : 'border-dark-700 bg-dark-800/50 text-dark-400 hover:border-dark-600'
+                    ? 'border-brand-green-500/50 bg-brand-green-50 text-brand-green-500'
+                    : 'border-border-default bg-surface-200/80 text-text-muted hover:border-border-strong'
                 }`}
               >
                 <input
@@ -121,7 +121,7 @@ export default function RoleFormPage() {
                   className="sr-only"
                 />
                 <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                  permissions.includes(perm) ? 'bg-ocean-600 border-ocean-500' : 'border-dark-600'
+                  permissions.includes(perm) ? 'bg-brand-green-600 border-brand-green-500' : 'border-border-strong'
                 }`}>
                   {permissions.includes(perm) && (
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

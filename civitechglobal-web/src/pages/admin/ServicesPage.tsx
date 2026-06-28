@@ -39,7 +39,7 @@ export default function AdminServices() {
     { key: 'isActive', header: t.status, render: (s: Service) => <Badge variant={s.isActive ? 'success' : 'default'}>{s.isActive ? t.admin.active : t.admin.inactive}</Badge> },
     { key: 'actions', header: '', className: 'w-24', render: (s: Service) => (
       <div className="flex items-center gap-2">
-        <Link to={`/admin/services/${s.id}/edit`} className="text-primary-600 hover:text-primary-700"><Edit className="w-4 h-4" /></Link>
+        <Link to={`/admin/services/${s.id}/edit`} className="text-brand-green-600 hover:text-brand-green-700"><Edit className="w-4 h-4" /></Link>
         <button onClick={() => { if (confirm(t.confirmDelete)) deleteMut.mutate(s.id); }} className="text-red-600 hover:text-red-700"><Trash2 className="w-4 h-4" /></button>
       </div>
     )},
@@ -48,7 +48,7 @@ export default function AdminServices() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t.admin.services}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{t.admin.services}</h1>
         <Link to="/admin/services/new"><Button className="gap-2"><Plus className="w-4 h-4" /> {t.admin.addNew}</Button></Link>
       </div>
       <Table columns={columns} data={(data?.data || []) as any} />

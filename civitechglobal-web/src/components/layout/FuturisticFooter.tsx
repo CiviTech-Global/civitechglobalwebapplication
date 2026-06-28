@@ -63,17 +63,17 @@ export function FuturisticFooter() {
   ];
 
   return (
-    <footer className="relative border-t border-dark-800">
+    <footer className="relative border-t border-border-default bg-surface-50/60 backdrop-blur-sm">
       <div className="neon-line" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <img src={logoSrc} alt={t.brand} className="w-9 h-9 object-contain" />
-              <span className="font-bold text-white block leading-tight">{t.brand}</span>
+              <img src={logoSrc} alt={t.brand} className="w-9 h-9 object-contain invert dark:invert-0" />
+              <span className="font-bold text-text-primary block leading-tight">{t.brand}</span>
             </div>
-            <p className="text-sm text-dark-400 mb-6 leading-relaxed">
+            <p className="text-sm text-text-secondary mb-6 leading-relaxed">
               {t.footer.description}
             </p>
             <div className="flex gap-2">
@@ -83,7 +83,7 @@ export function FuturisticFooter() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 flex items-center justify-center rounded-lg bg-dark-800 border border-dark-700/50 text-dark-400 hover:text-ocean-400 hover:border-ocean-500/40 transition-all duration-300"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-100 border border-border-default text-text-muted hover:text-brand-green-600 hover:border-brand-green-400/40 transition-all duration-300"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -93,11 +93,11 @@ export function FuturisticFooter() {
 
           {columns.map((col) => (
             <div key={col.title}>
-              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">{col.title}</h4>
+              <h4 className="font-semibold text-text-primary mb-4 text-sm uppercase tracking-wider">{col.title}</h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.to} className="text-sm text-dark-400 hover:text-ocean-400 transition-colors">
+                    <Link to={link.to} className="text-sm text-text-secondary hover:text-brand-green-600 transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -110,10 +110,10 @@ export function FuturisticFooter() {
         <div className="neon-line mt-12 mb-6" />
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-dark-500">
+          <p className="text-xs text-text-muted">
             &copy; {new Date().getFullYear()} {t.brand}. {t.footer.copyright}
           </p>
-          <p className="text-xs text-dark-600">
+          <p className="text-xs text-text-muted/70">
             CiviTech Global | رایان تمدن جهان گستر
           </p>
         </div>

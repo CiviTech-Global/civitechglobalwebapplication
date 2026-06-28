@@ -33,7 +33,7 @@ export default function AdminsPage() {
       render: (u: User) => (
         <div>
           <span className="font-medium">{u.firstName} {u.lastName}</span>
-          {u.username && <span className="block text-xs text-dark-500">@{u.username}</span>}
+          {u.username && <span className="block text-xs text-text-muted">@{u.username}</span>}
         </div>
       ),
     },
@@ -52,7 +52,7 @@ export default function AdminsPage() {
       header: t.admin.roles,
       render: (u: User) => u.adminRole ? (
         <span className="flex items-center gap-1 text-sm">
-          <Shield className="w-3 h-3 text-purple-400" /> {u.adminRole.name}
+          <Shield className="w-3 h-3 text-brand-amber-500" /> {u.adminRole.name}
         </span>
       ) : '-',
     },
@@ -66,7 +66,7 @@ export default function AdminsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t.admin.admins}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{t.admin.admins}</h1>
         <Link to="/admin/admins/new">
           <Button className="gap-2"><Plus className="w-4 h-4" /> {t.admin.addNew}</Button>
         </Link>

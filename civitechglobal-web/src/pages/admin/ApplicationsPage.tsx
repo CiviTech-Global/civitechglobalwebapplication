@@ -66,10 +66,10 @@ export default function ApplicationsPage() {
 
   return (
     <div>
-      <Link to="/admin/opportunities" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 mb-6">
+      <Link to="/admin/opportunities" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-600 mb-6">
         <BackArrow className="w-4 h-4" /> {t.opportunities.backToOpportunities}
       </Link>
-      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.applications}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.admin.applications}</h1>
       <Table columns={columns} data={(data?.data || []) as any} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

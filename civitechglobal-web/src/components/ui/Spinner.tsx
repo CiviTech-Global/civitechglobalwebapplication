@@ -6,12 +6,16 @@ interface SpinnerProps {
   className?: string;
 }
 
-const sizes = { sm: 'w-4 h-4', md: 'w-8 h-8', lg: 'w-12 h-12' };
+const sizes = {
+  sm: 'w-4 h-4',
+  md: 'w-6 h-6',
+  lg: 'w-10 h-10',
+};
 
 export function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
-    <div className="flex items-center justify-center p-8">
-      <Loader2 className={cn('animate-spin text-ocean-500', sizes[size], className)} />
+    <div className={cn('flex items-center justify-center', className)}>
+      <Loader2 className={cn('animate-spin text-brand-green-500', sizes[size])} />
     </div>
   );
 }

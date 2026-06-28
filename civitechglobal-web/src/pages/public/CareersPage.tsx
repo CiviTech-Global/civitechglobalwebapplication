@@ -36,8 +36,8 @@ export default function CareersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <AnimatedSection className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.careers.title}</h1>
-        <p className="text-dark-400 max-w-2xl mx-auto">{t.careers.description}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{t.careers.title}</h1>
+        <p className="text-text-muted max-w-2xl mx-auto">{t.careers.description}</p>
       </AnimatedSection>
 
       <div className="flex justify-center gap-2 mb-8">
@@ -47,8 +47,8 @@ export default function CareersPage() {
             onClick={() => { setFilter(tab.key); setPage(1); }}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
               filter === tab.key
-                ? 'bg-gradient-to-r from-ocean-600 to-purple-600 text-white shadow-[0_0_15px_rgba(0,128,230,0.3)]'
-                : 'bg-dark-800 text-dark-300 hover:bg-dark-700 hover:text-white border border-dark-700'
+                ? 'bg-gradient-to-r from-brand-green-600 to-brand-amber-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                : 'bg-surface-200 text-text-secondary hover:bg-surface-300 hover:text-text-primary border border-border-default'
             }`}
           >
             {tab.label}
@@ -72,13 +72,13 @@ export default function CareersPage() {
                       </Badge>
                       {opportunity.isOpen && <Badge variant="default">{t.careers.open}</Badge>}
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{opportunity.title}</h3>
-                    <p className="text-sm text-dark-400 flex-1 line-clamp-2 mb-4">{opportunity.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-dark-500 mb-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-2">{opportunity.title}</h3>
+                    <p className="text-sm text-text-muted flex-1 line-clamp-2 mb-4">{opportunity.description}</p>
+                    <div className="flex items-center gap-4 text-sm text-text-muted mb-4">
                       <span className="flex items-center gap-1"><MapPin className="w-4 h-4" />{opportunity.location}</span>
                       <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{opportunity.duration}</span>
                     </div>
-                    <span className="text-sm text-ocean-400 flex items-center gap-1">
+                    <span className="text-sm text-brand-green-500 flex items-center gap-1">
                       {t.careers.viewDetails} <ArrowIcon className="w-4 h-4" />
                     </span>
                   </GlowCard>

@@ -41,16 +41,16 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand-green-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">CT</span>
             </div>
-            <span className="font-bold text-lg text-dark-900 dark:text-white">{t.brand}</span>
+            <span className="font-bold text-lg text-text-primary">{t.brand}</span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {publicLinks.map((link) => (
-              <Link key={link.to} to={link.to} className="px-3 py-2 text-sm text-dark-600 hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400 rounded-lg hover:bg-dark-50 dark:hover:bg-dark-800 transition-colors">
+              <Link key={link.to} to={link.to} className="px-3 py-2 text-sm text-text-secondary hover:text-brand-green-600 rounded-lg hover:bg-surface-200 transition-colors">
                 {link.label}
               </Link>
             ))}
@@ -59,48 +59,48 @@ export function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-2">
             {/* Language toggle */}
-            <button onClick={toggleLocale} className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-800 transition-colors flex items-center gap-1" title={locale === 'fa' ? 'English' : 'فارسی'}>
-              <Languages className="w-5 h-5 text-dark-500" />
-              <span className="text-xs text-dark-500 hidden sm:inline">{locale === 'fa' ? 'EN' : 'FA'}</span>
+            <button onClick={toggleLocale} className="p-2 rounded-lg hover:bg-surface-200 transition-colors flex items-center gap-1" title={locale === 'fa' ? 'English' : 'فارسی'}>
+              <Languages className="w-5 h-5 text-text-secondary" />
+              <span className="text-xs text-text-secondary hidden sm:inline">{locale === 'fa' ? 'EN' : 'FA'}</span>
             </button>
 
             {/* Theme toggle */}
-            <button onClick={toggle} className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-800 transition-colors">
-              {isDark ? <Sun className="w-5 h-5 text-dark-400" /> : <Moon className="w-5 h-5 text-dark-600" />}
+            <button onClick={toggle} className="p-2 rounded-lg hover:bg-surface-200 transition-colors">
+              {isDark ? <Sun className="w-5 h-5 text-text-muted" /> : <Moon className="w-5 h-5 text-text-secondary" />}
             </button>
 
             {isAuthenticated ? (
               <div className="relative hidden md:block">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-800 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-200 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary-700 dark:text-primary-400">
+                  <div className="w-8 h-8 bg-brand-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-brand-green-700">
                       {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                     </span>
                   </div>
-                  <span className="text-sm text-dark-700 dark:text-dark-300">{user?.firstName}</span>
-                  <ChevronDown className="w-4 h-4 text-dark-400" />
+                  <span className="text-sm text-text-primary">{user?.firstName}</span>
+                  <ChevronDown className="w-4 h-4 text-text-muted" />
                 </button>
 
                 {dropdownOpen && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-                    <div className={cn('absolute mt-1 w-48 py-1 bg-white dark:bg-dark-800 rounded-lg shadow-lg border border-dark-200 dark:border-dark-700 z-20', isRtl ? 'left-0' : 'right-0')}>
-                      <Link to="/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-700">
+                    <div className={cn('absolute mt-1 w-48 py-1 bg-surface-50 rounded-lg shadow-lg border border-border-default z-20', isRtl ? 'left-0' : 'right-0')}>
+                      <Link to="/dashboard" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-text-primary hover:bg-surface-200">
                         <LayoutDashboard className="w-4 h-4" /> {t.nav.dashboard}
                       </Link>
-                      <Link to="/dashboard/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-700">
+                      <Link to="/dashboard/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-text-primary hover:bg-surface-200">
                         <User className="w-4 h-4" /> {t.nav.profile}
                       </Link>
                       {isAdmin && (
-                        <Link to="/admin" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-dark-700 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-700">
+                        <Link to="/admin" onClick={() => setDropdownOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-text-primary hover:bg-surface-200">
                           <Shield className="w-4 h-4" /> {t.nav.adminPanel}
                         </Link>
                       )}
-                      <hr className="my-1 border-dark-200 dark:border-dark-700" />
-                      <button onClick={handleLogout} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                      <hr className="my-1 border-border-default" />
+                      <button onClick={handleLogout} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-brand-red-600 hover:bg-brand-red-50">
                         <LogOut className="w-4 h-4" /> {t.nav.logout}
                       </button>
                     </div>
@@ -115,33 +115,33 @@ export function Navbar() {
             )}
 
             {/* Mobile menu button */}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-800">
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg hover:bg-surface-200">
+              {mobileOpen ? <X className="w-5 h-5 text-text-primary" /> : <Menu className="w-5 h-5 text-text-primary" />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      <div className={cn('md:hidden border-t border-dark-200 dark:border-dark-700', mobileOpen ? 'block' : 'hidden')}>
+      <div className={cn('md:hidden border-t border-border-default bg-surface-50', mobileOpen ? 'block' : 'hidden')}>
         <div className="px-4 py-3 space-y-1">
           {publicLinks.map((link) => (
-            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-dark-600 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-800 rounded-lg">
+            <Link key={link.to} to={link.to} onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary rounded-lg">
               {link.label}
             </Link>
           ))}
-          <hr className="border-dark-200 dark:border-dark-700" />
+          <hr className="border-border-default" />
           {isAuthenticated ? (
             <>
-              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-dark-600 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-800 rounded-lg">
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary rounded-lg">
                 {t.nav.dashboard}
               </Link>
               {isAdmin && (
-                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-dark-600 dark:text-dark-300 hover:bg-dark-50 dark:hover:bg-dark-800 rounded-lg">
+                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary rounded-lg">
                   {t.nav.adminPanel}
                 </Link>
               )}
-              <button onClick={handleLogout} className="block w-full text-start px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg">
+              <button onClick={handleLogout} className="block w-full text-start px-3 py-2 text-sm text-brand-red-600 hover:bg-brand-red-50 rounded-lg">
                 {t.nav.logout}
               </button>
             </>

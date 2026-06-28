@@ -38,13 +38,13 @@ export default function AdminTickets() {
     { key: 'messages', header: t.tickets.messages, render: (tk: any) => tk._count?.messages || 0 },
     { key: 'createdAt', header: t.tickets.date, render: (tk: any) => formatDate(tk.createdAt) },
     { key: 'actions', header: '', render: (tk: any) => (
-      <Link to={`/admin/tickets/${tk.id}`} className="text-primary-600 hover:text-primary-700"><Eye className="w-4 h-4" /></Link>
+      <Link to={`/admin/tickets/${tk.id}`} className="text-brand-green-600 hover:text-brand-green-700"><Eye className="w-4 h-4" /></Link>
     )},
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.tickets}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.admin.tickets}</h1>
       <Table columns={columns} data={(data?.data || []) as any} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

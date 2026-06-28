@@ -38,14 +38,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="relative rounded-2xl border border-dark-700/50 bg-dark-800/60 backdrop-blur-xl p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)]">
+        <div className="relative rounded-2xl border border-border-default/50 bg-surface-200/90 backdrop-blur-xl p-8 shadow-[0_0_40px_rgba(0,0,0,0.3)]">
           {/* Glow border effect */}
-          <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-ocean-500/20 via-transparent to-purple-500/20 -z-10" />
+          <div className="absolute -inset-px rounded-2xl bg-gradient-to-b from-brand-green-500/20 via-transparent to-brand-amber-500/20 -z-10" />
 
           <div className="text-center mb-8">
-            <img src={logoSrc} alt={t.brand} className="w-16 h-16 object-contain mx-auto mb-4 drop-shadow-[0_0_15px_rgba(0,128,230,0.3)]" />
-            <h1 className="text-2xl font-bold text-white">{t.auth.welcomeBack}</h1>
-            <p className="text-sm text-dark-400 mt-1">{t.auth.signInTitle}</p>
+            <img src={logoSrc} alt={t.brand} className="w-16 h-16 object-contain mx-auto mb-4 invert dark:invert-0 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]" />
+            <h1 className="text-2xl font-bold text-text-primary">{t.auth.welcomeBack}</h1>
+            <p className="text-sm text-text-muted mt-1">{t.auth.signInTitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">

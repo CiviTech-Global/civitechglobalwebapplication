@@ -65,7 +65,7 @@ export default function AdminUserDetail() {
   });
 
   if (isLoading) return <Spinner size="lg" />;
-  if (!user) return <div className="text-center py-8 text-dark-500">{t.noData}</div>;
+  if (!user) return <div className="text-center py-8 text-text-muted">{t.noData}</div>;
 
   const BackArrow = isRtl ? ArrowRight : ArrowLeft;
   const effectivePerms = localPerms !== null ? localPerms : (user.permissions || []);
@@ -73,34 +73,34 @@ export default function AdminUserDetail() {
 
   return (
     <div>
-      <Link to="/admin/users" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 mb-6">
+      <Link to="/admin/users" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-600 mb-6">
         <BackArrow className="w-4 h-4" /> {t.admin.users}
       </Link>
 
       <Card className="mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-primary-900/30 rounded-full flex items-center justify-center">
-            <span className="text-xl font-bold text-primary-400">{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</span>
+          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center">
+            <span className="text-xl font-bold text-brand-green-400">{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">{user.firstName} {user.lastName}</h1>
-            <p className="text-dark-500">{user.email}</p>
+            <h1 className="text-xl font-bold text-text-primary">{user.firstName} {user.lastName}</h1>
+            <p className="text-text-muted">{user.email}</p>
             <Badge variant={roleVariant[user.role]}>{t.admin.userManagement.roles[user.role as keyof typeof t.admin.userManagement.roles]}</Badge>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div><p className="text-dark-500">{t.admin.userManagement.joinDate}</p><p className="text-white">{formatDate(user.createdAt)}</p></div>
-          <div><p className="text-dark-500">{t.admin.orders}</p><p className="text-white">{user._count?.orders || 0}</p></div>
-          <div><p className="text-dark-500">{t.admin.tickets}</p><p className="text-white">{user._count?.tickets || 0}</p></div>
-          <div><p className="text-dark-500">{t.admin.applications}</p><p className="text-white">{user._count?.opportunityApplications || 0}</p></div>
+          <div><p className="text-text-muted">{t.admin.userManagement.joinDate}</p><p className="text-text-primary">{formatDate(user.createdAt)}</p></div>
+          <div><p className="text-text-muted">{t.admin.orders}</p><p className="text-text-primary">{user._count?.orders || 0}</p></div>
+          <div><p className="text-text-muted">{t.admin.tickets}</p><p className="text-text-primary">{user._count?.tickets || 0}</p></div>
+          <div><p className="text-text-muted">{t.admin.applications}</p><p className="text-text-primary">{user._count?.opportunityApplications || 0}</p></div>
         </div>
       </Card>
 
       {isSuperAdmin && user.role === 'ADMIN' && (
         <Card className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white">
+            <h2 className="font-semibold text-text-primary">
               {t.admin.permissions?.title || 'Permissions'}
             </h2>
             {permsDirty && (
@@ -122,13 +122,13 @@ export default function AdminUserDetail() {
                   key={perm.key}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                     checked
-                      ? 'border-primary-700 bg-primary-900/20'
-                      : 'border-dark-700 hover:bg-dark-800'
+                      ? 'border-brand-green-700 bg-brand-green-900/20'
+                      : 'border-border-default hover:bg-surface-200'
                   }`}
                 >
                   <input
                     type="checkbox"
-                    className="w-4 h-4 text-primary-600 rounded border-dark-300 focus:ring-primary-500"
+                    className="w-4 h-4 text-brand-green-600 rounded border-border-strong focus:ring-brand-green-500"
                     checked={checked}
                     onChange={() => {
                       const next = checked
@@ -137,7 +137,7 @@ export default function AdminUserDetail() {
                       setLocalPerms(next);
                     }}
                   />
-                  <span className="text-sm text-dark-300">
+                  <span className="text-sm text-text-secondary">
                     {locale === 'fa' ? perm.labelFa : perm.labelEn}
                   </span>
                 </label>
@@ -149,9 +149,9 @@ export default function AdminUserDetail() {
 
       {isSuperAdmin && user.id !== currentUser?.id && (
         <Card>
-          <h2 className="font-semibold text-white mb-4">{t.admin.userManagement.title}</h2>
+          <h2 className="font-semibold text-text-primary mb-4">{t.admin.userManagement.title}</h2>
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-sm text-dark-500 me-2">{t.admin.userManagement.changeRole}:</span>
+            <span className="text-sm text-text-muted me-2">{t.admin.userManagement.changeRole}:</span>
             {['USER', 'ADMIN', 'SUPER_ADMIN'].map((role) => (
               <Button key={role} size="sm" variant={user.role === role ? 'primary' : 'outline'} onClick={() => updateRole.mutate(role)}>
                 {t.admin.userManagement.roles[role as keyof typeof t.admin.userManagement.roles]}

@@ -46,7 +46,7 @@ export default function RolesPage() {
       header: t.admin.name,
       render: (r: AdminRole) => (
         <span className="flex items-center gap-2 font-medium">
-          <Shield className="w-4 h-4 text-purple-400" /> {r.name}
+          <Shield className="w-4 h-4 text-brand-amber-500" /> {r.name}
         </span>
       ),
     },
@@ -77,7 +77,7 @@ export default function RolesPage() {
       className: 'w-24',
       render: (r: AdminRole) => (
         <div className="flex items-center gap-2">
-          <Link to={`/admin/roles/${r.id}/edit`} className="text-primary-600 hover:text-primary-700">
+          <Link to={`/admin/roles/${r.id}/edit`} className="text-brand-green-600 hover:text-brand-green-700">
             <Edit className="w-4 h-4" />
           </Link>
           <button
@@ -100,7 +100,7 @@ export default function RolesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t.admin.roles}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{t.admin.roles}</h1>
         <Link to="/admin/roles/new">
           <Button className="gap-2"><Plus className="w-4 h-4" /> {t.admin.addNew}</Button>
         </Link>

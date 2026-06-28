@@ -36,9 +36,9 @@ export default function ProfilePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.profile.title}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.profile.title}</h1>
       <Card className="max-w-lg">
-        <h3 className="font-semibold text-dark-900 dark:text-white mb-4">{t.profile.personalInfo}</h3>
+        <h3 className="font-semibold text-text-primary mb-4">{t.profile.personalInfo}</h3>
         <div className="space-y-4">
           <Input label={t.profile.firstName} value={form.firstName} onChange={update('firstName')} />
           <Input label={t.profile.lastName} value={form.lastName} onChange={update('lastName')} />

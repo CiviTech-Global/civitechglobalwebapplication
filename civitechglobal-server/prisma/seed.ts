@@ -20,7 +20,7 @@ const USER_PASSWORD = process.env.USER_PASSWORD || 'User@123';
 const USER_FIRST_NAME = process.env.USER_FIRST_NAME || 'Demo';
 const USER_LAST_NAME = process.env.USER_LAST_NAME || 'User';
 
-const ALL_PERMISSIONS = ['products', 'services', 'opportunities', 'orders', 'tickets', 'users', 'content', 'analytics', 'roles', 'admins'];
+const ALL_PERMISSIONS = ['products', 'services', 'opportunities', 'orders', 'tickets', 'users', 'content', 'analytics', 'roles', 'admins', 'leads'];
 
 async function main() {
   console.log('Seeding database...');
@@ -77,7 +77,7 @@ async function main() {
       firstName: DEMO_ADMIN_FIRST_NAME,
       lastName: DEMO_ADMIN_LAST_NAME,
       role: 'ADMIN',
-      permissions: ['products', 'orders', 'tickets'],
+      permissions: ['products', 'orders', 'tickets', 'leads'],
       adminRoleId: contentManagerRole.id,
     },
   });
@@ -348,12 +348,112 @@ async function main() {
   console.log(`Created ${demoTickets.length} demo tickets`);
 
   // Demo Opportunity Applications
-  const demoApplications = await Promise.all([
-    prisma.opportunityApplication.create({
-      data: { userId: demoUser.id, opportunityId: opportunities[0].id, coverLetter: 'I am interested in the Frontend Developer Intern position.', status: 'PENDING' },
-    }),
-  ]);
-  console.log(`Created ${demoApplications.length} demo applications`);
+  await prisma.opportunityApplication.upsert({
+    where: { userId_opportunityId: { userId: demoUser.id, opportunityId: opportunities[0].id } },
+    update: {},
+    create: { userId: demoUser.id, opportunityId: opportunities[0].id, coverLetter: 'I am interested in the Frontend Developer Intern position.', status: 'PENDING' },
+  });
+  console.log('Created 1 demo application');
+
+  // Insurance Categories & Subcategories
+  const insuranceCategories = [
+    {
+      title: 'بیمه وسایل نقلیه',
+      emoji: '🚗',
+      subcategories: ['شخص ثالث', 'بدنه', 'موتورسیکلت'],
+    },
+    {
+      title: 'بیمه خانه',
+      emoji: '🏠',
+      subcategories: ['بسته جامع مسکونی', 'آتش‌سوزی مسکونی', 'زلزله مسکونی', 'آسانسور'],
+    },
+    {
+      title: 'بیمه درمان تکمیلی',
+      emoji: '❤️',
+      subcategories: ['درمان تکمیلی انفرادی', 'درمان تکمیلی خانوادگی', 'تکمیلی شرکتی'],
+    },
+    {
+      title: 'بیمه عمر',
+      emoji: '👨‍👩‍👧‍👦',
+      subcategories: [
+        'طرح‌های عمر و سرمایه‌گذاری',
+        'عمر گروهی',
+        'عمر مانده بدهکار',
+        'عمر مستمری فوت در اثر حادثه',
+        'طرح‌های عمر و مستمری شوکا',
+      ],
+    },
+    {
+      title: 'بیمه مسئولیت',
+      emoji: '⚖️',
+      subcategories: [
+        'پزشکان و پیراپزشکان',
+        'تمام خطر مهندسی',
+        'مسئولیت مدیران ساختمان',
+        'مسئولیت حرفه‌ای مهندسین ناظر',
+        'سایر',
+      ],
+    },
+    {
+      title: 'بیمه باربری',
+      emoji: '🚢',
+      subcategories: ['وارداتی', 'صادراتی', 'مرهونات'],
+    },
+    {
+      title: 'بیمه مسافرتی',
+      emoji: '✈️',
+      subcategories: ['خارجی', 'داخلی', 'زائرین', 'ورودی به ایران'],
+    },
+    {
+      title: 'بیمه کارفرما',
+      emoji: '👷',
+      subcategories: ['ساختمانی', 'غیر ساختمانی'],
+    },
+    {
+      title: 'بیمه کسب و کار',
+      emoji: '🏢',
+      subcategories: ['آتش‌سوزی اداری و تجاری', 'آتش‌سوزی صنعتی', 'آسانسور'],
+    },
+    {
+      title: 'بیمه حوادث',
+      emoji: '⚠️',
+      subcategories: ['حوادث انفرادی', 'حوادث گروهی'],
+    },
+    {
+      title: 'بیمه تجهیزات الکترونیکی',
+      emoji: '📱',
+      subcategories: ['موبایل'],
+    },
+  ];
+
+  for (const category of insuranceCategories) {
+    const upsertedCategory = await prisma.insuranceCategory.upsert({
+      where: { title: category.title },
+      update: { emoji: category.emoji },
+      create: { title: category.title, emoji: category.emoji },
+    });
+
+    for (const subcategoryTitle of category.subcategories) {
+      const existingSubcategory = await prisma.insuranceSubcategory.findFirst({
+        where: { categoryId: upsertedCategory.id, title: subcategoryTitle },
+      });
+
+      if (existingSubcategory) {
+        await prisma.insuranceSubcategory.update({
+          where: { id: existingSubcategory.id },
+          data: { title: subcategoryTitle },
+        });
+      } else {
+        await prisma.insuranceSubcategory.create({
+          data: {
+            categoryId: upsertedCategory.id,
+            title: subcategoryTitle,
+          },
+        });
+      }
+    }
+  }
+  console.log(`Created ${insuranceCategories.length} insurance categories with subcategories`);
 
   // Site Content
   const contentItems = [

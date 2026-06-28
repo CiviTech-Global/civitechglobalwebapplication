@@ -27,7 +27,7 @@ export default function OrdersPage() {
   });
 
   const columns = [
-    { key: 'id', header: t.orders.orderId, render: (o: Order) => <Link to={`/dashboard/orders/${o.id}`} className="text-primary-600 dark:text-primary-400 hover:underline">{o.id.slice(0, 8)}...</Link> },
+    { key: 'id', header: t.orders.orderId, render: (o: Order) => <Link to={`/dashboard/orders/${o.id}`} className="text-brand-green-600 dark:text-brand-green-400 hover:underline">{o.id.slice(0, 8)}...</Link> },
     { key: 'createdAt', header: t.orders.date, render: (o: Order) => formatDate(o.createdAt) },
     { key: 'total', header: t.orders.total, render: (o: Order) => formatPrice(o.total) },
     { key: 'status', header: t.orders.status, render: (o: Order) => <Badge variant={statusVariants[o.status]}>{t.orders.statusLabels[o.status as keyof typeof t.orders.statusLabels]}</Badge> },
@@ -37,7 +37,7 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.dashboard.myOrders}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.dashboard.myOrders}</h1>
       <Table columns={columns} data={data?.data || []} emptyMessage={t.orders.noOrders} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

@@ -35,39 +35,39 @@ export default function AdminOrderDetail() {
   });
 
   if (isLoading) return <Spinner size="lg" />;
-  if (!order) return <div className="text-center py-8 text-dark-500">{t.noData}</div>;
+  if (!order) return <div className="text-center py-8 text-text-muted">{t.noData}</div>;
 
   const currentIdx = statusFlow.indexOf(order.status);
   const BackArrow = isRtl ? ArrowRight : ArrowLeft;
 
   return (
     <div>
-      <Link to="/admin/orders" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 mb-6">
+      <Link to="/admin/orders" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-600 mb-6">
         <BackArrow className="w-4 h-4" /> {t.orders.backToOrders}
       </Link>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t.orders.details}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{t.orders.details}</h1>
         <Badge variant={statusVariant[order.status]}>{t.orders.statusLabels[order.status as keyof typeof t.orders.statusLabels]}</Badge>
       </div>
 
       <Card className="mb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div><p className="text-dark-500">{t.admin.userManagement.name}</p><p className="font-medium text-white">{order.user?.firstName} {order.user?.lastName}</p></div>
-          <div><p className="text-dark-500">{t.orders.date}</p><p className="text-white">{formatDate(order.createdAt)}</p></div>
-          <div><p className="text-dark-500">{t.orders.total}</p><p className="font-bold text-primary-600">{formatPrice(order.total)}</p></div>
-          <div><p className="text-dark-500">{t.orders.items}</p><p className="text-white">{order.items?.length || 0}</p></div>
+          <div><p className="text-text-muted">{t.admin.userManagement.name}</p><p className="font-medium text-text-primary">{order.user?.firstName} {order.user?.lastName}</p></div>
+          <div><p className="text-text-muted">{t.orders.date}</p><p className="text-text-primary">{formatDate(order.createdAt)}</p></div>
+          <div><p className="text-text-muted">{t.orders.total}</p><p className="font-bold text-brand-green-600">{formatPrice(order.total)}</p></div>
+          <div><p className="text-text-muted">{t.orders.items}</p><p className="text-text-primary">{order.items?.length || 0}</p></div>
         </div>
       </Card>
 
       <Card className="mb-6">
-        <h2 className="font-semibold text-white mb-4">{t.orders.items}</h2>
+        <h2 className="font-semibold text-text-primary mb-4">{t.orders.items}</h2>
         <div className="space-y-3">
           {order.items?.map((item) => (
-            <div key={item.id} className="flex items-center justify-between py-2 border-b border-dark-700 last:border-0">
+            <div key={item.id} className="flex items-center justify-between py-2 border-b border-border-default last:border-0">
               <div>
-                <p className="font-medium text-white">{item.product?.name}</p>
-                <p className="text-sm text-dark-500">{t.orders.quantity}: {item.quantity} x {formatPrice(item.price)}</p>
+                <p className="font-medium text-text-primary">{item.product?.name}</p>
+                <p className="text-sm text-text-muted">{t.orders.quantity}: {item.quantity} x {formatPrice(item.price)}</p>
               </div>
               <p className="font-medium text-end">{formatPrice(item.price * item.quantity)}</p>
             </div>
@@ -77,7 +77,7 @@ export default function AdminOrderDetail() {
 
       {order.status !== 'COMPLETED' && order.status !== 'CANCELLED' && (
         <Card>
-          <h2 className="font-semibold text-white mb-4">{t.orders.updateStatus}</h2>
+          <h2 className="font-semibold text-text-primary mb-4">{t.orders.updateStatus}</h2>
           <div className="flex gap-2">
             {currentIdx < statusFlow.length - 1 && (
               <Button onClick={() => updateStatus.mutate(statusFlow[currentIdx + 1])} isLoading={updateStatus.isPending}>

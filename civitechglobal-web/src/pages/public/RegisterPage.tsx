@@ -39,11 +39,11 @@ export default function RegisterPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <Card>
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 bg-brand-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold">CT</span>
             </div>
-            <h1 className="text-2xl font-bold text-dark-900 dark:text-white">{t.auth.signUp}</h1>
-            <p className="text-sm text-dark-500 dark:text-dark-400 mt-1">{t.auth.signUpTitle}</p>
+            <h1 className="text-2xl font-bold text-text-primary">{t.auth.signUp}</h1>
+            <p className="text-sm text-text-muted mt-1">{t.auth.signUpTitle}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -56,9 +56,9 @@ export default function RegisterPage() {
             <Button type="submit" isLoading={loading} className="w-full">{t.auth.signUp}</Button>
           </form>
 
-          <p className="text-center text-sm text-dark-500 dark:text-dark-400 mt-6">
+          <p className="text-center text-sm text-text-muted mt-6">
             {t.auth.hasAccount}{' '}
-            <Link to="/login" className="text-primary-600 dark:text-primary-400 hover:underline font-medium">{t.auth.signIn}</Link>
+            <Link to="/login" className="text-brand-green-600 dark:text-brand-green-400 hover:underline font-medium">{t.auth.signIn}</Link>
           </p>
         </Card>
       </motion.div>

@@ -1,6 +1,6 @@
-import { useEffect, type ReactNode } from 'react';
-import { X } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { cn } from '../../lib/utils';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,33 +11,28 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className={cn(
-        'relative z-10 w-full max-w-lg mx-4 bg-dark-800 rounded-xl shadow-xl border border-dark-700',
-        className
-      )}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div
+        className={cn(
+          'bg-surface-50 rounded-xl border border-border-default shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto',
+          className
+        )}
+      >
         {title && (
-          <div className="flex items-center justify-between p-4 border-b border-dark-700">
-            <h3 className="text-lg font-semibold text-dark-100">{title}</h3>
-            <button onClick={onClose} className="p-1 rounded-lg hover:bg-dark-700 transition-colors">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border-default">
+            <h3 className="text-lg font-semibold text-text-primary">{title}</h3>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-text-muted hover:bg-surface-200 hover:text-text-primary transition-colors"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
         )}
-        <div className="p-4">{children}</div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );

@@ -7,11 +7,11 @@ interface BadgeProps {
 }
 
 const variants = {
-  default: 'bg-dark-700 text-dark-300',
-  success: 'bg-green-900/30 text-green-400',
-  warning: 'bg-yellow-900/30 text-yellow-400',
-  danger: 'bg-red-900/30 text-red-400',
-  info: 'bg-ocean-900/30 text-ocean-400',
+  default: 'bg-surface-200 text-text-secondary',
+  success: 'bg-brand-green-100 text-brand-green-700 dark:bg-brand-green-900/30 dark:text-brand-green-400',
+  warning: 'bg-brand-amber-100 text-brand-amber-700 dark:bg-brand-amber-900/30 dark:text-brand-amber-400',
+  danger: 'bg-brand-red-100 text-brand-red-700 dark:bg-brand-red-900/30 dark:text-brand-red-400',
+  info: 'bg-brand-green-100 text-brand-green-700 dark:bg-brand-green-900/30 dark:text-brand-green-400',
 };
 
 export function Badge({ children, variant = 'default', className }: BadgeProps) {

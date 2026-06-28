@@ -31,7 +31,7 @@ export default function TicketsPage() {
   });
 
   const columns = [
-    { key: 'subject', header: t.tickets.subject, render: (ticket: Ticket) => <Link to={`/dashboard/tickets/${ticket.id}`} className="text-primary-600 dark:text-primary-400 hover:underline">{ticket.subject}</Link> },
+    { key: 'subject', header: t.tickets.subject, render: (ticket: Ticket) => <Link to={`/dashboard/tickets/${ticket.id}`} className="text-brand-green-600 dark:text-brand-green-400 hover:underline">{ticket.subject}</Link> },
     { key: 'status', header: t.tickets.status, render: (ticket: Ticket) => <Badge variant={statusVariants[ticket.status]}>{t.tickets.statusLabels[ticket.status as keyof typeof t.tickets.statusLabels]}</Badge> },
     { key: 'priority', header: t.tickets.priority, render: (ticket: Ticket) => <Badge variant={priorityVariants[ticket.priority]}>{t.tickets.priorityLabels[ticket.priority as keyof typeof t.tickets.priorityLabels]}</Badge> },
     { key: 'createdAt', header: t.tickets.date, render: (ticket: Ticket) => formatDate(ticket.createdAt) },
@@ -41,7 +41,7 @@ export default function TicketsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.dashboard.myTickets}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.dashboard.myTickets}</h1>
       <Table columns={columns} data={data?.data || []} emptyMessage={t.tickets.noTickets} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

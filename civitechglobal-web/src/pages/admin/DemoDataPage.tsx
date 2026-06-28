@@ -64,7 +64,7 @@ export default function DemoDataPage() {
 
   const statCards = status ? [
     { icon: Users, label: t.admin.demoData.demoUsers, value: status.demoUsers, color: 'text-blue-400 bg-blue-900/20' },
-    { icon: Package, label: t.admin.demoData.demoProducts, value: status.demoProducts, color: 'text-purple-400 bg-purple-900/20' },
+    { icon: Package, label: t.admin.demoData.demoProducts, value: status.demoProducts, color: 'text-brand-amber-500 bg-brand-amber-50' },
     { icon: Wrench, label: t.admin.demoData.demoServices, value: status.demoServices, color: 'text-indigo-400 bg-indigo-900/20' },
     { icon: ShoppingCart, label: t.admin.demoData.demoOrders, value: status.demoOrders, color: 'text-green-400 bg-green-900/20' },
     { icon: Ticket, label: t.admin.demoData.demoTickets, value: status.demoTickets, color: 'text-orange-400 bg-orange-900/20' },
@@ -73,12 +73,12 @@ export default function DemoDataPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-bold text-white mb-2">{t.admin.demoData.title}</h1>
-      <p className="text-dark-400 text-sm mb-8">{t.admin.demoData.description}</p>
+      <h1 className="text-2xl font-bold text-text-primary mb-2">{t.admin.demoData.title}</h1>
+      <p className="text-text-muted text-sm mb-8">{t.admin.demoData.description}</p>
 
       {/* Status Section */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-white mb-4">{t.admin.demoData.status}</h2>
+        <h2 className="text-lg font-semibold text-text-primary mb-4">{t.admin.demoData.status}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {statCards.map((s) => (
             <Card key={s.label}>
@@ -87,8 +87,8 @@ export default function DemoDataPage() {
                   <s.icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-dark-400">{s.label}</p>
-                  <p className="text-lg font-bold text-white">{s.value}</p>
+                  <p className="text-xs text-text-muted">{s.label}</p>
+                  <p className="text-lg font-bold text-text-primary">{s.value}</p>
                 </div>
               </div>
             </Card>
@@ -96,10 +96,10 @@ export default function DemoDataPage() {
         </div>
 
         <div className="mt-4">
-          <Card className={hasData ? 'border-ocean-500/30' : 'border-dark-700/50'}>
+          <Card className={hasData ? 'border-brand-green-500/30' : 'border-border-default/50'}>
             <div className="flex items-center gap-3">
-              <Database className={`w-5 h-5 ${hasData ? 'text-ocean-400' : 'text-dark-500'}`} />
-              <span className={hasData ? 'text-ocean-300' : 'text-dark-500'}>
+              <Database className={`w-5 h-5 ${hasData ? 'text-brand-green-500' : 'text-text-muted'}`} />
+              <span className={hasData ? 'text-brand-green-500' : 'text-text-muted'}>
                 {hasData ? t.admin.demoData.hasData : t.admin.demoData.noData}
               </span>
             </div>

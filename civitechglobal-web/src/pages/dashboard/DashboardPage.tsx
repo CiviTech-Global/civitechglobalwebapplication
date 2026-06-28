@@ -32,7 +32,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-dark-900 dark:text-white mb-6">{t.dashboard.overview}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.dashboard.overview}</h1>
 
       <div className="grid sm:grid-cols-3 gap-6 mb-8">
         {stats.map((stat, i) => (
@@ -44,8 +44,8 @@ export default function DashboardPage() {
                     <stat.icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm text-dark-500 dark:text-dark-400">{stat.label}</p>
-                    <p className="text-2xl font-bold text-dark-900 dark:text-white">{stat.value}</p>
+                    <p className="text-sm text-text-muted">{stat.label}</p>
+                    <p className="text-2xl font-bold text-text-primary">{stat.value}</p>
                   </div>
                 </div>
               </Card>

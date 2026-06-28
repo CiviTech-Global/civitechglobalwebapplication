@@ -53,8 +53,8 @@ export default function ContactPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <AnimatedSection className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.contact.title}</h1>
-        <p className="text-dark-400 max-w-2xl mx-auto">{t.contact.description}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{t.contact.title}</h1>
+        <p className="text-text-muted max-w-2xl mx-auto">{t.contact.description}</p>
       </AnimatedSection>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -82,23 +82,23 @@ export default function ContactPage() {
         <div>
           <AnimatedSection delay={0.2}>
             <GlowCard hover={false} glowColor="purple" className="space-y-6">
-              <h3 className="text-lg font-semibold text-white">{t.contact.info.title}</h3>
+              <h3 className="text-lg font-semibold text-text-primary">{t.contact.info.title}</h3>
               <div className="space-y-4">
-                <div className="flex items-center gap-3 text-dark-300">
-                  <div className="w-10 h-10 rounded-lg bg-ocean-900/30 flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-ocean-400" />
+                <div className="flex items-center gap-3 text-text-secondary">
+                  <div className="w-10 h-10 rounded-lg bg-brand-green-100 flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-brand-green-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-dark-500">{t.contact.email}</p>
+                    <p className="text-xs text-text-muted">{t.contact.email}</p>
                     <p className="text-sm">{t.contact.info.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 text-dark-300">
-                  <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-purple-400" />
+                <div className="flex items-center gap-3 text-text-secondary">
+                  <div className="w-10 h-10 rounded-lg bg-brand-amber-100 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-brand-amber-500" />
                   </div>
                   <div>
-                    <p className="text-xs text-dark-500">Location</p>
+                    <p className="text-xs text-text-muted">Location</p>
                     <p className="text-sm">{t.contact.info.location}</p>
                   </div>
                 </div>

@@ -32,8 +32,8 @@ export default function ServicesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <AnimatedSection className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.services.title}</h1>
-        <p className="text-dark-400 max-w-2xl mx-auto">{t.services.description}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{t.services.title}</h1>
+        <p className="text-text-muted max-w-2xl mx-auto">{t.services.description}</p>
       </AnimatedSection>
 
       {isLoading ? (
@@ -47,24 +47,24 @@ export default function ServicesPage() {
                 <Link to={`/services/${service.slug}`}>
                   <GlowCard className="h-full" glowColor={i === 0 ? 'ocean' : 'purple'}>
                     <div className="flex items-start gap-4 mb-4">
-                      <div className="w-14 h-14 shrink-0 bg-gradient-to-br from-ocean-600/20 to-purple-600/20 rounded-xl flex items-center justify-center border border-ocean-500/20">
-                        <Icon className="w-7 h-7 text-ocean-400" />
+                      <div className="w-14 h-14 shrink-0 bg-gradient-to-br from-brand-green-500/20 to-brand-amber-500/20 rounded-xl flex items-center justify-center border border-brand-green-500/20">
+                        <Icon className="w-7 h-7 text-brand-green-500" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold text-white mb-1">{service.name}</h3>
+                        <h3 className="text-xl font-semibold text-text-primary mb-1">{service.name}</h3>
                         {service.category && <Badge variant="info" className="text-xs">{service.category}</Badge>}
                       </div>
                     </div>
 
-                    <p className="text-dark-400 mb-6 leading-relaxed">{service.description}</p>
+                    <p className="text-text-muted mb-6 leading-relaxed">{service.description}</p>
 
                     {service.features && service.features.length > 0 && (
                       <div className="mb-6">
-                        <h4 className="text-sm font-medium text-dark-300 mb-3">{t.services.whatsIncluded}</h4>
+                        <h4 className="text-sm font-medium text-text-secondary mb-3">{t.services.whatsIncluded}</h4>
                         <ul className="space-y-2">
                           {service.features.slice(0, 4).map((feature) => (
-                            <li key={feature} className="flex items-center gap-2 text-sm text-dark-400">
-                              <div className="w-1.5 h-1.5 rounded-full bg-ocean-500" />
+                            <li key={feature} className="flex items-center gap-2 text-sm text-text-muted">
+                              <div className="w-1.5 h-1.5 rounded-full bg-brand-green-500" />
                               {feature}
                             </li>
                           ))}
@@ -72,7 +72,7 @@ export default function ServicesPage() {
                       </div>
                     )}
 
-                    <span className="text-sm text-ocean-400 flex items-center gap-1">
+                    <span className="text-sm text-brand-green-500 flex items-center gap-1">
                       {t.services.learnMore} <ArrowIcon className="w-4 h-4" />
                     </span>
                   </GlowCard>

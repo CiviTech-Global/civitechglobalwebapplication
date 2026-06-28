@@ -34,14 +34,14 @@ export default function AdminUsers() {
     { key: 'role', header: t.admin.userManagement.role, render: (u: User) => <Badge variant={roleVariant[u.role]}>{t.admin.userManagement.roles[u.role as keyof typeof t.admin.userManagement.roles]}</Badge> },
     { key: 'createdAt', header: t.admin.userManagement.joinDate, render: (u: User) => formatDate(u.createdAt) },
     { key: 'actions', header: '', render: (u: User) => (
-      <Link to={`/admin/users/${u.id}`} className="text-primary-600 hover:text-primary-700"><Eye className="w-4 h-4" /></Link>
+      <Link to={`/admin/users/${u.id}`} className="text-brand-green-600 hover:text-brand-green-700"><Eye className="w-4 h-4" /></Link>
     )},
   ];
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">{t.admin.users}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{t.admin.users}</h1>
         <div className="w-64">
           <Input placeholder={t.search} value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         </div>

@@ -78,15 +78,15 @@ export default function AdminPermissions() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <ShieldCheck className="w-6 h-6 text-primary-600" />
-        <h1 className="text-2xl font-bold text-white">
+        <ShieldCheck className="w-6 h-6 text-brand-green-600" />
+        <h1 className="text-2xl font-bold text-text-primary">
           {t.admin.permissions?.title || 'Permissions'}
         </h1>
       </div>
 
       {admins.length === 0 ? (
         <Card>
-          <p className="text-dark-500 text-center py-8">{t.noData}</p>
+          <p className="text-text-muted text-center py-8">{t.noData}</p>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -94,10 +94,10 @@ export default function AdminPermissions() {
             <Card key={admin.id}>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="font-semibold text-white">
+                  <h2 className="font-semibold text-text-primary">
                     {admin.firstName} {admin.lastName}
                   </h2>
-                  <p className="text-sm text-dark-500">{admin.email}</p>
+                  <p className="text-sm text-text-muted">{admin.email}</p>
                 </div>
                 {isDirty(admin) && (
                   <Button
@@ -119,17 +119,17 @@ export default function AdminPermissions() {
                       key={perm.key}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                         checked
-                          ? 'border-primary-700 bg-primary-900/20'
-                          : 'border-dark-700 hover:bg-dark-800'
+                          ? 'border-brand-green-700 bg-brand-green-900/20'
+                          : 'border-border-default hover:bg-surface-200'
                       }`}
                     >
                       <input
                         type="checkbox"
-                        className="w-4 h-4 text-primary-600 rounded border-dark-300 focus:ring-primary-500"
+                        className="w-4 h-4 text-brand-green-600 rounded border-border-strong focus:ring-brand-green-500"
                         checked={checked}
                         onChange={() => togglePerm(admin.id, perm.key)}
                       />
-                      <span className="text-sm text-dark-300">
+                      <span className="text-sm text-text-secondary">
                         {locale === 'fa' ? perm.labelFa : perm.labelEn}
                       </span>
                     </label>

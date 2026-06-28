@@ -47,31 +47,31 @@ export default function TicketDetailPage() {
   });
 
   if (isLoading) return <Spinner size="lg" />;
-  if (!ticket) return <div className="text-center py-20 text-dark-500">{t.noData}</div>;
+  if (!ticket) return <div className="text-center py-20 text-text-muted">{t.noData}</div>;
 
   return (
     <div>
-      <Link to="/dashboard/tickets" className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-primary-600 dark:hover:text-primary-400 mb-6">
+      <Link to="/dashboard/tickets" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-600 dark:hover:text-brand-green-400 mb-6">
         <BackIcon className="w-4 h-4" /> {t.tickets.backToTickets}
       </Link>
 
       <div className="flex items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-dark-900 dark:text-white">{ticket.subject}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{ticket.subject}</h1>
         <Badge variant={statusVariants[ticket.status]}>{t.tickets.statusLabels[ticket.status as keyof typeof t.tickets.statusLabels]}</Badge>
       </div>
 
       <Card className="mb-6">
-        <h3 className="font-semibold text-dark-900 dark:text-white mb-4">{t.tickets.messages}</h3>
+        <h3 className="font-semibold text-text-primary mb-4">{t.tickets.messages}</h3>
         <div className="space-y-4 max-h-96 overflow-y-auto">
           {ticket.messages?.map((msg: any) => (
-            <div key={msg.id} className={`p-3 rounded-lg ${msg.isStaff ? 'bg-primary-50 dark:bg-primary-900/20' : 'bg-dark-50 dark:bg-dark-800'}`}>
+            <div key={msg.id} className={`p-3 rounded-lg ${msg.isStaff ? 'bg-brand-green-50 dark:bg-brand-green-900/20' : 'bg-surface-200 dark:bg-surface-800'}`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium text-dark-500 dark:text-dark-400">
+                <span className="text-xs font-medium text-text-muted">
                   {msg.isStaff ? t.tickets.staff : (msg.userId === user?.id ? t.tickets.you : msg.user?.firstName)}
                 </span>
-                <span className="text-xs text-dark-400">{formatDate(msg.createdAt)}</span>
+                <span className="text-xs text-text-muted">{formatDate(msg.createdAt)}</span>
               </div>
-              <p className="text-sm text-dark-700 dark:text-dark-300">{msg.content}</p>
+              <p className="text-sm text-text-secondary">{msg.content}</p>
             </div>
           ))}
         </div>

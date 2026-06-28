@@ -4,6 +4,7 @@ export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type ApplicationStatus = 'PENDING' | 'REVIEWING' | 'ACCEPTED' | 'REJECTED';
 export type OpportunityType = 'JOB' | 'INTERNSHIP';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 export interface AdminRole {
   id: string;
@@ -129,6 +130,41 @@ export interface TicketMessage {
   user?: { id: string; firstName: string; lastName: string; role: Role };
 }
 
+export interface InsuranceCategory {
+  id: string;
+  title: string;
+  emoji?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InsuranceSubcategory {
+  id: string;
+  categoryId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Lead {
+  id: string;
+  telegramUserId: string;
+  telegramUsername?: string;
+  telegramFirstName?: string;
+  categoryId: string;
+  subcategoryId: string;
+  fullName: string;
+  phoneNumber: string;
+  city: string;
+  preferredContactTime: string;
+  notes?: string;
+  status: LeadStatus;
+  createdAt: string;
+  updatedAt: string;
+  category?: InsuranceCategory;
+  subcategory?: InsuranceSubcategory;
+}
+
 export interface SiteContent {
   id: string;
   key: string;
@@ -155,6 +191,8 @@ export interface DashboardStats {
     totalProducts: number;
     totalServices: number;
     totalOpportunities: number;
+    totalLeads: number;
+    newLeads: number;
     pendingApplications: number;
     openTickets: number;
     totalRevenue: number;
@@ -163,4 +201,5 @@ export interface DashboardStats {
   };
   recentOrders: Order[];
   recentTickets: Ticket[];
+  recentLeads: Lead[];
 }

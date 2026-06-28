@@ -33,13 +33,13 @@ export default function AdminOrders() {
     { key: 'status', header: t.orders.status, render: (o: any) => <Badge variant={statusVariant[o.status]}>{t.orders.statusLabels[o.status as keyof typeof t.orders.statusLabels]}</Badge> },
     { key: 'createdAt', header: t.orders.date, render: (o: any) => formatDate(o.createdAt) },
     { key: 'actions', header: '', render: (o: any) => (
-      <Link to={`/admin/orders/${o.id}`} className="text-primary-600 hover:text-primary-700"><Eye className="w-4 h-4" /></Link>
+      <Link to={`/admin/orders/${o.id}`} className="text-brand-green-600 hover:text-brand-green-700"><Eye className="w-4 h-4" /></Link>
     )},
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">{t.admin.orders}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.admin.orders}</h1>
       <Table columns={columns} data={(data?.data || []) as any} />
       {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
     </div>

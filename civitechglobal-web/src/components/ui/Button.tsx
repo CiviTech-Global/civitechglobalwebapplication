@@ -9,11 +9,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-gradient-to-r from-ocean-600 to-purple-600 text-white hover:from-ocean-500 hover:to-purple-500 shadow-[0_0_15px_rgba(0,128,230,0.2)]',
-  secondary: 'bg-dark-700 text-dark-100 hover:bg-dark-600',
-  outline: 'border border-dark-600 text-dark-200 hover:bg-dark-800 hover:border-dark-500',
-  ghost: 'text-dark-300 hover:bg-dark-800 hover:text-dark-100',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
+  primary: 'bg-gradient-to-r from-brand-green-500 to-brand-green-600 text-white hover:from-brand-green-600 hover:to-brand-green-700 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+  secondary: 'bg-surface-200 text-text-primary hover:bg-surface-300 dark:bg-surface-300 dark:text-text-primary dark:hover:bg-surface-400',
+  outline: 'border border-border-default text-text-secondary hover:bg-surface-200 hover:border-border-strong dark:border-surface-400 dark:text-surface-700 dark:hover:bg-surface-300 dark:hover:text-text-primary',
+  ghost: 'text-text-secondary hover:bg-surface-200 hover:text-text-primary dark:hover:bg-surface-300 dark:hover:text-text-primary',
+  danger: 'bg-gradient-to-r from-brand-red-500 to-brand-red-600 text-white hover:from-brand-red-600 hover:to-brand-red-700 shadow-[0_0_15px_rgba(239,68,68,0.25)]',
 };
 
 const sizes = {
@@ -26,7 +26,7 @@ export function Button({ variant = 'primary', size = 'md', isLoading, className,
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ocean-500/50 disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         className

@@ -27,8 +27,8 @@ export default function ProductsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <AnimatedSection className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.products.title}</h1>
-        <p className="text-dark-400 max-w-2xl mx-auto">{t.products.description}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{t.products.title}</h1>
+        <p className="text-text-muted max-w-2xl mx-auto">{t.products.description}</p>
       </AnimatedSection>
 
       {isLoading ? (
@@ -40,16 +40,16 @@ export default function ProductsPage() {
               <AnimatedSection key={product.id} delay={i * 0.1}>
                 <Link to={`/products/${product.slug}`}>
                   <GlowCard className="h-full flex flex-col" glowColor={i % 3 === 1 ? 'purple' : 'ocean'}>
-                    <div className="h-48 bg-gradient-to-br from-ocean-900/30 to-purple-900/20 rounded-lg mb-4 flex items-center justify-center border border-dark-700/50">
-                      <span className="text-4xl font-bold text-ocean-500/40">{product.name.charAt(0)}</span>
+                    <div className="h-48 bg-gradient-to-br from-brand-green-100 to-brand-amber-50 rounded-lg mb-4 flex items-center justify-center border border-border-default/50">
+                      <span className="text-4xl font-bold text-brand-green-600/40">{product.name.charAt(0)}</span>
                     </div>
                     <div className="flex items-center gap-2 mb-2">
                       {product.category && <Badge variant="info" className="text-xs">{product.category}</Badge>}
                       {!product.isActive && <Badge variant="warning" className="text-xs">{t.products.comingSoon}</Badge>}
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{product.name}</h3>
-                    <p className="text-sm text-dark-400 flex-1 line-clamp-2 mb-4">{product.description}</p>
-                    <span className="text-sm text-ocean-400 flex items-center gap-1">
+                    <h3 className="text-lg font-semibold text-text-primary mb-2">{product.name}</h3>
+                    <p className="text-sm text-text-muted flex-1 line-clamp-2 mb-4">{product.description}</p>
+                    <span className="text-sm text-brand-green-500 flex items-center gap-1">
                       {t.products.learnMore} <ArrowIcon className="w-4 h-4" />
                     </span>
                   </GlowCard>

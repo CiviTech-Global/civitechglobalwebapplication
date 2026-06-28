@@ -56,11 +56,11 @@ export default function OpportunityDetailPage() {
   };
 
   if (isLoading) return <Spinner size="lg" />;
-  if (!opportunity) return <div className="text-center py-20 text-dark-500">{t.careers.notFound}</div>;
+  if (!opportunity) return <div className="text-center py-20 text-text-muted">{t.careers.notFound}</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link to="/careers" className="inline-flex items-center gap-2 text-sm text-dark-400 hover:text-ocean-400 transition-colors mb-8">
+      <Link to="/careers" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-500 transition-colors mb-8">
         <BackIcon className="w-4 h-4" /> {t.careers.backToCareers}
       </Link>
 
@@ -75,22 +75,22 @@ export default function OpportunityDetailPage() {
           </Badge>
         </div>
 
-        <h1 className="text-3xl font-bold text-white mb-4">{opportunity.title}</h1>
+        <h1 className="text-3xl font-bold text-text-primary mb-4">{opportunity.title}</h1>
 
-        <div className="flex items-center gap-6 text-sm text-dark-400 mb-6">
+        <div className="flex items-center gap-6 text-sm text-text-muted mb-6">
           <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {opportunity.location}</span>
           <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {opportunity.duration}</span>
         </div>
 
-        <p className="text-dark-300 mb-8 text-lg leading-relaxed">{opportunity.description}</p>
+        <p className="text-text-secondary mb-8 text-lg leading-relaxed">{opportunity.description}</p>
 
         {opportunity.requirements.length > 0 && (
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-white mb-3">{t.careers.requirements}</h3>
+            <h3 className="text-xl font-semibold text-text-primary mb-3">{t.careers.requirements}</h3>
             <ul className="space-y-2">
               {opportunity.requirements.map((r) => (
-                <li key={r} className="flex items-center gap-2 text-dark-300">
-                  <Check className="w-4 h-4 text-ocean-400 shrink-0" /> {r}
+                <li key={r} className="flex items-center gap-2 text-text-secondary">
+                  <Check className="w-4 h-4 text-brand-green-500 shrink-0" /> {r}
                 </li>
               ))}
             </ul>
@@ -103,7 +103,7 @@ export default function OpportunityDetailPage() {
           </NeonButton>
         ) : (
           <GlowCard hover={false} className="max-w-lg">
-            <h3 className="text-lg font-semibold text-white mb-4">{t.careers.applyNow}</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">{t.careers.applyNow}</h3>
             <div className="space-y-4">
               <TextArea
                 label={t.careers.coverLetter}

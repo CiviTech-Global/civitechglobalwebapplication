@@ -41,12 +41,12 @@ export function SocialPanel() {
           target="_blank"
           rel="noopener noreferrer"
           title={label}
-          className="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-800/60 backdrop-blur-sm border border-dark-700/50 text-dark-400 hover:text-ocean-400 hover:border-ocean-500/40 hover:shadow-[0_0_15px_rgba(0,128,230,0.15)] transition-all duration-300"
+          className="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-50/80 backdrop-blur-sm border border-border-default text-text-muted hover:text-brand-green-600 hover:border-brand-green-400/40 hover:shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all duration-300"
         >
           <Icon className="w-4 h-4" />
         </a>
       ))}
-      <div className="w-px h-8 mx-auto bg-gradient-to-b from-dark-600 to-transparent" />
+      <div className="w-px h-8 mx-auto bg-gradient-to-b from-border-strong to-transparent" />
     </div>
   );
 }

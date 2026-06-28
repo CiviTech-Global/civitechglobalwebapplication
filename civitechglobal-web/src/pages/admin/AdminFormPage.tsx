@@ -68,20 +68,20 @@ export default function AdminFormPage() {
   if (credentials) {
     return (
       <div className="max-w-lg">
-        <h1 className="text-2xl font-bold text-white mb-6">
+        <h1 className="text-2xl font-bold text-text-primary mb-6">
           {t.admin.adminForm.generatedCredentials}
         </h1>
 
-        <div className="space-y-4 bg-dark-800 rounded-xl border border-dark-700 p-6">
+        <div className="space-y-4 bg-surface-200 rounded-xl border border-border-default p-6">
           <div>
-            <label className="block text-xs text-dark-500 mb-1">{t.admin.adminForm.username}</label>
+            <label className="block text-xs text-text-muted mb-1">{t.admin.adminForm.username}</label>
             <div className="flex items-center gap-2">
-              <code className="flex-1 bg-dark-900 px-3 py-2 rounded-lg text-ocean-400 text-sm font-mono">
+              <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
                 {credentials.username}
               </code>
               <button
                 onClick={() => copyToClipboard(credentials.username, 'username')}
-                className="p-2 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
               >
                 {copied === 'username' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -89,14 +89,14 @@ export default function AdminFormPage() {
           </div>
 
           <div>
-            <label className="block text-xs text-dark-500 mb-1">{t.admin.adminForm.password}</label>
+            <label className="block text-xs text-text-muted mb-1">{t.admin.adminForm.password}</label>
             <div className="flex items-center gap-2">
-              <code className="flex-1 bg-dark-900 px-3 py-2 rounded-lg text-ocean-400 text-sm font-mono">
+              <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
                 {credentials.password}
               </code>
               <button
                 onClick={() => copyToClipboard(credentials.password, 'password')}
-                className="p-2 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
               >
                 {copied === 'password' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -118,11 +118,11 @@ export default function AdminFormPage() {
 
   return (
     <div className="max-w-lg">
-      <button onClick={() => navigate('/admin/admins')} className="flex items-center gap-1 text-sm text-dark-500 hover:text-dark-300 mb-4">
+      <button onClick={() => navigate('/admin/admins')} className="flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary mb-4">
         <ArrowLeft className="w-4 h-4" /> {t.back}
       </button>
 
-      <h1 className="text-2xl font-bold text-white mb-6">
+      <h1 className="text-2xl font-bold text-text-primary mb-6">
         {t.admin.adminForm.createTitle}
       </h1>
 

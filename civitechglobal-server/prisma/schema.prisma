@@ -47,6 +47,14 @@ enum OpportunityType {
   INTERNSHIP
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 model AdminRole {
   id          String   @id @default(cuid())
   name        String   @unique
@@ -221,4 +229,51 @@ model SiteContent {
   updatedAt DateTime @updatedAt
 
   @@map("site_content")
+}
+
+model InsuranceCategory {
+  id            String               @id @default(cuid())
+  title         String               @unique
+  emoji         String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  subcategories InsuranceSubcategory[]
+  leads         Lead[]
+
+  @@map("insurance_categories")
+}
+
+model InsuranceSubcategory {
+  id         String            @id @default(cuid())
+  categoryId String
+  title      String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  category   InsuranceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  leads      Lead[]
+
+  @@unique([categoryId, title])
+  @@map("insurance_subcategories")
+}
+
+model Lead {
+  id                   String            @id @default(cuid())
+  telegramUserId       String            @map("telegram_user_id")
+  telegramUsername     String?           @map("telegram_username")
+  telegramFirstName    String?           @map("telegram_first_name")
+  categoryId           String            @map("category_id")
+  subcategoryId        String            @map("subcategory_id")
+  fullName             String            @map("full_name")
+  phoneNumber          String            @map("phone_number")
+  city                 String
+  preferredContactTime String            @map("preferred_contact_time")
+  notes                String?
+  status               LeadStatus        @default(NEW)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  category    InsuranceCategory    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  subcategory InsuranceSubcategory @relation(fields: [subcategoryId], references: [id], onDelete: Restrict)
+
+  @@map("leads")
 }

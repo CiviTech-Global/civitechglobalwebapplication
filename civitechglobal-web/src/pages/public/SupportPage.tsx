@@ -50,8 +50,8 @@ export default function SupportPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-dark-900 dark:text-white mb-4">{t.support.title}</h1>
-        <p className="text-dark-500 dark:text-dark-400">{t.support.description}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">{t.support.title}</h1>
+        <p className="text-text-muted">{t.support.description}</p>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

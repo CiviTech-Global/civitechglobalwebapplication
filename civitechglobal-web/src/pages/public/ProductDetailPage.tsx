@@ -53,17 +53,17 @@ export default function ProductDetailPage() {
   });
 
   if (isLoading) return <Spinner size="lg" />;
-  if (!product) return <div className="text-center py-20 text-dark-500">{t.products.notFound}</div>;
+  if (!product) return <div className="text-center py-20 text-text-muted">{t.products.notFound}</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link to="/products" className="inline-flex items-center gap-2 text-sm text-dark-400 hover:text-ocean-400 transition-colors mb-8">
+      <Link to="/products" className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-brand-green-500 transition-colors mb-8">
         <BackIcon className="w-4 h-4" /> {t.products.backToProducts}
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-2 gap-12">
-        <div className="h-80 md:h-full bg-gradient-to-br from-ocean-900/30 to-purple-900/20 rounded-2xl flex items-center justify-center border border-dark-700/50">
-          <span className="text-8xl font-bold text-ocean-500/30">{product.name.charAt(0)}</span>
+        <div className="h-80 md:h-full bg-gradient-to-br from-brand-green-100 to-brand-amber-50 rounded-2xl flex items-center justify-center border border-border-default/50">
+          <span className="text-8xl font-bold text-brand-green-600/30">{product.name.charAt(0)}</span>
         </div>
 
         <div>
@@ -71,16 +71,16 @@ export default function ProductDetailPage() {
             {product.category && <Badge variant="info">{product.category}</Badge>}
             {!product.isActive && <Badge variant="warning">{t.products.comingSoon}</Badge>}
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">{product.name}</h1>
-          <p className="text-dark-400 mb-6 leading-relaxed">{product.description}</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-4">{product.name}</h1>
+          <p className="text-text-muted mb-6 leading-relaxed">{product.description}</p>
 
           {product.features.length > 0 && (
             <div className="mb-8">
-              <h3 className="font-semibold text-white mb-3">{t.products.features}</h3>
+              <h3 className="font-semibold text-text-primary mb-3">{t.products.features}</h3>
               <ul className="space-y-2">
                 {product.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-dark-300">
-                    <Check className="w-4 h-4 text-ocean-400" /> {f}
+                  <li key={f} className="flex items-center gap-2 text-sm text-text-secondary">
+                    <Check className="w-4 h-4 text-brand-green-500" /> {f}
                   </li>
                 ))}
               </ul>
@@ -110,7 +110,7 @@ export default function ProductDetailPage() {
           {showDemoForm && (
             <AnimatedSection>
               <GlowCard hover={false} glowColor="purple">
-                <h3 className="text-lg font-semibold text-white mb-4">{t.products.requestDemo}</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">{t.products.requestDemo}</h3>
                 <div className="space-y-4">
                   <Input
                     label={t.contact.email}
