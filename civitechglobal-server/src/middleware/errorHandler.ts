@@ -1,20 +1,39 @@
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../config/logger.js';
 
 export class AppError extends Error {
   statusCode: number;
-  constructor(message: string, statusCode: number) {
+  errors?: Array<{ path: string; message: string }>;
+
+  constructor(message: string, statusCode: number, errors?: Array<{ path: string; message: string }>) {
     super(message);
     this.statusCode = statusCode;
+    this.errors = errors;
   }
 }
 
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  console.error('Error:', err.message);
+  logger.error({ err }, 'Unhandled error');
 
   if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
+    const response: Record<string, unknown> = {
       success: false,
       message: err.message,
+    };
+    if (err.errors) {
+      response.errors = err.errors;
+    }
+    return res.status(err.statusCode).json(response);
+  }
+
+  // Handle validation errors created by the validate middleware
+  const statusCode = (err as { statusCode?: number }).statusCode;
+  const errors = (err as { errors?: Array<{ path: string; message: string }> }).errors;
+  if (statusCode === 400 && errors) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+      errors,
     });
   }
 

@@ -1,11 +1,12 @@
-import { type ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { type ReactNode } from "react";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "../../hooks/useReducedMotion";
 
 interface AnimatedSectionProps {
   children: ReactNode;
   className?: string;
   delay?: number;
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: "up" | "down" | "left" | "right";
 }
 
 const directionOffsets = {
@@ -15,15 +16,25 @@ const directionOffsets = {
   right: { x: -40 },
 };
 
-export function AnimatedSection({ children, className, delay = 0, direction = 'up' }: AnimatedSectionProps) {
+export function AnimatedSection({
+  children,
+  className,
+  delay = 0,
+  direction = "up",
+}: AnimatedSectionProps) {
+  const reducedMotion = useReducedMotion();
   const offset = directionOffsets[direction];
+
+  if (reducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, ...offset }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={className}
     >
       {children}

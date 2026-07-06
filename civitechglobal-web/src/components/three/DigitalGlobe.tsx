@@ -1,7 +1,7 @@
-import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
+import { useRef, useMemo, useCallback, useState, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -25,12 +25,22 @@ function fibonacciSphere(count: number, radius: number): Float32Array {
 }
 
 /** Detect WebGL availability */
+/** Deterministic seeded PRNG (mulberry32) for stable render output. */
+function mulberry32(seed: number) {
+  return function () {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function isWebGLAvailable(): boolean {
   try {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     return !!(
       window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
     );
   } catch {
     return false;
@@ -49,42 +59,70 @@ interface CityCluster {
 
 const CITY_CLUSTERS: CityCluster[] = [
   // Roughly: New York, London, Dubai, Tokyo, Sydney, Sao Paulo, Mumbai
-  { lat: 40.7, lon: -74.0, buildings: [
-    { dx: 0, dz: 0, h: 0.08, w: 0.012 },
-    { dx: 0.02, dz: 0.01, h: 0.06, w: 0.01 },
-    { dx: -0.015, dz: 0.015, h: 0.07, w: 0.008 },
-    { dx: 0.01, dz: -0.01, h: 0.05, w: 0.01 },
-  ]},
-  { lat: 51.5, lon: -0.12, buildings: [
-    { dx: 0, dz: 0, h: 0.06, w: 0.01 },
-    { dx: 0.015, dz: 0.01, h: 0.05, w: 0.009 },
-    { dx: -0.01, dz: -0.01, h: 0.045, w: 0.008 },
-  ]},
-  { lat: 25.2, lon: 55.3, buildings: [
-    { dx: 0, dz: 0, h: 0.09, w: 0.008 },
-    { dx: 0.012, dz: 0.008, h: 0.06, w: 0.01 },
-    { dx: -0.01, dz: 0.012, h: 0.055, w: 0.007 },
-  ]},
-  { lat: 35.7, lon: 139.7, buildings: [
-    { dx: 0, dz: 0, h: 0.07, w: 0.01 },
-    { dx: 0.018, dz: 0.005, h: 0.055, w: 0.009 },
-    { dx: -0.012, dz: 0.01, h: 0.065, w: 0.008 },
-    { dx: 0.005, dz: -0.015, h: 0.04, w: 0.01 },
-  ]},
-  { lat: -33.9, lon: 151.2, buildings: [
-    { dx: 0, dz: 0, h: 0.05, w: 0.009 },
-    { dx: 0.01, dz: 0.01, h: 0.04, w: 0.008 },
-  ]},
-  { lat: -23.5, lon: -46.6, buildings: [
-    { dx: 0, dz: 0, h: 0.06, w: 0.01 },
-    { dx: 0.015, dz: -0.005, h: 0.05, w: 0.008 },
-    { dx: -0.008, dz: 0.012, h: 0.045, w: 0.009 },
-  ]},
-  { lat: 19.1, lon: 72.9, buildings: [
-    { dx: 0, dz: 0, h: 0.055, w: 0.009 },
-    { dx: 0.012, dz: 0.008, h: 0.045, w: 0.008 },
-    { dx: -0.01, dz: -0.006, h: 0.05, w: 0.007 },
-  ]},
+  {
+    lat: 40.7,
+    lon: -74.0,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.08, w: 0.012 },
+      { dx: 0.02, dz: 0.01, h: 0.06, w: 0.01 },
+      { dx: -0.015, dz: 0.015, h: 0.07, w: 0.008 },
+      { dx: 0.01, dz: -0.01, h: 0.05, w: 0.01 },
+    ],
+  },
+  {
+    lat: 51.5,
+    lon: -0.12,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.06, w: 0.01 },
+      { dx: 0.015, dz: 0.01, h: 0.05, w: 0.009 },
+      { dx: -0.01, dz: -0.01, h: 0.045, w: 0.008 },
+    ],
+  },
+  {
+    lat: 25.2,
+    lon: 55.3,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.09, w: 0.008 },
+      { dx: 0.012, dz: 0.008, h: 0.06, w: 0.01 },
+      { dx: -0.01, dz: 0.012, h: 0.055, w: 0.007 },
+    ],
+  },
+  {
+    lat: 35.7,
+    lon: 139.7,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.07, w: 0.01 },
+      { dx: 0.018, dz: 0.005, h: 0.055, w: 0.009 },
+      { dx: -0.012, dz: 0.01, h: 0.065, w: 0.008 },
+      { dx: 0.005, dz: -0.015, h: 0.04, w: 0.01 },
+    ],
+  },
+  {
+    lat: -33.9,
+    lon: 151.2,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.05, w: 0.009 },
+      { dx: 0.01, dz: 0.01, h: 0.04, w: 0.008 },
+    ],
+  },
+  {
+    lat: -23.5,
+    lon: -46.6,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.06, w: 0.01 },
+      { dx: 0.015, dz: -0.005, h: 0.05, w: 0.008 },
+      { dx: -0.008, dz: 0.012, h: 0.045, w: 0.009 },
+    ],
+  },
+  {
+    lat: 19.1,
+    lon: 72.9,
+    buildings: [
+      { dx: 0, dz: 0, h: 0.055, w: 0.009 },
+      { dx: 0.012, dz: 0.008, h: 0.045, w: 0.008 },
+      { dx: -0.01, dz: -0.006, h: 0.05, w: 0.007 },
+    ],
+  },
 ];
 
 function latLonToVec3(lat: number, lon: number, radius: number): THREE.Vector3 {
@@ -101,7 +139,7 @@ function latLonToVec3(lat: number, lon: number, radius: number): THREE.Vector3 {
 // CityBuildings – extruded rectangles placed on sphere surface
 // ---------------------------------------------------------------------------
 
-const BUILDING_COLOR = new THREE.Color('#00b8ff');
+const BUILDING_COLOR = new THREE.Color("#00b8ff");
 
 function CityBuildings({ radius }: { radius: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
@@ -117,10 +155,15 @@ function CityBuildings({ radius }: { radius: number }) {
       const up = new THREE.Vector3(0, 1, 0);
       const tangent = new THREE.Vector3().crossVectors(up, normal).normalize();
       if (tangent.length() < 0.01) tangent.set(1, 0, 0);
-      const bitangent = new THREE.Vector3().crossVectors(normal, tangent).normalize();
+      const bitangent = new THREE.Vector3()
+        .crossVectors(normal, tangent)
+        .normalize();
 
       for (const b of cluster.buildings) {
-        const offset = tangent.clone().multiplyScalar(b.dx).add(bitangent.clone().multiplyScalar(b.dz));
+        const offset = tangent
+          .clone()
+          .multiplyScalar(b.dx)
+          .add(bitangent.clone().multiplyScalar(b.dz));
         const pos = center.clone().add(offset);
         const top = pos.clone().add(normal.clone().multiplyScalar(b.h));
         const mid = pos.clone().add(normal.clone().multiplyScalar(b.h / 2));
@@ -168,12 +211,18 @@ function CityBuildings({ radius }: { radius: number }) {
 // GlobePoints – point cloud with mouse proximity glow
 // ---------------------------------------------------------------------------
 
-const BASE_COLOR = new THREE.Color('#0080e6');
-const GLOW_COLOR = new THREE.Color('#00d4ff');
+const BASE_COLOR = new THREE.Color("#0080e6");
+const GLOW_COLOR = new THREE.Color("#00d4ff");
 const TEMP_COLOR = new THREE.Color();
 const TEMP_VEC = new THREE.Vector3();
 
-function GlobePoints({ radius, pointCount }: { radius: number; pointCount: number }) {
+function GlobePoints({
+  radius,
+  pointCount,
+}: {
+  radius: number;
+  pointCount: number;
+}) {
   const pointsRef = useRef<THREE.Points>(null);
   const pointerWorld = useRef(new THREE.Vector3(0, 0, 100));
   const { camera, raycaster, pointer } = useThree();
@@ -197,9 +246,10 @@ function GlobePoints({ radius, pointCount }: { radius: number; pointCount: numbe
   }, [pointCount, radius]);
 
   const sizes = useMemo(() => {
+    const rng = mulberry32(12345);
     const s = new Float32Array(pointCount);
     for (let i = 0; i < pointCount; i++) {
-      s[i] = 0.012 + Math.random() * 0.008;
+      s[i] = 0.012 + rng() * 0.008;
     }
     return s;
   }, [pointCount]);
@@ -215,9 +265,13 @@ function GlobePoints({ radius, pointCount }: { radius: number; pointCount: numbe
       pointerWorld.current.copy(intersects[0].point);
     }
 
-    const colorAttr = pts.geometry.getAttribute('color') as THREE.BufferAttribute;
-    const sizeAttr = pts.geometry.getAttribute('size') as THREE.BufferAttribute;
-    const posAttr = pts.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const colorAttr = pts.geometry.getAttribute(
+      "color",
+    ) as THREE.BufferAttribute;
+    const sizeAttr = pts.geometry.getAttribute("size") as THREE.BufferAttribute;
+    const posAttr = pts.geometry.getAttribute(
+      "position",
+    ) as THREE.BufferAttribute;
     const pw = pointerWorld.current;
 
     for (let i = 0; i < pointCount; i++) {
@@ -241,18 +295,12 @@ function GlobePoints({ radius, pointCount }: { radius: number; pointCount: numbe
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute
           attach="attributes-color"
           args={[baseColors.slice(), 3]}
         />
-        <bufferAttribute
-          attach="attributes-size"
-          args={[sizes.slice(), 1]}
-        />
+        <bufferAttribute attach="attributes-size" args={[sizes.slice(), 1]} />
       </bufferGeometry>
       <pointsMaterial
         vertexColors
@@ -333,22 +381,22 @@ function GlobeFallback() {
   return (
     <div
       style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <div
         style={{
-          width: '60%',
+          width: "60%",
           maxWidth: 400,
-          aspectRatio: '1 / 1',
-          borderRadius: '50%',
+          aspectRatio: "1 / 1",
+          borderRadius: "50%",
           background:
-            'radial-gradient(circle at 35% 35%, #00d4ff 0%, #0080e6 40%, #003366 75%, #060911 100%)',
-          boxShadow: '0 0 60px 10px rgba(0, 128, 230, 0.25)',
+            "radial-gradient(circle at 35% 35%, #00d4ff 0%, #0080e6 40%, #003366 75%, #060911 100%)",
+          boxShadow: "0 0 60px 10px rgba(0, 128, 230, 0.25)",
         }}
       />
     </div>
@@ -362,7 +410,7 @@ function GlobeFallback() {
 export function DigitalGlobe() {
   const [webgl] = useState(() => isWebGLAvailable());
   const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth < 768 : false,
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
   );
 
   const handleResize = useCallback(() => {
@@ -370,31 +418,31 @@ export function DigitalGlobe() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
 
   const pointCount = isMobile ? 1200 : 2500;
 
   if (!webgl) {
     return (
-      <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ width: "100%", height: "100%" }}>
         <GlobeFallback />
       </div>
     );
   }
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <Canvas
         camera={{ position: [0, 0, 3.2], fov: 45 }}
         dpr={[1, isMobile ? 1.5 : 2]}
         gl={{
           antialias: true,
           alpha: true,
-          powerPreference: 'high-performance',
+          powerPreference: "high-performance",
         }}
-        style={{ background: 'transparent' }}
+        style={{ background: "transparent" }}
       >
         <GlobeScene pointCount={pointCount} />
       </Canvas>

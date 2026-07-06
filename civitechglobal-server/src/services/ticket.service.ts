@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -20,7 +21,10 @@ export async function getUserTickets(userId: string, query: Record<string, unkno
 
   const [tickets, total] = await Promise.all([
     prisma.ticket.findMany({
-      where: { userId }, skip, take: limit, orderBy: { updatedAt: 'desc' },
+      where: { userId },
+      skip,
+      take: limit,
+      orderBy: { updatedAt: 'desc' },
       include: { _count: { select: { messages: true } } },
     }),
     prisma.ticket.count({ where: { userId } }),
@@ -42,8 +46,14 @@ export async function getAllTickets(query: Record<string, unknown>) {
 
   const [tickets, total] = await Promise.all([
     prisma.ticket.findMany({
-      where, skip, take: limit, orderBy: { updatedAt: 'desc' },
-      include: { user: { select: { id: true, email: true, firstName: true, lastName: true } }, _count: { select: { messages: true } } },
+      where,
+      skip,
+      take: limit,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        _count: { select: { messages: true } },
+      },
     }),
     prisma.ticket.count({ where }),
   ]);
@@ -59,7 +69,10 @@ export async function getTicketById(id: string, userId?: string) {
     where,
     include: {
       user: { select: { id: true, email: true, firstName: true, lastName: true } },
-      messages: { include: { user: { select: { id: true, firstName: true, lastName: true, role: true } } }, orderBy: { createdAt: 'asc' } },
+      messages: {
+        include: { user: { select: { id: true, firstName: true, lastName: true, role: true } } },
+        orderBy: { createdAt: 'asc' },
+      },
     },
   });
   if (!ticket) throw new AppError('Ticket not found', 404);
@@ -79,5 +92,5 @@ export async function addTicketMessage(ticketId: string, userId: string, content
 export async function updateTicketStatus(id: string, data: { status?: string; priority?: string }) {
   const ticket = await prisma.ticket.findUnique({ where: { id } });
   if (!ticket) throw new AppError('Ticket not found', 404);
-  return prisma.ticket.update({ where: { id }, data: data as any });
+  return prisma.ticket.update({ where: { id }, data: data as Prisma.TicketUpdateInput });
 }

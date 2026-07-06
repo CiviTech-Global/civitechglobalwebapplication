@@ -1,5 +1,6 @@
 import fastify from 'fastify';
 import { Bot, GrammyError, HttpError } from 'grammy';
+import type { Update } from '@grammyjs/types';
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { session } from 'grammy';
 import { botConfig } from './config.js';
@@ -10,6 +11,8 @@ import { helpCommand } from './commands/help.command.js';
 import { cancelCommand } from './commands/cancel.command.js';
 import { leadConversation } from './conversations/lead.conversation.js';
 import type { BotContext, SessionData } from './types.js';
+
+const TELEGRAM_SECRET_HEADER = 'x-telegram-bot-api-secret-token';
 
 export function createBot(): Bot<BotContext> {
   const bot = new Bot<BotContext>(botConfig.token);
@@ -61,12 +64,23 @@ export async function createApp(): Promise<ReturnType<typeof fastify>> {
 
   if (botConfig.mode === 'webhook' && botConfig.webhookUrl) {
     app.post('/webhook', async (request, reply) => {
-      const update = request.body as any;
+      // Validate webhook secret token if configured
+      if (botConfig.webhookSecret) {
+        const secretHeader = request.headers[TELEGRAM_SECRET_HEADER];
+        if (secretHeader !== botConfig.webhookSecret) {
+          logger.warn({ ip: request.ip }, 'Webhook request with invalid secret token');
+          return reply.status(401).send({ ok: false, error: 'Unauthorized' });
+        }
+      }
+
+      const update = request.body as Update;
       await bot.handleUpdate(update);
       return reply.status(200).send({ ok: true });
     });
 
-    await bot.api.setWebhook(botConfig.webhookUrl);
+    const webhookOptions = botConfig.webhookSecret ? { secret_token: botConfig.webhookSecret } : undefined;
+
+    await bot.api.setWebhook(botConfig.webhookUrl, webhookOptions);
     logger.info({ webhookUrl: botConfig.webhookUrl }, 'Webhook set');
   }
 

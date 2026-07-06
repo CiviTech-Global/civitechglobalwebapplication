@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server:
+    name: Server Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./civitechglobal-server
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: civitechglobal
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./civitechglobal-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgres://user:password@localhost:5432/civitechglobal?schema=public
+          JWT_SECRET: test-jwt-secret-min-32-chars-long
+          JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
+          ADMIN_PASSWORD: TestAdminPass123!
+          DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
+          USER_PASSWORD: TestUserPass123!
+        run: npx prisma migrate deploy
+
+      - name: Type check
+        env:
+          DATABASE_URL: postgres://user:password@localhost:5432/civitechglobal?schema=public
+          JWT_SECRET: test-jwt-secret-min-32-chars-long
+          JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
+          ADMIN_PASSWORD: TestAdminPass123!
+          DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
+          USER_PASSWORD: TestUserPass123!
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Test
+        env:
+          DATABASE_URL: postgres://user:password@localhost:5432/civitechglobal?schema=public
+          JWT_SECRET: test-jwt-secret-min-32-chars-long
+          JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
+          ADMIN_PASSWORD: TestAdminPass123!
+          DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
+          USER_PASSWORD: TestUserPass123!
+          TELEGRAM_BOT_TOKEN: test-token
+        run: npm run test
+
+  web:
+    name: Web Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./civitechglobal-web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./civitechglobal-web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build server API image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-server
+          target: api
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build server bot image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-server
+          target: bot
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build web image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-web
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

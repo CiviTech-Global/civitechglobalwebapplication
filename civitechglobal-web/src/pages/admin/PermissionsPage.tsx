@@ -1,25 +1,25 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ShieldCheck, Save } from 'lucide-react';
-import api from '../../config/api';
-import type { User, ApiResponse } from '../../types';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Spinner } from '../../components/ui/Spinner';
-import { useAuth } from '../../hooks/useAuth';
-import { useLocale } from '../../hooks/useLocale';
-import { useToast } from '../../components/ui/Toast';
+import { useState } from "react";
+import { Navigate } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ShieldCheck, Save } from "lucide-react";
+import api from "../../config/api";
+import type { User, ApiResponse } from "../../types";
+import { Card } from "../../components/ui/Card";
+import { Button } from "../../components/ui/Button";
+import { Spinner } from "../../components/ui/Spinner";
+import { useAuth } from "../../hooks/useAuth";
+import { useLocale } from "../../hooks/useLocale";
+import { useToast } from "../../hooks/useToast";
 
 const ALL_PERMISSIONS = [
-  { key: 'products', labelEn: 'Products', labelFa: 'محصولات' },
-  { key: 'services', labelEn: 'Services', labelFa: 'خدمات' },
-  { key: 'opportunities', labelEn: 'Opportunities', labelFa: 'فرصت‌ها' },
-  { key: 'orders', labelEn: 'Orders', labelFa: 'سفارش‌ها' },
-  { key: 'tickets', labelEn: 'Tickets', labelFa: 'تیکت‌ها' },
-  { key: 'users', labelEn: 'Users', labelFa: 'کاربران' },
-  { key: 'content', labelEn: 'Content', labelFa: 'محتوا' },
-  { key: 'analytics', labelEn: 'Analytics', labelFa: 'تحلیل‌ها' },
+  { key: "products", labelEn: "Products", labelFa: "محصولات" },
+  { key: "services", labelEn: "Services", labelFa: "خدمات" },
+  { key: "opportunities", labelEn: "Opportunities", labelFa: "فرصت‌ها" },
+  { key: "orders", labelEn: "Orders", labelFa: "سفارش‌ها" },
+  { key: "tickets", labelEn: "Tickets", labelFa: "تیکت‌ها" },
+  { key: "users", labelEn: "Users", labelFa: "کاربران" },
+  { key: "content", labelEn: "Content", labelFa: "محتوا" },
+  { key: "analytics", labelEn: "Analytics", labelFa: "تحلیل‌ها" },
 ];
 
 export default function AdminPermissions() {
@@ -28,43 +28,58 @@ export default function AdminPermissions() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [editing, setEditing] = useState<Record<string, string[]>>({});
-
-  if (user?.role !== 'SUPER_ADMIN') {
-    return <Navigate to="/admin" replace />;
-  }
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-permissions-users'],
+    queryKey: ["admin-permissions-users"],
     queryFn: async () => {
       const { data } = await api.get<ApiResponse<User[]>>(`/users?role=ADMIN`);
       return data.data;
     },
+    enabled: isSuperAdmin,
   });
 
   const updatePermissions = useMutation({
-    mutationFn: async ({ id, permissions }: { id: string; permissions: string[] }) => {
+    mutationFn: async ({
+      id,
+      permissions,
+    }: {
+      id: string;
+      permissions: string[];
+    }) => {
       await api.put(`/users/${id}/permissions`, { permissions });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-permissions-users'] });
-      toast(t.admin.permissions?.saveSuccess || 'Permissions saved', 'success');
+      queryClient.invalidateQueries({ queryKey: ["admin-permissions-users"] });
+      toast(t.admin.permissions?.saveSuccess || "Permissions saved", "success");
     },
     onError: () => {
-      toast(t.error || 'An error occurred', 'error');
+      toast(t.error || "An error occurred", "error");
     },
   });
+
+  if (!isSuperAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
 
   if (isLoading) return <Spinner size="lg" />;
 
   const admins = data || [];
 
   const getPerms = (admin: User) => {
-    return editing[admin.id] !== undefined ? editing[admin.id] : (admin.permissions || []);
+    return editing[admin.id] !== undefined
+      ? editing[admin.id]
+      : admin.permissions || [];
   };
 
   const togglePerm = (adminId: string, perm: string) => {
-    const current = getPerms({ id: adminId, permissions: editing[adminId] } as User);
-    const next = current.includes(perm) ? current.filter((p) => p !== perm) : [...current, perm];
+    const current = getPerms({
+      id: adminId,
+      permissions: editing[adminId],
+    } as User);
+    const next = current.includes(perm)
+      ? current.filter((p) => p !== perm)
+      : [...current, perm];
     setEditing((prev) => ({ ...prev, [adminId]: next }));
   };
 
@@ -72,7 +87,10 @@ export default function AdminPermissions() {
     const current = editing[admin.id];
     if (current === undefined) return false;
     const original = admin.permissions || [];
-    return current.length !== original.length || current.some((p) => !original.includes(p));
+    return (
+      current.length !== original.length ||
+      current.some((p) => !original.includes(p))
+    );
   };
 
   return (
@@ -80,7 +98,7 @@ export default function AdminPermissions() {
       <div className="flex items-center gap-2 mb-6">
         <ShieldCheck className="w-6 h-6 text-brand-green-600" />
         <h1 className="text-2xl font-bold text-text-primary">
-          {t.admin.permissions?.title || 'Permissions'}
+          {t.admin.permissions?.title || "Permissions"}
         </h1>
       </div>
 
@@ -102,7 +120,12 @@ export default function AdminPermissions() {
                 {isDirty(admin) && (
                   <Button
                     size="sm"
-                    onClick={() => updatePermissions.mutate({ id: admin.id, permissions: getPerms(admin) })}
+                    onClick={() =>
+                      updatePermissions.mutate({
+                        id: admin.id,
+                        permissions: getPerms(admin),
+                      })
+                    }
                     disabled={updatePermissions.isPending}
                   >
                     <Save className="w-4 h-4 me-2" />
@@ -119,8 +142,8 @@ export default function AdminPermissions() {
                       key={perm.key}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                         checked
-                          ? 'border-brand-green-700 bg-brand-green-900/20'
-                          : 'border-border-default hover:bg-surface-200'
+                          ? "border-brand-green-700 bg-brand-green-900/20"
+                          : "border-border-default hover:bg-surface-200"
                       }`}
                     >
                       <input
@@ -130,7 +153,7 @@ export default function AdminPermissions() {
                         onChange={() => togglePerm(admin.id, perm.key)}
                       />
                       <span className="text-sm text-text-secondary">
-                        {locale === 'fa' ? perm.labelFa : perm.labelEn}
+                        {locale === "fa" ? perm.labelFa : perm.labelEn}
                       </span>
                     </label>
                   );

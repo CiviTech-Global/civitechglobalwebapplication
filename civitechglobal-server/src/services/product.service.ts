@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -27,13 +28,13 @@ export async function getProductBySlug(slug: string) {
 }
 
 export async function createProduct(data: Record<string, unknown>) {
-  return prisma.product.create({ data: data as any });
+  return prisma.product.create({ data: data as Prisma.ProductCreateInput });
 }
 
 export async function updateProduct(id: string, data: Record<string, unknown>) {
   const product = await prisma.product.findUnique({ where: { id } });
   if (!product) throw new AppError('Product not found', 404);
-  return prisma.product.update({ where: { id }, data: data as any });
+  return prisma.product.update({ where: { id }, data: data as Prisma.ProductUpdateInput });
 }
 
 export async function deleteProduct(id: string) {

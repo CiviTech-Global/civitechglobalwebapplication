@@ -1,7 +1,11 @@
+import { OrderStatus } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 
-export async function createOrder(userId: string, data: { items: { productId: string; quantity: number }[]; notes?: string }) {
+export async function createOrder(
+  userId: string,
+  data: { items: { productId: string; quantity: number }[]; notes?: string },
+) {
   const productIds = data.items.map((i) => i.productId);
   const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
 
@@ -32,7 +36,10 @@ export async function getUserOrders(userId: string, query: Record<string, unknow
 
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
-      where: { userId }, skip, take: limit, orderBy: { createdAt: 'desc' },
+      where: { userId },
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
       include: { items: { include: { product: { select: { id: true, name: true, image: true } } } } },
     }),
     prisma.order.count({ where: { userId } }),
@@ -52,8 +59,14 @@ export async function getAllOrders(query: Record<string, unknown>) {
 
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
-      where, skip, take: limit, orderBy: { createdAt: 'desc' },
-      include: { user: { select: { id: true, email: true, firstName: true, lastName: true } }, items: { include: { product: { select: { id: true, name: true } } } } },
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        items: { include: { product: { select: { id: true, name: true } } } },
+      },
     }),
     prisma.order.count({ where }),
   ]);
@@ -67,7 +80,10 @@ export async function getOrderById(id: string, userId?: string) {
 
   const order = await prisma.order.findFirst({
     where,
-    include: { user: { select: { id: true, email: true, firstName: true, lastName: true } }, items: { include: { product: true } } },
+    include: {
+      user: { select: { id: true, email: true, firstName: true, lastName: true } },
+      items: { include: { product: true } },
+    },
   });
   if (!order) throw new AppError('Order not found', 404);
   return order;
@@ -76,5 +92,5 @@ export async function getOrderById(id: string, userId?: string) {
 export async function updateOrderStatus(id: string, status: string) {
   const order = await prisma.order.findUnique({ where: { id } });
   if (!order) throw new AppError('Order not found', 404);
-  return prisma.order.update({ where: { id }, data: { status: status as any } });
+  return prisma.order.update({ where: { id }, data: { status: status as OrderStatus } });
 }

@@ -1,22 +1,31 @@
-import { useQuery } from '@tanstack/react-query';
-import api from '../../config/api';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
-import { Spinner } from '../../components/ui/Spinner';
-import { formatDate } from '../../lib/utils';
-import { useLocale } from '../../hooks/useLocale';
+import { useQuery } from "@tanstack/react-query";
+import api from "../../config/api";
+import type { OpportunityApplication } from "../../types";
+import { Card } from "../../components/ui/Card";
+import { Badge } from "../../components/ui/Badge";
+import { Spinner } from "../../components/ui/Spinner";
+import { formatDate } from "../../lib/utils";
+import { useLocale } from "../../hooks/useLocale";
 
-const statusVariants: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
-  PENDING: 'warning', REVIEWING: 'info', ACCEPTED: 'success', REJECTED: 'danger',
+const statusVariants: Record<
+  string,
+  "default" | "success" | "warning" | "danger" | "info"
+> = {
+  PENDING: "warning",
+  REVIEWING: "info",
+  ACCEPTED: "success",
+  REJECTED: "danger",
 };
 
 export default function OpportunitiesPage() {
   const { t } = useLocale();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['my-applications'],
+    queryKey: ["my-applications"],
     queryFn: async () => {
-      const { data } = await api.get('/opportunities/user/applications');
+      const { data } = await api.get<{ data: OpportunityApplication[] }>(
+        "/opportunities/user/applications",
+      );
       return data;
     },
   });
@@ -25,26 +34,49 @@ export default function OpportunitiesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-text-primary mb-6">{t.dashboard.myApplications}</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-6">
+        {t.dashboard.myApplications}
+      </h1>
 
-      {(!data?.data || data.data.length === 0) ? (
-        <Card><p className="text-center text-text-muted py-8">{t.dashboard.noApplications}</p></Card>
+      {!data?.data || data.data.length === 0 ? (
+        <Card>
+          <p className="text-center text-text-muted py-8">
+            {t.dashboard.noApplications}
+          </p>
+        </Card>
       ) : (
         <div className="space-y-4">
-          {data.data.map((app: any) => (
+          {data.data.map((app) => (
             <Card key={app.id}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-text-primary">{app.opportunity?.title}</h3>
+                  <h3 className="font-semibold text-text-primary">
+                    {app.opportunity?.title}
+                  </h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge variant={app.opportunity?.opportunityType === 'JOB' ? 'info' : 'success'} className="text-xs">
-                      {app.opportunity?.opportunityType === 'JOB' ? t.opportunities.job : t.opportunities.internship}
+                    <Badge
+                      variant={
+                        app.opportunity?.opportunityType === "JOB"
+                          ? "info"
+                          : "success"
+                      }
+                      className="text-xs"
+                    >
+                      {app.opportunity?.opportunityType === "JOB"
+                        ? t.opportunities.job
+                        : t.opportunities.internship}
                     </Badge>
-                    <span className="text-sm text-text-muted">{formatDate(app.createdAt)}</span>
+                    <span className="text-sm text-text-muted">
+                      {formatDate(app.createdAt)}
+                    </span>
                   </div>
                 </div>
                 <Badge variant={statusVariants[app.status]}>
-                  {t.admin.applicationStatus[app.status as keyof typeof t.admin.applicationStatus]}
+                  {
+                    t.admin.applicationStatus[
+                      app.status as keyof typeof t.admin.applicationStatus
+                    ]
+                  }
                 </Badge>
               </div>
             </Card>

@@ -5,18 +5,27 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 // Configurable seed credentials from environment variables
+// IMPORTANT: Do not commit real passwords. Set these via .env before seeding.
+function getSeedCredential(key: string): string {
+  const value = process.env[key];
+  if (!value || value.trim() === '') {
+    throw new Error(`Missing required seed credential: ${key}. Set it in .env before running prisma db seed.`);
+  }
+  return value;
+}
+
 const SUPER_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'superadmin@civitechglobal.com';
-const SUPER_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'SuperAdmin@123';
+const SUPER_ADMIN_PASSWORD = getSeedCredential('ADMIN_PASSWORD');
 const SUPER_ADMIN_FIRST_NAME = process.env.ADMIN_FIRST_NAME || 'Super';
 const SUPER_ADMIN_LAST_NAME = process.env.ADMIN_LAST_NAME || 'Admin';
 
 const DEMO_ADMIN_EMAIL = process.env.DEMO_ADMIN_EMAIL || 'admin@civitechglobal.com';
-const DEMO_ADMIN_PASSWORD = process.env.DEMO_ADMIN_PASSWORD || 'Admin@123';
+const DEMO_ADMIN_PASSWORD = getSeedCredential('DEMO_ADMIN_PASSWORD');
 const DEMO_ADMIN_FIRST_NAME = process.env.DEMO_ADMIN_FIRST_NAME || 'Manager';
 const DEMO_ADMIN_LAST_NAME = process.env.DEMO_ADMIN_LAST_NAME || 'Admin';
 
 const USER_EMAIL = process.env.USER_EMAIL || 'user@civitechglobal.com';
-const USER_PASSWORD = process.env.USER_PASSWORD || 'User@123';
+const USER_PASSWORD = getSeedCredential('USER_PASSWORD');
 const USER_FIRST_NAME = process.env.USER_FIRST_NAME || 'Demo';
 const USER_LAST_NAME = process.env.USER_LAST_NAME || 'User';
 
@@ -471,10 +480,11 @@ async function main() {
 
   console.log('Seeding complete!');
   console.log('----------------------------------------');
-  console.log('Super Admin :', SUPER_ADMIN_EMAIL, '/', SUPER_ADMIN_PASSWORD);
-  console.log('Demo Admin  :', DEMO_ADMIN_EMAIL, '/', DEMO_ADMIN_PASSWORD);
-  console.log('Demo User   :', USER_EMAIL, '/', USER_PASSWORD);
+  console.log('Super Admin :', SUPER_ADMIN_EMAIL);
+  console.log('Demo Admin  :', DEMO_ADMIN_EMAIL);
+  console.log('Demo User   :', USER_EMAIL);
   console.log('----------------------------------------');
+  console.log('Passwords were read from environment variables and are not logged.');
 }
 
 main()

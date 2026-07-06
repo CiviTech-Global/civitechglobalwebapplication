@@ -36,10 +36,9 @@ function formatConfirmation(lead: LeadData): string {
 async function selectCategory(conversation: BotConversation, ctx: BotContext, lead: LeadData): Promise<void> {
   const categories = await conversation.external(() => insuranceService.getAllCategories());
 
-  await ctx.reply(
-    'لطفا نوع بیمه مورد نظر خود را انتخاب کنید:',
-    { reply_markup: persianKeyboards.categories(categories) },
-  );
+  await ctx.reply('لطفا نوع بیمه مورد نظر خود را انتخاب کنید:', {
+    reply_markup: persianKeyboards.categories(categories),
+  });
 
   const response = await conversation.waitForCallbackQuery(/^category:(.+)$/);
   await response.answerCallbackQuery();
@@ -62,19 +61,16 @@ async function selectSubcategory(conversation: BotConversation, ctx: BotContext,
     throw new Error('Missing categoryId in session');
   }
 
-  const subcategories = await conversation.external(() =>
-    insuranceService.getSubcategoriesByCategoryId(categoryId),
-  );
+  const subcategories = await conversation.external(() => insuranceService.getSubcategoriesByCategoryId(categoryId));
 
   if (subcategories.length === 0) {
     await ctx.reply('برای این دسته‌بندی زیرشاخه‌ای یافت نشد. لطفا دسته دیگری انتخاب کنید.');
     return selectSubcategory(conversation, ctx, lead);
   }
 
-  await ctx.reply(
-    'لطفا زیرشاخه بیمه مورد نظر خود را انتخاب کنید:',
-    { reply_markup: persianKeyboards.subcategories(subcategories) },
-  );
+  await ctx.reply('لطفا زیرشاخه بیمه مورد نظر خود را انتخاب کنید:', {
+    reply_markup: persianKeyboards.subcategories(subcategories),
+  });
 
   const response = await conversation.waitForCallbackQuery(/^(subcategory|back):(.+)$/);
   await response.answerCallbackQuery();
@@ -86,9 +82,7 @@ async function selectSubcategory(conversation: BotConversation, ctx: BotContext,
     return selectSubcategory(conversation, ctx, lead);
   }
 
-  const subcategory = await conversation.external(() =>
-    insuranceService.getSubcategoryById(value),
-  );
+  const subcategory = await conversation.external(() => insuranceService.getSubcategoryById(value));
 
   if (!subcategory || subcategory.categoryId !== lead.categoryId) {
     await ctx.reply('زیرشاخه انتخاب شده نامعتبر است. لطفا دوباره تلاش کنید.');
@@ -107,7 +101,7 @@ async function askFullName(conversation: BotConversation, ctx: BotContext, lead:
 
   try {
     lead.fullName = parseFullName(text);
-  } catch (error) {
+  } catch {
     await ctx.reply('نام و نام خانوادگی باید بین ۳ تا ۱۰۰ کاراکتر باشد. لطفا دوباره وارد کنید:');
     return askFullName(conversation, ctx, lead);
   }
@@ -121,7 +115,7 @@ async function askPhoneNumber(conversation: BotConversation, ctx: BotContext, le
 
   try {
     lead.phoneNumber = parsePhoneNumber(text);
-  } catch (error) {
+  } catch {
     await ctx.reply('شماره تماس باید به فرمت ۰۹xxxxxxxxx باشد. لطفا دوباره وارد کنید:');
     return askPhoneNumber(conversation, ctx, lead);
   }
@@ -135,21 +129,14 @@ async function askCity(conversation: BotConversation, ctx: BotContext, lead: Lea
 
   try {
     lead.city = parseCity(text);
-  } catch (error) {
+  } catch {
     await ctx.reply('نام شهر باید بین ۲ تا ۱۰۰ کاراکتر باشد. لطفا دوباره وارد کنید:');
     return askCity(conversation, ctx, lead);
   }
 }
 
-async function askPreferredContactTime(
-  conversation: BotConversation,
-  ctx: BotContext,
-  lead: LeadData,
-): Promise<void> {
-  await ctx.reply(
-    'چه زمانی برای تماس مناسب‌تر است؟',
-    { reply_markup: persianKeyboards.contactTime() },
-  );
+async function askPreferredContactTime(conversation: BotConversation, ctx: BotContext, lead: LeadData): Promise<void> {
+  await ctx.reply('چه زمانی برای تماس مناسب‌تر است؟', { reply_markup: persianKeyboards.contactTime() });
 
   const response = await conversation.waitForCallbackQuery(/^contact_time:(.+)$/);
   await response.answerCallbackQuery();
@@ -157,17 +144,14 @@ async function askPreferredContactTime(
 
   try {
     lead.preferredContactTime = parsePreferredContactTime(contactTime);
-  } catch (error) {
+  } catch {
     await ctx.reply('زمان تماس نامعتبر است. لطفا دوباره انتخاب کنید:');
     return askPreferredContactTime(conversation, ctx, lead);
   }
 }
 
 async function askNotes(conversation: BotConversation, ctx: BotContext, lead: LeadData): Promise<void> {
-  await ctx.reply(
-    'توضیحات تکمیلی (اختیاری):',
-    { reply_markup: persianKeyboards.skipNotes() },
-  );
+  await ctx.reply('توضیحات تکمیلی (اختیاری):', { reply_markup: persianKeyboards.skipNotes() });
 
   const response = await conversation.waitFor('message:text');
   const text = response.msg.text.trim();
@@ -179,17 +163,13 @@ async function askNotes(conversation: BotConversation, ctx: BotContext, lead: Le
 
   try {
     lead.notes = parseNotes(text);
-  } catch (error) {
+  } catch {
     await ctx.reply('توضیحات نباید بیشتر از ۵۰۰ کاراکتر باشد. لطفا دوباره وارد کنید یا رد کنید:');
     return askNotes(conversation, ctx, lead);
   }
 }
 
-async function confirmAndSubmit(
-  conversation: BotConversation,
-  ctx: BotContext,
-  lead: LeadData,
-): Promise<boolean> {
+async function confirmAndSubmit(conversation: BotConversation, ctx: BotContext, lead: LeadData): Promise<boolean> {
   await ctx.reply(formatConfirmation(lead), {
     reply_markup: persianKeyboards.confirmation(),
   });
@@ -250,10 +230,7 @@ async function confirmAndSubmit(
   return false;
 }
 
-export async function leadConversation(
-  conversation: BotConversation,
-  ctx: BotContext,
-): Promise<void> {
+export async function leadConversation(conversation: BotConversation, ctx: BotContext): Promise<void> {
   const lead: LeadData = {};
 
   try {
@@ -283,9 +260,7 @@ export async function leadConversation(
       }),
     );
 
-    await conversation.external(() =>
-      notificationService.notifyAdmins(ctx.api, createdLead),
-    );
+    await conversation.external(() => notificationService.notifyAdmins(ctx.api, createdLead));
 
     await ctx.reply(
       [
@@ -301,8 +276,6 @@ export async function leadConversation(
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
     logger.error({ errorMessage, errorStack, error }, 'Error in lead conversation');
-    await ctx.reply(
-      'متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.',
-    );
+    await ctx.reply('متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.');
   }
 }

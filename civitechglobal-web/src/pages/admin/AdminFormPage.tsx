@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { ArrowLeft, Copy, Check } from 'lucide-react';
-import api from '../../config/api';
-import type { AdminRole, ApiResponse } from '../../types';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
-import { useToast } from '../../components/ui/Toast';
-import { useLocale } from '../../hooks/useLocale';
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { ArrowLeft, Copy, Check } from "lucide-react";
+import api from "../../config/api";
+import type { AdminRole, ApiResponse } from "../../types";
+import { Button } from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Select } from "../../components/ui/Select";
+import { useToast } from "../../hooks/useToast";
+import { useLocale } from "../../hooks/useLocale";
 
 export default function AdminFormPage() {
   const navigate = useNavigate();
@@ -17,18 +17,22 @@ export default function AdminFormPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    email: '',
-    firstName: '',
-    lastName: '',
-    adminRoleId: '',
+    email: "",
+    firstName: "",
+    lastName: "",
+    adminRoleId: "",
   });
 
-  const [credentials, setCredentials] = useState<{ username: string; password: string } | null>(null);
+  const [credentials, setCredentials] = useState<{
+    username: string;
+    password: string;
+  } | null>(null);
 
   const { data: rolesData } = useQuery({
-    queryKey: ['roles-list'],
+    queryKey: ["roles-list"],
     queryFn: async () => {
-      const { data } = await api.get<ApiResponse<AdminRole[]>>('/roles?limit=100');
+      const { data } =
+        await api.get<ApiResponse<AdminRole[]>>("/roles?limit=100");
       return data.data;
     },
   });
@@ -41,14 +45,16 @@ export default function AdminFormPage() {
         lastName: form.lastName,
       };
       if (form.adminRoleId) payload.adminRoleId = form.adminRoleId;
-      const { data } = await api.post<ApiResponse<{ username: string; password: string }>>('/users/admin', payload);
+      const { data } = await api.post<
+        ApiResponse<{ username: string; password: string }>
+      >("/users/admin", payload);
       return data.data;
     },
     onSuccess: (data) => {
       setCredentials(data);
-      toast(t.admin.adminForm.createSuccess, 'success');
+      toast(t.admin.adminForm.createSuccess, "success");
     },
-    onError: () => toast(t.admin.adminForm.createFailed, 'error'),
+    onError: () => toast(t.admin.adminForm.createFailed, "error"),
   });
 
   const copyToClipboard = (text: string, field: string) => {
@@ -57,11 +63,13 @@ export default function AdminFormPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const update = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+  const update =
+    (key: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   const roleOptions = [
-    { value: '', label: t.admin.adminForm.selectRole },
+    { value: "", label: t.admin.adminForm.selectRole },
     ...(rolesData?.map((r) => ({ value: r.id, label: r.name })) || []),
   ];
 
@@ -74,41 +82,70 @@ export default function AdminFormPage() {
 
         <div className="space-y-4 bg-surface-200 rounded-xl border border-border-default p-6">
           <div>
-            <label className="block text-xs text-text-muted mb-1">{t.admin.adminForm.username}</label>
+            <label className="block text-xs text-text-muted mb-1">
+              {t.admin.adminForm.username}
+            </label>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
                 {credentials.username}
               </code>
               <button
-                onClick={() => copyToClipboard(credentials.username, 'username')}
+                onClick={() =>
+                  copyToClipboard(credentials.username, "username")
+                }
                 className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
               >
-                {copied === 'username' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                {copied === "username" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs text-text-muted mb-1">{t.admin.adminForm.password}</label>
+            <label className="block text-xs text-text-muted mb-1">
+              {t.admin.adminForm.password}
+            </label>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
                 {credentials.password}
               </code>
               <button
-                onClick={() => copyToClipboard(credentials.password, 'password')}
+                onClick={() =>
+                  copyToClipboard(credentials.password, "password")
+                }
                 className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
               >
-                {copied === 'password' ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                {copied === "password" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
 
-          <p className="text-xs text-yellow-400 mt-4">{t.admin.adminForm.copyWarning}</p>
+          <p className="text-xs text-yellow-400 mt-4">
+            {t.admin.adminForm.copyWarning}
+          </p>
         </div>
 
         <div className="flex gap-3 mt-6">
-          <Button onClick={() => navigate('/admin/admins')}>{t.back}</Button>
-          <Button variant="outline" onClick={() => { setCredentials(null); setForm({ email: '', firstName: '', lastName: '', adminRoleId: '' }); }}>
+          <Button onClick={() => navigate("/admin/admins")}>{t.back}</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setCredentials(null);
+              setForm({
+                email: "",
+                firstName: "",
+                lastName: "",
+                adminRoleId: "",
+              });
+            }}
+          >
             {t.admin.addNew}
           </Button>
         </div>
@@ -118,7 +155,10 @@ export default function AdminFormPage() {
 
   return (
     <div className="max-w-lg">
-      <button onClick={() => navigate('/admin/admins')} className="flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary mb-4">
+      <button
+        onClick={() => navigate("/admin/admins")}
+        className="flex items-center gap-1 text-sm text-text-muted hover:text-text-secondary mb-4"
+      >
         <ArrowLeft className="w-4 h-4" /> {t.back}
       </button>
 
@@ -126,17 +166,53 @@ export default function AdminFormPage() {
         {t.admin.adminForm.createTitle}
       </h1>
 
-      <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }} className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutation.mutate();
+        }}
+        className="space-y-4"
+      >
         <div className="grid grid-cols-2 gap-4">
-          <Input label={t.admin.adminForm.firstName} value={form.firstName} onChange={update('firstName')} required />
-          <Input label={t.admin.adminForm.lastName} value={form.lastName} onChange={update('lastName')} required />
+          <Input
+            label={t.admin.adminForm.firstName}
+            value={form.firstName}
+            onChange={update("firstName")}
+            required
+          />
+          <Input
+            label={t.admin.adminForm.lastName}
+            value={form.lastName}
+            onChange={update("lastName")}
+            required
+          />
         </div>
-        <Input label={t.admin.adminForm.email} type="email" value={form.email} onChange={update('email')} placeholder={t.admin.adminForm.emailPlaceholder} required />
-        <Select label={t.admin.adminForm.role} value={form.adminRoleId} onChange={update('adminRoleId')} options={roleOptions} />
+        <Input
+          label={t.admin.adminForm.email}
+          type="email"
+          value={form.email}
+          onChange={update("email")}
+          placeholder={t.admin.adminForm.emailPlaceholder}
+          required
+        />
+        <Select
+          label={t.admin.adminForm.role}
+          value={form.adminRoleId}
+          onChange={update("adminRoleId")}
+          options={roleOptions}
+        />
 
         <div className="flex gap-3">
-          <Button type="submit" isLoading={mutation.isPending}>{t.create}</Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/admin/admins')}>{t.cancel}</Button>
+          <Button type="submit" isLoading={mutation.isPending}>
+            {t.create}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/admin/admins")}
+          >
+            {t.cancel}
+          </Button>
         </div>
       </form>
     </div>

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 
@@ -25,13 +26,13 @@ export async function getServiceBySlug(slug: string) {
 }
 
 export async function createService(data: Record<string, unknown>) {
-  return prisma.service.create({ data: data as any });
+  return prisma.service.create({ data: data as Prisma.ServiceCreateInput });
 }
 
 export async function updateService(id: string, data: Record<string, unknown>) {
   const service = await prisma.service.findUnique({ where: { id } });
   if (!service) throw new AppError('Service not found', 404);
-  return prisma.service.update({ where: { id }, data: data as any });
+  return prisma.service.update({ where: { id }, data: data as Prisma.ServiceUpdateInput });
 }
 
 export async function deleteService(id: string) {

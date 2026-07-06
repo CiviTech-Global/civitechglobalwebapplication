@@ -1,1 +1,6 @@
-guides
+node_modules/
+dist/
+.env
+.env.local
+guides/
+nexus-codebase-review/

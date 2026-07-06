@@ -17,12 +17,10 @@ function formatLeadNotification(lead: Lead & { category: { title: string }; subc
     '',
     `دسته: ${lead.category.title}`,
     `زیرشاخه: ${lead.subcategory.title}`,
-    `نام: ${lead.fullName}`,
-    `شماره تماس: ${lead.phoneNumber}`,
-    `شهر: ${lead.city}`,
-    `زمان تماس: ${lead.preferredContactTime}`,
+    `شناسه: ${lead.id}`,
     `تاریخ: ${toPersianDate(lead.createdAt)}`,
-    lead.notes ? `توضیحات: ${lead.notes}` : '',
+    '',
+    'برای مشاهده جزئیات کامل به پنل مدیریت مراجعه کنید.',
   ]
     .filter(Boolean)
     .join('\n');

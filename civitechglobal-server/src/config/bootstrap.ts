@@ -1,5 +1,6 @@
 import { prisma } from './database.js';
 import { env } from './env.js';
+import { logger } from './logger.js';
 import { hashPassword } from '../utils/password.js';
 
 /**
@@ -13,7 +14,7 @@ import { hashPassword } from '../utils/password.js';
 export async function bootstrapSuperAdmin(): Promise<void> {
   try {
     const existing = await prisma.user.findFirst({
-      where: { role: 'SUPER_ADMIN' },
+      where: { role: 'SUPER_ADMIN', deletedAt: null },
     });
 
     if (existing) return;
@@ -28,24 +29,31 @@ export async function bootstrapSuperAdmin(): Promise<void> {
         lastName: env.ADMIN_LAST_NAME,
         role: 'SUPER_ADMIN',
         permissions: [
-          'products', 'services', 'opportunities', 'orders',
-          'tickets', 'users', 'content', 'analytics', 'roles', 'admins',
+          'products',
+          'services',
+          'opportunities',
+          'orders',
+          'tickets',
+          'users',
+          'content',
+          'analytics',
+          'roles',
+          'admins',
         ],
       },
     });
 
-    console.log('-----------------------------------------------');
-    console.log('  Initial Super Admin created');
-    console.log(`  Email:    ${env.ADMIN_EMAIL}`);
-    console.log(`  Password: ${env.ADMIN_PASSWORD}`);
-    console.log('  (Change these in .env and restart if needed)');
-    console.log('-----------------------------------------------');
+    logger.info('-----------------------------------------------');
+    logger.info('  Initial Super Admin created');
+    logger.info(`  Email: ${env.ADMIN_EMAIL}`);
+    logger.info('  (Credentials were read from environment variables)');
+    logger.info('-----------------------------------------------');
   } catch (err: unknown) {
     const code = (err as { code?: string }).code;
     // P2021 = table does not exist, P2010 = raw query failed (schema not applied)
     if (code === 'P2021' || code === 'P2010') {
-      console.warn('Database tables not found. Run "npx prisma migrate dev" or "npx prisma db push" first.');
-      console.warn('Skipping Super Admin bootstrap — server starting without it.');
+      logger.warn('Database tables not found. Run "npx prisma migrate dev" or "npx prisma db push" first.');
+      logger.warn('Skipping Super Admin bootstrap — server starting without it.');
     } else {
       throw err;
     }

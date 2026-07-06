@@ -67,46 +67,71 @@ model AdminRole {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  username    String?  @unique
-  password    String
-  firstName   String
-  lastName    String
-  role        Role     @default(USER)
-  permissions String[] @default([])
-  avatar      String?
-  phone       String?
-  adminRoleId String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String    @id @default(cuid())
+  email          String    @unique
+  username       String?   @unique
+  password       String
+  firstName      String
+  lastName       String
+  role           Role      @default(USER)
+  permissions    String[]  @default([])
+  avatar         String?
+  phone          String?
+  emailVerified  Boolean   @default(false)
+  adminRoleId    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
-  adminRole              AdminRole? @relation(fields: [adminRoleId], references: [id], onDelete: SetNull)
-  orders                 Order[]
-  tickets                Ticket[]
-  ticketMessages         TicketMessage[]
+  adminRole               AdminRole?              @relation(fields: [adminRoleId], references: [id], onDelete: SetNull)
+  orders                  Order[]
+  tickets                 Ticket[]
+  ticketMessages          TicketMessage[]
   opportunityApplications OpportunityApplication[]
+  refreshTokens           RefreshToken[]
 
+  @@index([role])
+  @@index([createdAt])
+  @@index([deletedAt])
   @@map("users")
 }
 
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String
-  price       Float?
-  image       String?
-  category    String?
-  features    String[]
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  description    String
+  price          Float?
+  image          String?
+  category       String?
+  features       String[]
   githubUrl      String?
   landingPageUrl String?
   isActive       Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   orderItems OrderItem[]
 
+  @@index([category])
+  @@index([isActive])
+  @@index([createdAt])
   @@map("products")
 }
 
@@ -124,6 +149,9 @@ model Service {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([category])
+  @@index([isActive])
+  @@index([createdAt])
   @@map("services")
 }
 
@@ -143,6 +171,9 @@ model Opportunity {
 
   applications OpportunityApplication[]
 
+  @@index([isOpen])
+  @@index([opportunityType])
+  @@index([createdAt])
   @@map("opportunities")
 }
 
@@ -160,6 +191,8 @@ model OpportunityApplication {
   opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
 
   @@unique([userId, opportunityId])
+  @@index([status])
+  @@index([createdAt])
   @@map("opportunity_applications")
 }
 
@@ -175,6 +208,8 @@ model Order {
   user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items OrderItem[]
 
+  @@index([status])
+  @@index([createdAt])
   @@map("orders")
 }
 
@@ -188,6 +223,7 @@ model OrderItem {
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
 
+  @@index([orderId])
   @@map("order_items")
 }
 
@@ -205,6 +241,9 @@ model Ticket {
   user     User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   messages TicketMessage[]
 
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
   @@map("tickets")
 }
 
@@ -219,6 +258,8 @@ model TicketMessage {
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
+  @@index([ticketId])
+  @@index([createdAt])
   @@map("ticket_messages")
 }
 
@@ -253,27 +294,30 @@ model InsuranceSubcategory {
   leads      Lead[]
 
   @@unique([categoryId, title])
+  @@index([categoryId])
   @@map("insurance_subcategories")
 }
 
 model Lead {
-  id                   String            @id @default(cuid())
-  telegramUserId       String            @map("telegram_user_id")
-  telegramUsername     String?           @map("telegram_username")
-  telegramFirstName    String?           @map("telegram_first_name")
-  categoryId           String            @map("category_id")
-  subcategoryId        String            @map("subcategory_id")
-  fullName             String            @map("full_name")
-  phoneNumber          String            @map("phone_number")
+  id                   String     @id @default(cuid())
+  telegramUserId       String     @map("telegram_user_id")
+  telegramUsername     String?    @map("telegram_username")
+  telegramFirstName    String?    @map("telegram_first_name")
+  categoryId           String     @map("category_id")
+  subcategoryId        String     @map("subcategory_id")
+  fullName             String     @map("full_name")
+  phoneNumber          String     @map("phone_number")
   city                 String
-  preferredContactTime String            @map("preferred_contact_time")
+  preferredContactTime String     @map("preferred_contact_time")
   notes                String?
-  status               LeadStatus        @default(NEW)
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
+  status               LeadStatus @default(NEW)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
 
   category    InsuranceCategory    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   subcategory InsuranceSubcategory @relation(fields: [subcategoryId], references: [id], onDelete: Restrict)
 
+  @@index([status])
+  @@index([createdAt])
   @@map("leads")
 }

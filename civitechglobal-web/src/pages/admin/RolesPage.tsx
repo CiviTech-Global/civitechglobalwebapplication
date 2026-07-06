@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Shield } from 'lucide-react';
-import api from '../../config/api';
-import type { AdminRole, ApiResponse } from '../../types';
-import { Button } from '../../components/ui/Button';
-import { Table } from '../../components/ui/Table';
-import { Badge } from '../../components/ui/Badge';
-import { Spinner } from '../../components/ui/Spinner';
-import { Pagination } from '../../components/ui/Pagination';
-import { useToast } from '../../components/ui/Toast';
-import { useLocale } from '../../hooks/useLocale';
+import { useState } from "react";
+import { Link } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Edit, Trash2, Shield } from "lucide-react";
+import api from "../../config/api";
+import type { AdminRole, ApiResponse } from "../../types";
+import { Button } from "../../components/ui/Button";
+import { Table } from "../../components/ui/Table";
+import { Badge } from "../../components/ui/Badge";
+import { Spinner } from "../../components/ui/Spinner";
+import { Pagination } from "../../components/ui/Pagination";
+import { useToast } from "../../hooks/useToast";
+import { useLocale } from "../../hooks/useLocale";
 
 export default function RolesPage() {
   const { t } = useLocale();
@@ -19,22 +19,28 @@ export default function RolesPage() {
   const { toast } = useToast();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-roles', page],
+    queryKey: ["admin-roles", page],
     queryFn: async () => {
-      const { data } = await api.get<ApiResponse<AdminRole[]>>(`/roles?page=${page}`);
+      const { data } = await api.get<ApiResponse<AdminRole[]>>(
+        `/roles?page=${page}`,
+      );
       return data;
     },
   });
 
   const deleteMut = useMutation({
-    mutationFn: async (id: string) => { await api.delete(`/roles/${id}`); },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-roles'] });
-      toast(t.admin.roleForm.deleteSuccess, 'success');
+    mutationFn: async (id: string) => {
+      await api.delete(`/roles/${id}`);
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.message || t.admin.roleForm.deleteFailed;
-      toast(msg, 'error');
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-roles"] });
+      toast(t.admin.roleForm.deleteSuccess, "success");
+    },
+    onError: (err: unknown) => {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || t.admin.roleForm.deleteFailed;
+      toast(msg, "error");
     },
   });
 
@@ -42,7 +48,7 @@ export default function RolesPage() {
 
   const columns = [
     {
-      key: 'name',
+      key: "name",
       header: t.admin.name,
       render: (r: AdminRole) => (
         <span className="flex items-center gap-2 font-medium">
@@ -51,39 +57,46 @@ export default function RolesPage() {
       ),
     },
     {
-      key: 'permissions',
+      key: "permissions",
       header: t.admin.roleForm.permissions,
       render: (r: AdminRole) => (
         <div className="flex flex-wrap gap-1">
           {r.permissions.slice(0, 4).map((p) => (
-            <Badge key={p} variant="info" className="text-xs">{p}</Badge>
+            <Badge key={p} variant="info" className="text-xs">
+              {p}
+            </Badge>
           ))}
           {r.permissions.length > 4 && (
-            <Badge variant="default" className="text-xs">+{r.permissions.length - 4}</Badge>
+            <Badge variant="default" className="text-xs">
+              +{r.permissions.length - 4}
+            </Badge>
           )}
         </div>
       ),
     },
     {
-      key: 'users',
+      key: "users",
       header: t.admin.roleForm.usersAssigned,
       render: (r: AdminRole) => (
         <Badge variant="default">{r._count?.users ?? 0}</Badge>
       ),
     },
     {
-      key: 'actions',
-      header: '',
-      className: 'w-24',
+      key: "actions",
+      header: "",
+      className: "w-24",
       render: (r: AdminRole) => (
         <div className="flex items-center gap-2">
-          <Link to={`/admin/roles/${r.id}/edit`} className="text-brand-green-600 hover:text-brand-green-700">
+          <Link
+            to={`/admin/roles/${r.id}/edit`}
+            className="text-brand-green-600 hover:text-brand-green-700"
+          >
             <Edit className="w-4 h-4" />
           </Link>
           <button
             onClick={() => {
               if (r._count?.users && r._count.users > 0) {
-                toast(t.admin.roleForm.cannotDeleteWithUsers, 'error');
+                toast(t.admin.roleForm.cannotDeleteWithUsers, "error");
                 return;
               }
               if (confirm(t.confirmDelete)) deleteMut.mutate(r.id);
@@ -100,13 +113,23 @@ export default function RolesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">{t.admin.roles}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">
+          {t.admin.roles}
+        </h1>
         <Link to="/admin/roles/new">
-          <Button className="gap-2"><Plus className="w-4 h-4" /> {t.admin.addNew}</Button>
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" /> {t.admin.addNew}
+          </Button>
         </Link>
       </div>
-      <Table columns={columns} data={(data?.data || []) as any} />
-      {data?.meta && <Pagination page={data.meta.page} totalPages={data.meta.totalPages} onPageChange={setPage} />}
+      <Table columns={columns} data={data?.data || []} />
+      {data?.meta && (
+        <Pagination
+          page={data.meta.page}
+          totalPages={data.meta.totalPages}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

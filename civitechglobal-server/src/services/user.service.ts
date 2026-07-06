@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { Prisma, Role } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { hashPassword } from '../utils/password.js';
@@ -25,8 +26,21 @@ export async function getUsers(query: Record<string, unknown>) {
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
-      where, skip, take: limit, orderBy: { createdAt: 'desc' },
-      select: { id: true, email: true, firstName: true, lastName: true, role: true, permissions: true, phone: true, avatar: true, createdAt: true },
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        permissions: true,
+        phone: true,
+        avatar: true,
+        createdAt: true,
+      },
     }),
     prisma.user.count({ where }),
   ]);
@@ -38,7 +52,15 @@ export async function getUserById(id: string) {
   const user = await prisma.user.findUnique({
     where: { id },
     select: {
-      id: true, email: true, firstName: true, lastName: true, role: true, permissions: true, phone: true, avatar: true, createdAt: true,
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      permissions: true,
+      phone: true,
+      avatar: true,
+      createdAt: true,
       _count: { select: { orders: true, tickets: true, opportunityApplications: true } },
     },
   });
@@ -50,8 +72,19 @@ export async function updateProfile(id: string, data: Record<string, unknown>) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
   return prisma.user.update({
-    where: { id }, data: data as any,
-    select: { id: true, email: true, firstName: true, lastName: true, role: true, permissions: true, phone: true, avatar: true, createdAt: true },
+    where: { id },
+    data: data as Prisma.UserUpdateInput,
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      permissions: true,
+      phone: true,
+      avatar: true,
+      createdAt: true,
+    },
   });
 }
 
@@ -59,7 +92,8 @@ export async function updateUserRole(id: string, role: string) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
   return prisma.user.update({
-    where: { id }, data: { role: role as any },
+    where: { id },
+    data: { role: role as Role },
     select: { id: true, email: true, firstName: true, lastName: true, role: true, permissions: true, createdAt: true },
   });
 }
@@ -110,7 +144,17 @@ export async function createAdmin(data: { email: string; firstName: string; last
       permissions,
       adminRoleId: data.adminRoleId || null,
     },
-    select: { id: true, email: true, username: true, firstName: true, lastName: true, role: true, permissions: true, adminRoleId: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      permissions: true,
+      adminRoleId: true,
+      createdAt: true,
+    },
   });
 
   return { ...user, generatedPassword: rawPassword };
@@ -126,6 +170,15 @@ export async function assignAdminRole(userId: string, adminRoleId: string) {
   return prisma.user.update({
     where: { id: userId },
     data: { adminRoleId, permissions: role.permissions },
-    select: { id: true, email: true, firstName: true, lastName: true, role: true, permissions: true, adminRoleId: true, createdAt: true },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      permissions: true,
+      adminRoleId: true,
+      createdAt: true,
+    },
   });
 }

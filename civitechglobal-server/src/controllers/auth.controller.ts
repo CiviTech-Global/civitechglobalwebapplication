@@ -16,7 +16,9 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const result = await authService.register(req.body);
     res.cookie('refreshToken', result.refreshToken, COOKIE_OPTIONS);
     successResponse(res, { user: result.user, accessToken: result.accessToken }, 'Registration successful', 201);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function login(req: Request, res: Response, next: NextFunction) {
@@ -24,7 +26,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const result = await authService.login(req.body);
     res.cookie('refreshToken', result.refreshToken, COOKIE_OPTIONS);
     successResponse(res, { user: result.user, accessToken: result.accessToken }, 'Login successful');
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {
@@ -37,17 +41,29 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
     const result = await authService.refreshTokens(token);
     res.cookie('refreshToken', result.refreshToken, COOKIE_OPTIONS);
     successResponse(res, { accessToken: result.accessToken }, 'Token refreshed');
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function logout(_req: Request, res: Response) {
-  res.clearCookie('refreshToken', { path: '/' });
-  successResponse(res, null, 'Logged out successfully');
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.cookies.refreshToken;
+    if (token) {
+      await authService.revokeRefreshToken(token);
+    }
+    res.clearCookie('refreshToken', { path: '/' });
+    successResponse(res, null, 'Logged out successfully');
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function getMe(req: Request, res: Response, next: NextFunction) {
   try {
     const user = await authService.getMe(req.user!.userId);
     successResponse(res, user);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }
