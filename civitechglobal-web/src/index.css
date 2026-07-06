@@ -351,7 +351,7 @@ textarea::placeholder {
 
 /* Gradient text helper */
 .gradient-text {
-  background: linear-gradient(135deg, var(--color-brand-green-500), var(--color-brand-amber-500));
+  background: linear-gradient(135deg, var(--color-brand-green-600), var(--color-brand-amber-600));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
