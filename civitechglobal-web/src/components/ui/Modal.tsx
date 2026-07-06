@@ -79,7 +79,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "bg-surface-50 rounded-xl border border-border-default shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto",
+          "bg-surface-50 dark:bg-surface-200 rounded-xl border border-border-default shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto",
           className,
         )}
       >

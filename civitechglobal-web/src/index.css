@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Use the .dark class for explicit theme switching */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
   font-family: 'Vazir';
   src: url('./assets/fonts/Vazir-Thin.ttf') format('truetype');

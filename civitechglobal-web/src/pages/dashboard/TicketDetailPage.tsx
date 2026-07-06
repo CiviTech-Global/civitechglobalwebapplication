@@ -86,7 +86,7 @@ export default function TicketDetailPage() {
           {ticket.messages?.map((msg) => (
             <div
               key={msg.id}
-              className={`p-3 rounded-lg ${msg.isStaff ? "bg-brand-green-50 dark:bg-brand-green-900/20" : "bg-surface-200 dark:bg-surface-800"}`}
+              className={`p-3 rounded-lg ${msg.isStaff ? "bg-brand-green-50 dark:bg-brand-green-900/20" : "bg-surface-200"}`}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs font-medium text-text-muted">

@@ -26,8 +26,8 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
+      "npx eslint --fix",
+      "npx prettier --write"
     ]
   },
   "dependencies": {
@@ -57,7 +57,7 @@
     "@typescript-eslint/eslint-plugin": "^8.62.1",
     "@typescript-eslint/parser": "^8.62.1",
     "eslint": "^9.39.4",
-    "lint-staged": "^17.0.8",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.9.4",
     "prisma": "^6.9.0",
     "tsx": "^4.19.0",
