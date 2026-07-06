@@ -349,24 +349,13 @@ textarea::placeholder {
   text-align: start;
 }
 
-/* Gradient text helper — graceful fallback for browsers that don't support bg-clip:text */
+/* Accent text helper (replaces fragile background-clip:text gradient) */
 .gradient-text {
-  display: inline-block;
-  color: var(--color-brand-green-700);
-  background: linear-gradient(135deg, var(--color-brand-green-600), var(--color-brand-amber-600));
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-@supports (-webkit-background-clip: text) or (background-clip: text) {
-  .gradient-text {
-    color: transparent;
-  }
+  color: var(--color-brand-green-600);
 }
 
 .dark .gradient-text {
-  color: var(--color-brand-green-400);
-  background: linear-gradient(135deg, var(--color-brand-green-400), var(--color-brand-amber-400));
+  color: var(--color-brand-amber-400);
 }
 
 /* Soft themed shadows */
