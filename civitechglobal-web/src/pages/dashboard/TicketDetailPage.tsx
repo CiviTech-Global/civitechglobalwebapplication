@@ -83,26 +83,37 @@ export default function TicketDetailPage() {
           {t.tickets.messages}
         </h3>
         <div className="space-y-4 max-h-96 overflow-y-auto">
-          {ticket.messages?.map((msg) => (
-            <div
-              key={msg.id}
-              className={`p-3 rounded-lg ${msg.isStaff ? "bg-brand-green-50 dark:bg-brand-green-900/20" : "bg-surface-200"}`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium text-text-muted">
-                  {msg.isStaff
-                    ? t.tickets.staff
-                    : msg.userId === user?.id
-                      ? t.tickets.you
-                      : msg.user?.firstName}
-                </span>
-                <span className="text-xs text-text-muted">
-                  {formatDate(msg.createdAt)}
-                </span>
+          {ticket.messages?.map((msg) => {
+            const isStaff = msg.isStaff;
+            return (
+              <div
+                key={msg.id}
+                className={`p-3 rounded-lg ${isStaff ? "bg-brand-green-600 text-white" : "bg-surface-200"}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-xs font-medium ${isStaff ? "text-white/80" : "text-text-muted"}`}
+                  >
+                    {isStaff
+                      ? t.tickets.staff
+                      : msg.userId === user?.id
+                        ? t.tickets.you
+                        : msg.user?.firstName}
+                  </span>
+                  <span
+                    className={`text-xs ${isStaff ? "text-white/70" : "text-text-muted"}`}
+                  >
+                    {formatDate(msg.createdAt)}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm ${isStaff ? "text-white" : "text-text-secondary"}`}
+                >
+                  {msg.content}
+                </p>
               </div>
-              <p className="text-sm text-text-secondary">{msg.content}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {ticket.status !== "CLOSED" && (

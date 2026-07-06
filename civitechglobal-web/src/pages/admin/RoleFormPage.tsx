@@ -128,7 +128,7 @@ export default function RoleFormPage() {
                 key={perm}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                   currentPermissions.includes(perm)
-                    ? "border-brand-green-500/50 bg-brand-green-50 text-brand-green-500"
+                    ? "border-brand-green-600 bg-brand-green-600 text-white"
                     : "border-border-default bg-surface-200/80 text-text-muted hover:border-border-strong"
                 }`}
               >

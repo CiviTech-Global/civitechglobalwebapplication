@@ -18,11 +18,9 @@ const icons = {
 };
 
 const styles = {
-  success:
-    "bg-brand-green-50 border-brand-green-200 text-brand-green-700 dark:bg-brand-green-900/20 dark:border-brand-green-800 dark:text-brand-green-400",
-  error:
-    "bg-brand-red-50 border-brand-red-200 text-brand-red-700 dark:bg-brand-red-900/20 dark:border-brand-red-800 dark:text-brand-red-400",
-  info: "bg-brand-green-50 border-brand-green-200 text-brand-green-700 dark:bg-brand-green-900/20 dark:border-brand-green-800 dark:text-brand-green-400",
+  success: "bg-brand-green-600 text-white",
+  error: "bg-brand-red-600 text-white",
+  info: "bg-ocean-600 text-white",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -50,7 +48,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-lg border shadow-lg min-w-[250px] max-w-md",
+                "flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg min-w-[250px] max-w-md",
                 styles[t.type],
               )}
             >

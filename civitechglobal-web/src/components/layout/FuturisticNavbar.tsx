@@ -134,8 +134,8 @@ export function FuturisticNavbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-300 transition-colors"
                 >
-                  <div className="w-7 h-7 bg-brand-green-100 dark:bg-brand-green-900/30 rounded-full flex items-center justify-center border border-brand-green-400/40">
-                    <span className="text-xs font-medium text-brand-green-700 dark:text-brand-green-400">
+                  <div className="w-7 h-7 bg-brand-green-600 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-medium text-white">
                       {user?.firstName?.charAt(0)}
                       {user?.lastName?.charAt(0)}
                     </span>
@@ -213,7 +213,7 @@ export function FuturisticNavbar() {
                   className={cn(
                     "block px-4 py-2.5 text-sm rounded-lg transition-colors",
                     isActive(link.to)
-                      ? "text-brand-green-700 dark:text-brand-green-400 bg-brand-green-50 dark:bg-brand-green-900/20"
+                      ? "text-white bg-brand-green-600"
                       : "text-text-secondary hover:text-text-primary hover:bg-surface-100 dark:hover:bg-surface-300",
                   )}
                 >

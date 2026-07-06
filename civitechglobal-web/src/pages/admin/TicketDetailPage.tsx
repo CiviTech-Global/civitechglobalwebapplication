@@ -140,29 +140,40 @@ export default function AdminTicketDetail() {
           {t.tickets.messages}
         </h2>
         <div className="space-y-4 max-h-96 overflow-y-auto">
-          {ticket.messages?.map((msg) => (
-            <div
-              key={msg.id}
-              className={`p-3 rounded-lg ${msg.isStaff ? "bg-brand-green-900/20 ms-8" : "bg-surface-200 me-8"}`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-medium text-text-secondary">
-                  {msg.user
-                    ? `${msg.user.firstName} ${msg.user.lastName}`
-                    : t.admin.guest}
-                </span>
-                {msg.isStaff && (
-                  <Badge variant="info" className="text-[10px]">
-                    {t.tickets.staff}
-                  </Badge>
-                )}
-                <span className="text-[10px] text-text-muted">
-                  {formatDate(msg.createdAt)}
-                </span>
+          {ticket.messages?.map((msg) => {
+            const isStaff = msg.isStaff;
+            return (
+              <div
+                key={msg.id}
+                className={`p-3 rounded-lg ${isStaff ? "bg-brand-green-600 text-white ms-8" : "bg-surface-200 me-8"}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className={`text-xs font-medium ${isStaff ? "text-white/90" : "text-text-secondary"}`}
+                  >
+                    {msg.user
+                      ? `${msg.user.firstName} ${msg.user.lastName}`
+                      : t.admin.guest}
+                  </span>
+                  {isStaff && (
+                    <Badge variant="info" className="text-[10px]">
+                      {t.tickets.staff}
+                    </Badge>
+                  )}
+                  <span
+                    className={`text-[10px] ${isStaff ? "text-white/70" : "text-text-muted"}`}
+                  >
+                    {formatDate(msg.createdAt)}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm ${isStaff ? "text-white" : "text-text-secondary"}`}
+                >
+                  {msg.content}
+                </p>
               </div>
-              <p className="text-sm text-text-secondary">{msg.content}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
 

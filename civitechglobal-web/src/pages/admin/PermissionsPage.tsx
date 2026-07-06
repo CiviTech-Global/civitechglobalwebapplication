@@ -142,8 +142,8 @@ export default function AdminPermissions() {
                       key={perm.key}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                         checked
-                          ? "border-brand-green-700 bg-brand-green-900/20"
-                          : "border-border-default hover:bg-surface-200"
+                          ? "border-brand-green-600 bg-brand-green-600 text-white"
+                          : "border-border-default hover:bg-surface-200 text-text-secondary"
                       }`}
                     >
                       <input
@@ -152,7 +152,7 @@ export default function AdminPermissions() {
                         checked={checked}
                         onChange={() => togglePerm(admin.id, perm.key)}
                       />
-                      <span className="text-sm text-text-secondary">
+                      <span className="text-sm">
                         {locale === "fa" ? perm.labelFa : perm.labelEn}
                       </span>
                     </label>

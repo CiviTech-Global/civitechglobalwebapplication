@@ -85,8 +85,8 @@ export default function ProductDetailPage() {
         animate={{ opacity: 1, y: 0 }}
         className="grid md:grid-cols-2 gap-12"
       >
-        <div className="h-80 md:h-full bg-gradient-to-br from-brand-green-100 to-brand-amber-50 rounded-2xl flex items-center justify-center border border-border-default/50">
-          <span className="text-8xl font-bold text-brand-green-600/30">
+        <div className="h-80 md:h-full bg-brand-green-600 rounded-2xl flex items-center justify-center border border-transparent shadow-sm">
+          <span className="text-8xl font-bold text-white">
             {product.name.charAt(0)}
           </span>
         </div>

@@ -107,8 +107,8 @@ export default function AdminUserDetail() {
 
       <Card className="mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center">
-            <span className="text-xl font-bold text-brand-green-400">
+          <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center shadow-sm">
+            <span className="text-xl font-bold text-white">
               {user.firstName?.charAt(0)}
               {user.lastName?.charAt(0)}
             </span>
@@ -175,8 +175,8 @@ export default function AdminUserDetail() {
                   key={perm.key}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors ${
                     checked
-                      ? "border-brand-green-700 bg-brand-green-900/20"
-                      : "border-border-default hover:bg-surface-200"
+                      ? "border-brand-green-600 bg-brand-green-600 text-white"
+                      : "border-border-default hover:bg-surface-200 text-text-secondary"
                   }`}
                 >
                   <input
@@ -190,7 +190,7 @@ export default function AdminUserDetail() {
                       setLocalPerms(next);
                     }}
                   />
-                  <span className="text-sm text-text-secondary">
+                  <span className="text-sm">
                     {locale === "fa" ? perm.labelFa : perm.labelEn}
                   </span>
                 </label>

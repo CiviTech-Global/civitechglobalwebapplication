@@ -101,7 +101,7 @@ export default function AdminDashboard() {
               <Link key={m.perm} to={m.to}>
                 <Card hover>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-brand-green-100 text-brand-green-500">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-brand-green-600 text-white shadow-sm">
                       <m.icon className="w-5 h-5" />
                     </div>
                     <span className="font-medium text-text-primary">
@@ -124,49 +124,49 @@ export default function AdminDashboard() {
       icon: Users,
       label: t.admin.stats.totalUsers,
       value: data.stats.totalUsers,
-      color: "text-blue-400 bg-blue-900/20",
+      color: "text-white bg-blue-500",
     },
     {
       icon: ShoppingCart,
       label: t.admin.stats.totalOrders,
       value: data.stats.totalOrders,
-      color: "text-green-400 bg-green-900/20",
+      color: "text-white bg-green-500",
     },
     {
       icon: DollarSign,
       label: t.admin.stats.totalRevenue,
       value: formatPrice(data.stats.totalRevenue),
-      color: "text-emerald-400 bg-emerald-900/20",
+      color: "text-white bg-emerald-600",
     },
     {
       icon: Ticket,
       label: t.admin.stats.openTickets,
       value: data.stats.openTickets,
-      color: "text-orange-400 bg-orange-900/20",
+      color: "text-white bg-orange-500",
     },
     {
       icon: Package,
       label: t.admin.stats.totalProducts,
       value: data.stats.totalProducts,
-      color: "text-brand-amber-500 bg-brand-amber-50",
+      color: "text-white bg-brand-amber-500",
     },
     {
       icon: Wrench,
       label: t.admin.stats.totalServices,
       value: data.stats.totalServices,
-      color: "text-indigo-400 bg-indigo-900/20",
+      color: "text-white bg-indigo-500",
     },
     {
       icon: GraduationCap,
       label: t.admin.stats.totalOpportunities,
       value: data.stats.totalOpportunities,
-      color: "text-pink-400 bg-pink-900/20",
+      color: "text-white bg-pink-500",
     },
     {
       icon: AlertCircle,
       label: t.admin.stats.pendingApplications,
       value: data.stats.pendingApplications,
-      color: "text-amber-400 bg-amber-900/20",
+      color: "text-white bg-amber-500",
     },
   ];
 

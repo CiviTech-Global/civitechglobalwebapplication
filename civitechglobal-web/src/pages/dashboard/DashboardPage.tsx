@@ -40,7 +40,7 @@ export default function DashboardPage() {
       label: t.dashboard.totalOrders,
       value: orders?.data?.length ?? 0,
       to: "/dashboard/orders",
-      color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400",
+      color: "text-white bg-blue-500",
     },
     {
       icon: Ticket,
@@ -49,16 +49,14 @@ export default function DashboardPage() {
         tickets?.data?.filter((t: TicketType) => t.status === "OPEN").length ??
         0,
       to: "/dashboard/tickets",
-      color:
-        "text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400",
+      color: "text-white bg-orange-500",
     },
     {
       icon: GraduationCap,
       label: t.dashboard.applications,
       value: applications?.data?.length ?? 0,
       to: "/dashboard/opportunities",
-      color:
-        "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400",
+      color: "text-white bg-emerald-600",
     },
   ];
 

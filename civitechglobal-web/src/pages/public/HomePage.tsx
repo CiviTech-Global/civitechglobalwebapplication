@@ -74,7 +74,7 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-sm font-medium text-brand-green-600 dark:text-brand-green-400 bg-brand-green-50 dark:bg-brand-green-900/20 rounded-full border border-brand-green-500/20 dark:border-brand-green-400/30">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-sm font-medium text-white bg-brand-green-600 rounded-full shadow-sm">
               <Sparkles className="w-4 h-4" />
               {t.home.badge}
             </span>
@@ -114,8 +114,8 @@ export default function HomePage() {
             <div className="mt-16 mx-auto w-72 h-72 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem]">
               <Suspense
                 fallback={
-                  <div className="w-full h-full rounded-full border border-brand-green-500/20 dark:border-brand-green-400/30 bg-gradient-to-br from-brand-green-50 to-brand-amber-50 dark:from-brand-green-900/20 dark:to-brand-amber-900/20 flex items-center justify-center">
-                    <span className="text-5xl font-bold gradient-text">CT</span>
+                  <div className="w-full h-full rounded-full bg-brand-green-600 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.25)]">
+                    <span className="text-5xl font-bold text-white">CT</span>
                   </div>
                 }
               >
@@ -163,8 +163,8 @@ export default function HomePage() {
               .map(([key, title], i) => (
                 <AnimatedSection key={key} delay={i * 0.1}>
                   <GlowCard className="h-full">
-                    <div className="w-12 h-12 bg-brand-green-100 dark:bg-brand-green-900/20 rounded-lg flex items-center justify-center mb-4 border border-brand-green-500/20 dark:border-brand-green-400/30">
-                      <Sparkles className="w-6 h-6 text-brand-green-600 dark:text-brand-green-400" />
+                    <div className="w-12 h-12 bg-brand-green-600 rounded-lg flex items-center justify-center mb-4 shadow-sm">
+                      <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-text-primary mb-2">
                       {title as string}
@@ -204,8 +204,8 @@ export default function HomePage() {
                     className="h-full flex flex-col"
                     glowColor={i % 2 === 0 ? "ocean" : "purple"}
                   >
-                    <div className="h-32 bg-gradient-to-br from-brand-green-100 to-brand-amber-100 dark:from-brand-green-900/30 dark:to-brand-amber-900/30 rounded-lg mb-4 flex items-center justify-center border border-border-default/50">
-                      <span className="text-3xl font-bold text-brand-green-700/50 dark:text-brand-green-400/60">
+                    <div className="h-32 bg-brand-green-600 rounded-lg mb-4 flex items-center justify-center shadow-sm">
+                      <span className="text-3xl font-bold text-white">
                         {product.name.charAt(0)}
                       </span>
                     </div>
@@ -263,8 +263,8 @@ export default function HomePage() {
                     className="h-full"
                     glowColor={i === 0 ? "ocean" : "purple"}
                   >
-                    <div className="w-14 h-14 bg-gradient-to-br from-brand-green-500/20 to-brand-amber-500/20 rounded-xl flex items-center justify-center mb-4 border border-brand-green-500/20 dark:border-brand-green-400/30">
-                      <span className="text-2xl font-bold gradient-text">
+                    <div className="w-14 h-14 bg-brand-green-600 rounded-xl flex items-center justify-center mb-4 shadow-sm">
+                      <span className="text-2xl font-bold text-white">
                         {service.name.charAt(0)}
                       </span>
                     </div>
@@ -291,8 +291,8 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <GlowCard hover={false} className="text-center py-12 px-8">
-              <div className="w-16 h-16 bg-brand-green-100 dark:bg-brand-green-900/20 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-brand-green-500/20 dark:border-brand-green-400/30">
-                <Briefcase className="w-8 h-8 text-brand-green-600 dark:text-brand-green-400" />
+              <div className="w-16 h-16 bg-brand-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <Briefcase className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-3xl font-bold text-text-primary mb-4">
                 {t.home.joinTeam}
@@ -315,10 +315,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="relative overflow-hidden rounded-2xl border border-border-default/50 p-12 text-center">
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-green-100 via-brand-amber-50 to-brand-green-100 dark:from-brand-green-900/20 dark:via-brand-amber-900/10 dark:to-brand-green-900/20" />
-              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] opacity-50" />
+              <div className="absolute inset-0 bg-surface-200/60 dark:bg-surface-300/40" />
               <div className="relative">
-                <MessageSquare className="w-10 h-10 text-brand-green-600 dark:text-brand-green-400 mx-auto mb-4" />
+                <div className="w-14 h-14 bg-brand-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <MessageSquare className="w-7 h-7 text-white" />
+                </div>
                 <h2 className="text-3xl font-bold text-text-primary mb-4">
                   {t.home.getInTouch}
                 </h2>

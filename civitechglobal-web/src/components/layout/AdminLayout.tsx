@@ -1,15 +1,32 @@
-import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router';
+import { useState } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import {
-  LayoutDashboard, Package, Wrench, GraduationCap, ShoppingCart, Ticket, Users, FileText, ShieldCheck,
-  ChevronLeft, ChevronRight, LogOut, Home, Languages, Shield, UserPlus, Database, ClipboardList, Sun, Moon
-} from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { Badge } from '../../components/ui/Badge';
-import { useLocale } from '../../hooks/useLocale';
-import { useTheme } from '../../hooks/useTheme';
-import { cn } from '../../lib/utils';
-import logoSrc from '../../assets/logos/concept logo - no bg - white.png';
+  LayoutDashboard,
+  Package,
+  Wrench,
+  GraduationCap,
+  ShoppingCart,
+  Ticket,
+  Users,
+  FileText,
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Home,
+  Languages,
+  Shield,
+  UserPlus,
+  Database,
+  ClipboardList,
+  Sun,
+  Moon,
+} from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { Badge } from "../../components/ui/Badge";
+import { useLocale } from "../../hooks/useLocale";
+import { useTheme } from "../../hooks/useTheme";
+import { cn } from "../../lib/utils";
 
 export function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -19,59 +36,124 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
   const userPerms = user?.permissions || [];
 
   const allLinks = [
-    { to: '/admin', icon: LayoutDashboard, label: t.admin.dashboard, end: true, perm: 'dashboard' },
-    { to: '/admin/products', icon: Package, label: t.admin.products, perm: 'products' },
-    { to: '/admin/services', icon: Wrench, label: t.admin.services, perm: 'services' },
-    { to: '/admin/opportunities', icon: GraduationCap, label: t.admin.opportunities, perm: 'opportunities' },
-    { to: '/admin/orders', icon: ShoppingCart, label: t.admin.orders, perm: 'orders' },
-    { to: '/admin/leads', icon: ClipboardList, label: t.admin.leads, perm: 'leads' },
-    { to: '/admin/tickets', icon: Ticket, label: t.admin.tickets, perm: 'tickets' },
-    { to: '/admin/users', icon: Users, label: t.admin.users, perm: 'users' },
-    { to: '/admin/content', icon: FileText, label: t.admin.content, perm: 'content' },
-    { to: '/admin/roles', icon: Shield, label: t.admin.roles, perm: 'roles' },
-    { to: '/admin/admins', icon: UserPlus, label: t.admin.admins, perm: 'admins' },
+    {
+      to: "/admin",
+      icon: LayoutDashboard,
+      label: t.admin.dashboard,
+      end: true,
+      perm: "dashboard",
+    },
+    {
+      to: "/admin/products",
+      icon: Package,
+      label: t.admin.products,
+      perm: "products",
+    },
+    {
+      to: "/admin/services",
+      icon: Wrench,
+      label: t.admin.services,
+      perm: "services",
+    },
+    {
+      to: "/admin/opportunities",
+      icon: GraduationCap,
+      label: t.admin.opportunities,
+      perm: "opportunities",
+    },
+    {
+      to: "/admin/orders",
+      icon: ShoppingCart,
+      label: t.admin.orders,
+      perm: "orders",
+    },
+    {
+      to: "/admin/leads",
+      icon: ClipboardList,
+      label: t.admin.leads,
+      perm: "leads",
+    },
+    {
+      to: "/admin/tickets",
+      icon: Ticket,
+      label: t.admin.tickets,
+      perm: "tickets",
+    },
+    { to: "/admin/users", icon: Users, label: t.admin.users, perm: "users" },
+    {
+      to: "/admin/content",
+      icon: FileText,
+      label: t.admin.content,
+      perm: "content",
+    },
+    { to: "/admin/roles", icon: Shield, label: t.admin.roles, perm: "roles" },
+    {
+      to: "/admin/admins",
+      icon: UserPlus,
+      label: t.admin.admins,
+      perm: "admins",
+    },
   ];
 
-  const sidebarLinks = allLinks.filter((link) => isSuperAdmin || link.perm === 'dashboard' || userPerms.includes(link.perm));
+  const sidebarLinks = allLinks.filter(
+    (link) =>
+      isSuperAdmin ||
+      link.perm === "dashboard" ||
+      userPerms.includes(link.perm),
+  );
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate("/");
   };
 
   const CollapseIcon = isRtl
-    ? (collapsed ? ChevronLeft : ChevronRight)
-    : (collapsed ? ChevronRight : ChevronLeft);
+    ? collapsed
+      ? ChevronLeft
+      : ChevronRight
+    : collapsed
+      ? ChevronRight
+      : ChevronLeft;
 
   return (
     <div className="min-h-screen flex bg-surface-100">
       {/* Sidebar */}
-      <aside className={cn(
-        'fixed top-0 h-full bg-surface-50 backdrop-blur-md border-border-default transition-all duration-300 z-30 flex flex-col',
-        isRtl ? 'right-0 border-l' : 'left-0 border-r',
-        collapsed ? 'w-16' : 'w-64'
-      )}>
+      <aside
+        className={cn(
+          "fixed top-0 h-full bg-surface-50 backdrop-blur-md border-border-default transition-all duration-300 z-30 flex flex-col",
+          isRtl ? "right-0 border-l" : "left-0 border-r",
+          collapsed ? "w-16" : "w-64",
+        )}
+      >
         <div className="flex items-center gap-2 p-4 border-b border-border-default">
-          <img src={logoSrc} alt={t.brand} className="w-8 h-8 object-contain shrink-0 invert dark:invert-0" />
-          {!collapsed && <span className="font-bold text-text-primary">{t.nav.adminPanel}</span>}
+          <div className="w-8 h-8 bg-brand-green-600 rounded-lg flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-sm">CT</span>
+          </div>
+          {!collapsed && (
+            <span className="font-bold text-text-primary">
+              {t.nav.adminPanel}
+            </span>
+          )}
         </div>
 
         <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
           {sidebarLinks.map((link) => {
-            const isActive = link.end ? location.pathname === link.to : location.pathname.startsWith(link.to);
+            const isActive = link.end
+              ? location.pathname === link.to
+              : location.pathname.startsWith(link.to);
             return (
               <Link
                 key={link.to}
                 to={link.to}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                   isActive
-                    ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200 dark:bg-brand-green-900/20 dark:text-brand-green-400 dark:border-brand-green-500/30'
-                    : 'text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent'
+                    ? "bg-brand-green-600 text-white border border-brand-green-600"
+                    : "text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent",
                 )}
               >
                 <link.icon className="w-5 h-5 shrink-0" />
@@ -83,46 +165,68 @@ export function AdminLayout() {
             <Link
               to="/admin/permissions"
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                location.pathname === '/admin/permissions'
-                  ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200 dark:bg-brand-green-900/20 dark:text-brand-green-400 dark:border-brand-green-500/30'
-                  : 'text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent'
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                location.pathname === "/admin/permissions"
+                  ? "bg-brand-green-600 text-white border border-transparent"
+                  : "text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent",
               )}
             >
               <ShieldCheck className="w-5 h-5 shrink-0" />
-              {!collapsed && <span>{t.admin.permissions?.title || 'Permissions'}</span>}
+              {!collapsed && (
+                <span>{t.admin.permissions?.title || "Permissions"}</span>
+              )}
             </Link>
           )}
           {isSuperAdmin && (
             <Link
               to="/admin/demo-data"
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                location.pathname === '/admin/demo-data'
-                  ? 'bg-brand-green-50 text-brand-green-700 border border-brand-green-200 dark:bg-brand-green-900/20 dark:text-brand-green-400 dark:border-brand-green-500/30'
-                  : 'text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent'
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                location.pathname === "/admin/demo-data"
+                  ? "bg-brand-green-600 text-white border border-transparent"
+                  : "text-text-secondary hover:bg-surface-200 hover:text-text-primary border border-transparent",
               )}
             >
               <Database className="w-5 h-5 shrink-0" />
-              {!collapsed && <span>{t.admin.demoData?.title || 'Demo Data'}</span>}
+              {!collapsed && (
+                <span>{t.admin.demoData?.title || "Demo Data"}</span>
+              )}
             </Link>
           )}
         </nav>
 
         <div className="p-2 border-t border-border-default space-y-1">
-          <Link to="/" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors">
+          <Link
+            to="/"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors"
+          >
             <Home className="w-5 h-5 shrink-0" />
             {!collapsed && <span>{t.nav.backToSite}</span>}
           </Link>
-          <button onClick={() => setLocale(locale === 'fa' ? 'en' : 'fa')} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors">
+          <button
+            onClick={() => setLocale(locale === "fa" ? "en" : "fa")}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors"
+          >
             <Languages className="w-5 h-5 shrink-0" />
-            {!collapsed && <span>{locale === 'fa' ? 'English' : 'فارسی'}</span>}
+            {!collapsed && <span>{locale === "fa" ? "English" : "فارسی"}</span>}
           </button>
-          <button onClick={toggle} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors">
-            {isDark ? <Sun className="w-5 h-5 shrink-0" /> : <Moon className="w-5 h-5 shrink-0" />}
-            {!collapsed && <span>{isDark ? t.nav.lightMode : t.nav.darkMode}</span>}
+          <button
+            onClick={toggle}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-200 hover:text-text-primary transition-colors"
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 shrink-0" />
+            ) : (
+              <Moon className="w-5 h-5 shrink-0" />
+            )}
+            {!collapsed && (
+              <span>{isDark ? t.nav.lightMode : t.nav.darkMode}</span>
+            )}
           </button>
-          <button onClick={handleLogout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-brand-red-600 hover:bg-brand-red-50 transition-colors">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-brand-red-600 hover:bg-brand-red-50 transition-colors"
+          >
             <LogOut className="w-5 h-5 shrink-0" />
             {!collapsed && <span>{t.nav.logout}</span>}
           </button>
@@ -131,8 +235,8 @@ export function AdminLayout() {
         <button
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            'absolute top-20 w-6 h-6 bg-surface-50 border border-border-default rounded-full flex items-center justify-center shadow-sm hover:bg-surface-200',
-            isRtl ? '-left-3' : '-right-3'
+            "absolute top-20 w-6 h-6 bg-surface-50 border border-border-default rounded-full flex items-center justify-center shadow-sm hover:bg-surface-200",
+            isRtl ? "-left-3" : "-right-3",
           )}
         >
           <CollapseIcon className="w-3 h-3 text-text-secondary" />
@@ -140,19 +244,29 @@ export function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className={cn('flex-1 transition-all duration-300', collapsed ? (isRtl ? 'mr-16' : 'ml-16') : (isRtl ? 'mr-64' : 'ml-64'))}>
+      <div
+        className={cn(
+          "flex-1 transition-all duration-300",
+          collapsed ? (isRtl ? "mr-16" : "ml-16") : isRtl ? "mr-64" : "ml-64",
+        )}
+      >
         <header className="sticky top-0 z-20 bg-surface-50/80 backdrop-blur-md border-b border-border-default">
           <div className="flex items-center justify-between px-6 h-14">
             <h2 className="text-sm font-medium text-text-secondary">
-              {t.admin.welcomeBack}{isRtl ? '،' : ','} {user?.firstName}
+              {t.admin.welcomeBack}
+              {isRtl ? "،" : ","} {user?.firstName}
             </h2>
             <div className="flex items-center gap-2">
-              <Badge variant={isSuperAdmin ? 'warning' : 'info'} className="text-[10px]">
-                {isSuperAdmin ? 'Super Admin' : 'Admin'}
+              <Badge
+                variant={isSuperAdmin ? "warning" : "info"}
+                className="text-[10px]"
+              >
+                {isSuperAdmin ? "Super Admin" : "Admin"}
               </Badge>
-              <div className="w-8 h-8 bg-brand-green-100 border border-brand-green-200 rounded-full flex items-center justify-center">
-                <span className="text-xs font-medium text-brand-green-700">
-                  {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+              <div className="w-8 h-8 bg-brand-green-600 rounded-full flex items-center justify-center">
+                <span className="text-xs font-medium text-white">
+                  {user?.firstName?.charAt(0)}
+                  {user?.lastName?.charAt(0)}
                 </span>
               </div>
             </div>

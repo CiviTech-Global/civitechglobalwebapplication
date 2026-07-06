@@ -85,37 +85,37 @@ export default function DemoDataPage() {
           icon: Users,
           label: t.admin.demoData.demoUsers,
           value: status.demoUsers,
-          color: "text-blue-400 bg-blue-900/20",
+          color: "text-white bg-blue-500",
         },
         {
           icon: Package,
           label: t.admin.demoData.demoProducts,
           value: status.demoProducts,
-          color: "text-brand-amber-500 bg-brand-amber-50",
+          color: "text-white bg-brand-amber-500",
         },
         {
           icon: Wrench,
           label: t.admin.demoData.demoServices,
           value: status.demoServices,
-          color: "text-indigo-400 bg-indigo-900/20",
+          color: "text-white bg-indigo-500",
         },
         {
           icon: ShoppingCart,
           label: t.admin.demoData.demoOrders,
           value: status.demoOrders,
-          color: "text-green-400 bg-green-900/20",
+          color: "text-white bg-emerald-600",
         },
         {
           icon: Ticket,
           label: t.admin.demoData.demoTickets,
           value: status.demoTickets,
-          color: "text-orange-400 bg-orange-900/20",
+          color: "text-white bg-orange-500",
         },
         {
           icon: GraduationCap,
           label: t.admin.demoData.demoOpportunities,
           value: status.demoOpportunities,
-          color: "text-pink-400 bg-pink-900/20",
+          color: "text-white bg-pink-500",
         },
       ]
     : [];
@@ -189,7 +189,7 @@ export default function DemoDataPage() {
         </Button>
 
         <Button
-          variant="outline"
+          variant="danger"
           onClick={() => {
             if (confirm(t.admin.demoData.clearConfirm)) {
               clearMutation.mutate();
@@ -199,7 +199,7 @@ export default function DemoDataPage() {
           disabled={
             seedMutation.isPending || clearMutation.isPending || !hasData
           }
-          className="gap-2 border-red-500/30 text-red-400 hover:bg-red-900/20"
+          className="gap-2"
         >
           <Trash2 className="w-4 h-4" />
           {clearMutation.isPending
