@@ -12,8 +12,15 @@ import routes from './routes/index.js';
 
 const app = express();
 
+// Trust first proxy (nginx) for correct req.ip and rate limiting
+app.set('trust proxy', 1);
+
 // Security
-app.use(helmet());
+app.use(
+  helmet({
+    hsts: { maxAge: 63072000, includeSubDomains: true, preload: true },
+  }),
+);
 app.use(cors(corsOptions));
 
 // Parsing

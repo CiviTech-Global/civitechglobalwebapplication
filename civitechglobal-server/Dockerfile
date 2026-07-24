@@ -27,6 +27,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 COPY package*.json ./
 RUN npm ci --omit=dev && npm install prisma --no-save
 
@@ -34,6 +36,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 
 RUN npx prisma generate
+
+USER appuser
 
 EXPOSE 5000
 
@@ -47,6 +51,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 COPY package*.json ./
 RUN npm ci --omit=dev && npm install prisma --no-save
 
@@ -54,6 +60,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
 
 RUN npx prisma generate
+
+USER appuser
 
 EXPOSE 4000
 

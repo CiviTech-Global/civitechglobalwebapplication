@@ -24,7 +24,10 @@ export const env = {
   DATABASE_URL: getEnv('DATABASE_URL'),
   JWT_SECRET: getEnv('JWT_SECRET'),
   JWT_REFRESH_SECRET: getEnv('JWT_REFRESH_SECRET'),
-  CLIENT_URL: getEnvOrDefault('CLIENT_URL', 'http://localhost:5173'),
+  CLIENT_URL:
+    process.env.NODE_ENV === 'production'
+      ? getEnv('CLIENT_URL')
+      : getEnvOrDefault('CLIENT_URL', 'http://localhost:5173'),
   NODE_ENV: getEnvOrDefault('NODE_ENV', 'development'),
   isProduction: getEnvOrDefault('NODE_ENV', 'development') === 'production',
 

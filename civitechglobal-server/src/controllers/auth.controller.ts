@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service.js';
 import { successResponse } from '../utils/apiResponse.js';
-import { env } from '../config/env.js';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: env.isProduction,
+  secure: true,
   sameSite: 'strict' as const,
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',
@@ -52,7 +51,12 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
     if (token) {
       await authService.revokeRefreshToken(token);
     }
-    res.clearCookie('refreshToken', { path: '/' });
+    res.clearCookie('refreshToken', {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+    });
     successResponse(res, null, 'Logged out successfully');
   } catch (error) {
     next(error);

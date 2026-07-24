@@ -83,6 +83,10 @@ export async function addTicketMessage(ticketId: string, userId: string, content
   const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
   if (!ticket) throw new AppError('Ticket not found', 404);
 
+  if (!isStaff && ticket.userId !== userId) {
+    throw new AppError('Access denied', 403);
+  }
+
   return prisma.ticketMessage.create({
     data: { ticketId, userId, content, isStaff },
     include: { user: { select: { id: true, firstName: true, lastName: true, role: true } } },

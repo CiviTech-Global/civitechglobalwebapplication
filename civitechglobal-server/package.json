@@ -33,7 +33,7 @@
   "dependencies": {
     "@grammyjs/conversations": "^2.1.1",
     "@prisma/client": "^6.9.0",
-    "bcryptjs": "^3.0.2",
+    "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -48,7 +48,7 @@
     "zod": "^3.25.7"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.0",

@@ -71,9 +71,16 @@ export async function getUserById(id: string) {
 export async function updateProfile(id: string, data: Record<string, unknown>) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
+
+  const allowedFields: Record<string, unknown> = {};
+  if (data.firstName !== undefined) allowedFields.firstName = data.firstName;
+  if (data.lastName !== undefined) allowedFields.lastName = data.lastName;
+  if (data.phone !== undefined) allowedFields.phone = data.phone;
+  if (data.avatar !== undefined) allowedFields.avatar = data.avatar;
+
   return prisma.user.update({
     where: { id },
-    data: data as Prisma.UserUpdateInput,
+    data: allowedFields as Prisma.UserUpdateInput,
     select: {
       id: true,
       email: true,
@@ -91,6 +98,9 @@ export async function updateProfile(id: string, data: Record<string, unknown>) {
 export async function updateUserRole(id: string, role: string) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
+  // Revoke all tokens when role changes
+  const { revokeAllUserRefreshTokens } = await import('./auth.service.js');
+  await revokeAllUserRefreshTokens(id);
   return prisma.user.update({
     where: { id },
     data: { role: role as Role },
@@ -101,6 +111,9 @@ export async function updateUserRole(id: string, role: string) {
 export async function updateUserPermissions(id: string, permissions: string[]) {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
+  // Revoke all tokens when permissions change
+  const { revokeAllUserRefreshTokens } = await import('./auth.service.js');
+  await revokeAllUserRefreshTokens(id);
   return prisma.user.update({
     where: { id },
     data: { permissions },
