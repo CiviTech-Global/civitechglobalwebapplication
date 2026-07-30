@@ -10,9 +10,7 @@ export const errorMiddleware: MiddlewareFn<Context> = async (ctx, next) => {
     logger.error({ errorMessage, errorStack, error, update: ctx.update }, 'Unhandled bot error');
 
     try {
-      await ctx.reply(
-        'متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.',
-      );
+      await ctx.reply('متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.');
     } catch (replyError) {
       const replyErrorMessage = replyError instanceof Error ? replyError.message : String(replyError);
       logger.error({ replyErrorMessage, replyError }, 'Failed to send error reply');

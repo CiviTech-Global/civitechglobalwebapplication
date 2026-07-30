@@ -22,6 +22,7 @@ function warnIfWeakSecret(key: string, value: string): void {
 export const env = {
   PORT: parseInt(getEnvOrDefault('PORT', '5000'), 10),
   DATABASE_URL: getEnv('DATABASE_URL'),
+  REDIS_URL: getEnv('REDIS_URL'),
   JWT_SECRET: getEnv('JWT_SECRET'),
   JWT_REFRESH_SECRET: getEnv('JWT_REFRESH_SECRET'),
   CLIENT_URL:
@@ -37,6 +38,13 @@ export const env = {
   ADMIN_PASSWORD: getEnv('ADMIN_PASSWORD'),
   ADMIN_FIRST_NAME: getEnvOrDefault('ADMIN_FIRST_NAME', 'Super'),
   ADMIN_LAST_NAME: getEnvOrDefault('ADMIN_LAST_NAME', 'Admin'),
+
+  // Telegram Bot Configuration
+  TELEGRAM_BOT_TOKEN: getEnvOrDefault('TELEGRAM_BOT_TOKEN', ''),
+  TELEGRAM_BOT_MODE: getEnvOrDefault('TELEGRAM_BOT_MODE', 'polling'),
+  TELEGRAM_WEBHOOK_URL: getEnvOrDefault('TELEGRAM_WEBHOOK_URL', ''),
+  TELEGRAM_WEBHOOK_SECRET: getEnvOrDefault('TELEGRAM_WEBHOOK_SECRET', ''),
+  TELEGRAM_ADMIN_USER_IDS: getEnvOrDefault('TELEGRAM_ADMIN_USER_IDS', ''),
 };
 
 warnIfWeakSecret('JWT_SECRET', env.JWT_SECRET);

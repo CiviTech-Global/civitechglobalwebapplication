@@ -12,6 +12,12 @@ router.get('/my', authenticate, ticketController.getUserTickets);
 router.get('/:id', authenticate, ticketController.getTicket);
 router.post('/:id/messages', authenticate, validate(ticketMessageSchema), ticketController.addMessage);
 router.get('/', authenticate, requirePermission('tickets'), ticketController.getAllTickets);
-router.put('/:id/status', authenticate, requirePermission('tickets'), validate(updateTicketStatusSchema), ticketController.updateTicketStatus);
+router.put(
+  '/:id/status',
+  authenticate,
+  requirePermission('tickets'),
+  validate(updateTicketStatusSchema),
+  ticketController.updateTicketStatus,
+);
 
 export default router;

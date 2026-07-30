@@ -10,6 +10,7 @@ import { startCommand } from './commands/start.command.js';
 import { helpCommand } from './commands/help.command.js';
 import { cancelCommand } from './commands/cancel.command.js';
 import { leadConversation } from './conversations/lead.conversation.js';
+import { prisma } from '../config/database.js';
 import type { BotContext, SessionData } from './types.js';
 
 const TELEGRAM_SECRET_HEADER = 'x-telegram-bot-api-secret-token';
@@ -60,7 +61,23 @@ export async function createApp(): Promise<ReturnType<typeof fastify>> {
   });
   const bot = createBot();
 
-  app.get('/health', async () => ({ status: 'ok', service: 'telegram-bot' }));
+  // Liveness probe
+  app.get('/health/live', async () => ({ status: 'ok', service: 'telegram-bot' }));
+
+  // Readiness probe: verifies downstream dependencies
+  app.get('/health/ready', async (_request, reply) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      return reply.send({ status: 'ok', service: 'telegram-bot', checks: { database: true } });
+    } catch (error) {
+      logger.error({ error }, 'Bot readiness check failed: database');
+      return reply.status(503).send({
+        status: 'error',
+        service: 'telegram-bot',
+        checks: { database: false },
+      });
+    }
+  });
 
   if (botConfig.mode === 'webhook' && botConfig.webhookUrl) {
     app.post('/webhook', async (request, reply) => {

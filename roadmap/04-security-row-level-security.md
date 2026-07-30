@@ -1,7 +1,7 @@
 # Layer 4 — Security & Row-Level Security (RLS)
 
 **Score:** 2.5 / 5  
-**Status:** 🔴 Not Started  
+**Status:** 🟡 In Progress (Wave A partially complete)  
 **Owner:** Security Architect, Security & Compliance Officer, Data Privacy Officer
 
 ## Executive summary
@@ -43,7 +43,7 @@ Basic application security is in place (helmet, CORS, input sanitization, bcrypt
   - Return masked/anonymized data by default in non-admin list APIs.
   - Acceptance: DB dump reveals no usable PII.
 
-- [ ] **3. Hash refresh-token JTIs**
+- [x] **3. Hash refresh-token JTIs**
   - Store `SHA-256(jti)` and compare hashes during refresh.
   - Acceptance: refresh tokens are unusable if DB is compromised.
 

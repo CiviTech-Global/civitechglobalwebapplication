@@ -1,7 +1,7 @@
 # Layer 9 — CI/CD & Version Control
 
 **Score:** 3 / 5  
-**Status:** 🟡 In Progress  
+**Status:** 🟡 In Progress (Redis service added to CI for Wave A)  
 **Owner:** DevOps Engineer, Git Workflow Master
 
 ## Executive summary

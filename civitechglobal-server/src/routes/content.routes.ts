@@ -9,6 +9,12 @@ const router = Router();
 
 router.get('/', contentController.getAllContent);
 router.get('/:key', contentController.getContent);
-router.put('/:key', authenticate, requirePermission('content'), validate(updateContentSchema), contentController.updateContent);
+router.put(
+  '/:key',
+  authenticate,
+  requirePermission('content'),
+  validate(updateContentSchema),
+  contentController.updateContent,
+);
 
 export default router;

@@ -1,9 +1,5 @@
-import {
-  insuranceCategoryRepository,
-} from '../../database/prisma/repositories/insurance-category.repository.js';
-import {
-  insuranceSubcategoryRepository,
-} from '../../database/prisma/repositories/insurance-subcategory.repository.js';
+import { insuranceCategoryRepository } from '../../database/prisma/repositories/insurance-category.repository.js';
+import { insuranceSubcategoryRepository } from '../../database/prisma/repositories/insurance-subcategory.repository.js';
 
 export const insuranceService = {
   getAllCategories: () => {

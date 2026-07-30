@@ -3,6 +3,35 @@ import { verifyAccessToken } from '../utils/jwt.js';
 import { Role } from '@prisma/client';
 import { prisma } from '../config/database.js';
 
+async function loadUserFromToken(token: string) {
+  const payload = verifyAccessToken(token);
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+    select: {
+      id: true,
+      role: true,
+      permissions: true,
+      tokenVersion: true,
+      deletedAt: true,
+      emailVerified: true,
+    },
+  });
+
+  if (!user || user.deletedAt) {
+    throw new Error('User not found or inactive');
+  }
+
+  if (payload.tokenVersion !== undefined && user.tokenVersion !== payload.tokenVersion) {
+    throw new Error('Token revoked');
+  }
+
+  return {
+    userId: user.id,
+    role: user.role as Role,
+    permissions: user.permissions,
+  };
+}
+
 export function authenticate(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
@@ -11,41 +40,30 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   }
 
   const token = authHeader.split(' ')[1];
-  try {
-    const payload = verifyAccessToken(token);
-    if (payload.tokenVersion !== undefined) {
-      prisma.user
-        .findUnique({ where: { id: payload.userId }, select: { tokenVersion: true } })
-        .then((user) => {
-          if (!user || user.tokenVersion !== payload.tokenVersion) {
-            res.status(401).json({ success: false, message: 'Token revoked' });
-            return;
-          }
-          req.user = { userId: payload.userId, role: payload.role as Role, permissions: payload.permissions || [] };
-          next();
-        })
-        .catch(() => {
-          res.status(401).json({ success: false, message: 'Invalid token' });
-        });
-    } else {
-      req.user = { userId: payload.userId, role: payload.role as Role, permissions: payload.permissions || [] };
+  loadUserFromToken(token)
+    .then((user) => {
+      req.user = user;
       next();
-    }
-  } catch {
-    res.status(401).json({ success: false, message: 'Invalid or expired token' });
-  }
+    })
+    .catch(() => {
+      res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    });
 }
 
 export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
-    try {
-      const token = authHeader.split(' ')[1];
-      const payload = verifyAccessToken(token);
-      req.user = { userId: payload.userId, role: payload.role as Role, permissions: payload.permissions || [] };
-    } catch {
-      // Token invalid, continue without user
-    }
+    const token = authHeader.split(' ')[1];
+    loadUserFromToken(token)
+      .then((user) => {
+        req.user = user;
+        next();
+      })
+      .catch(() => {
+        // Token invalid or user inactive; continue without user
+        next();
+      });
+  } else {
+    next();
   }
-  next();
 }

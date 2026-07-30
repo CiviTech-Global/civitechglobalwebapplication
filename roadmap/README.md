@@ -23,7 +23,7 @@ This folder breaks the platform-wide technical assessment into **per-layer gap d
 
 | Metric | Value |
 |---|---|
-| Overall maturity | **2.5 / 5** |
+| Overall maturity | **3 / 5** |
 | Strongest layers | Frontend foundations, API/backend logic, CI/CD |
 | Weakest layers | Caching & CDN, Load balancing & scaling, Security/RLS, Observability |
 | Biggest risks | Plain-text PII, no RLS, in-memory rate limits, no backups/CD/observability |
@@ -34,9 +34,9 @@ This folder breaks the platform-wide technical assessment into **per-layer gap d
 |---|---|---|---|
 | 1 | Frontend Foundations | 3/5 | [01-frontend-foundations.md](./01-frontend-foundations.md) |
 | 2 | API & Backend Logic | 3/5 | [02-api-backend-logic.md](./02-api-backend-logic.md) |
-| 3 | Auth & Permissions | 3/5 | [03-auth-permissions.md](./03-auth-permissions.md) |
+| 3 | Auth & Permissions | 4/5 | [03-auth-permissions.md](./03-auth-permissions.md) |
 | 4 | Security & Row-Level Security | 2.5/5 | [04-security-row-level-security.md](./04-security-row-level-security.md) |
-| 5 | Rate Limiting | 2/5 | [05-rate-limiting.md](./05-rate-limiting.md) |
+| 5 | Rate Limiting | 3/5 | [05-rate-limiting.md](./05-rate-limiting.md) |
 | 6 | Database & Storage | 2.5/5 | [06-database-storage.md](./06-database-storage.md) |
 | 7 | Hosting & Deployment | 2/5 | [07-hosting-deployment.md](./07-hosting-deployment.md) |
 | 8 | Cloud & Compute | 2/5 | [08-cloud-compute.md](./08-cloud-compute.md) |
@@ -44,7 +44,7 @@ This folder breaks the platform-wide technical assessment into **per-layer gap d
 | 10 | Caching & CDN | 1/5 | [10-caching-cdn.md](./10-caching-cdn.md) |
 | 11 | Load Balancing & Scaling | 1.5/5 | [11-load-balancing-scaling.md](./11-load-balancing-scaling.md) |
 | 12 | Error Tracking & Logging | 2/5 | [12-error-tracking-logging.md](./12-error-tracking-logging.md) |
-| 13 | Availability & Recovery | 2/5 | [13-availability-recovery.md](./13-availability-recovery.md) |
+| 13 | Availability & Recovery | 3/5 | [13-availability-recovery.md](./13-availability-recovery.md) |
 | 14 | Prioritized Remediation Roadmap | — | [14-prioritized-remediation-roadmap.md](./14-prioritized-remediation-roadmap.md) |
 
 ## How to use

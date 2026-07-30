@@ -1,4 +1,6 @@
+import { createHash } from 'crypto';
 import { prisma } from '../config/database.js';
+import { redis } from '../config/redis.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -6,7 +8,7 @@ import { RegisterInput, LoginInput } from '../validators/auth.schema.js';
 
 const REFRESH_TOKEN_TTL_DAYS = 7;
 const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+const LOCKOUT_DURATION_SECONDS = 15 * 60; // 15 minutes
 
 function getRefreshTokenExpiresAt(): Date {
   const d = new Date();
@@ -14,31 +16,38 @@ function getRefreshTokenExpiresAt(): Date {
   return d;
 }
 
-// In-memory failed login tracker (per-email). In production, use Redis.
-const failedAttempts = new Map<string, { count: number; lockedUntil: number | null }>();
-
-function recordFailedAttempt(email: string): void {
-  const entry = failedAttempts.get(email) || { count: 0, lockedUntil: null };
-  entry.count += 1;
-  if (entry.count >= MAX_FAILED_ATTEMPTS) {
-    entry.lockedUntil = Date.now() + LOCKOUT_DURATION_MS;
-  }
-  failedAttempts.set(email, entry);
+function failedAttemptsKey(email: string): string {
+  return `login:failed:${email.toLowerCase()}`;
 }
 
-function clearFailedAttempts(email: string): void {
-  failedAttempts.delete(email);
+function hashJti(jti: string): string {
+  return createHash('sha256').update(jti).digest('hex');
 }
 
-function checkLockout(email: string): void {
-  const entry = failedAttempts.get(email);
-  if (!entry) return;
-  if (entry.lockedUntil && entry.lockedUntil > Date.now()) {
-    const waitSeconds = Math.ceil((entry.lockedUntil - Date.now()) / 1000);
-    throw new AppError(`Account locked. Try again in ${waitSeconds} seconds.`, 429);
+async function recordFailedAttempt(email: string): Promise<void> {
+  const key = failedAttemptsKey(email);
+  const count = await redis.incr(key);
+  if (count === 1) {
+    await redis.expire(key, LOCKOUT_DURATION_SECONDS);
   }
-  if (entry.lockedUntil && entry.lockedUntil <= Date.now()) {
-    failedAttempts.delete(email);
+}
+
+async function clearFailedAttempts(email: string): Promise<void> {
+  await redis.del(failedAttemptsKey(email));
+}
+
+async function checkLockout(email: string): Promise<void> {
+  const key = failedAttemptsKey(email);
+  const countStr = await redis.get(key);
+  if (!countStr) return;
+
+  const count = parseInt(countStr, 10);
+  if (count >= MAX_FAILED_ATTEMPTS) {
+    const ttl = await redis.ttl(key);
+    if (ttl > 0) {
+      throw new AppError(`Account locked. Try again in ${ttl} seconds.`, 429);
+    }
+    await redis.del(key);
   }
 }
 
@@ -76,7 +85,7 @@ export async function register(input: RegisterInput) {
 
   await prisma.refreshToken.create({
     data: {
-      token: jti,
+      token: hashJti(jti),
       userId: user.id,
       expiresAt: getRefreshTokenExpiresAt(),
     },
@@ -86,18 +95,18 @@ export async function register(input: RegisterInput) {
 }
 
 export async function login(input: LoginInput) {
-  checkLockout(input.email);
+  await checkLockout(input.email);
 
   const user = await prisma.user.findUnique({ where: { email: input.email } });
   if (!user) throw new AppError('Invalid credentials', 401);
 
   const valid = await comparePassword(input.password, user.password);
   if (!valid) {
-    recordFailedAttempt(input.email);
+    await recordFailedAttempt(input.email);
     throw new AppError('Invalid credentials', 401);
   }
 
-  clearFailedAttempts(input.email);
+  await clearFailedAttempts(input.email);
 
   const accessToken = generateAccessToken({
     userId: user.id,
@@ -114,7 +123,7 @@ export async function login(input: LoginInput) {
 
   await prisma.refreshToken.create({
     data: {
-      token: jti,
+      token: hashJti(jti),
       userId: user.id,
       expiresAt: getRefreshTokenExpiresAt(),
     },
@@ -126,9 +135,10 @@ export async function login(input: LoginInput) {
 
 export async function refreshTokens(oldRefreshToken: string) {
   const payload = verifyRefreshToken(oldRefreshToken);
+  const tokenHash = hashJti(payload.jti);
 
   const storedToken = await prisma.refreshToken.findUnique({
-    where: { token: payload.jti },
+    where: { token: tokenHash },
   });
 
   if (!storedToken) throw new AppError('Invalid refresh token', 401);
@@ -164,7 +174,7 @@ export async function refreshTokens(oldRefreshToken: string) {
 
   await prisma.refreshToken.create({
     data: {
-      token: jti,
+      token: hashJti(jti),
       userId: user.id,
       expiresAt: getRefreshTokenExpiresAt(),
     },
@@ -176,8 +186,9 @@ export async function refreshTokens(oldRefreshToken: string) {
 export async function revokeRefreshToken(refreshToken: string) {
   try {
     const payload = verifyRefreshToken(refreshToken);
+    const tokenHash = hashJti(payload.jti);
     await prisma.refreshToken.updateMany({
-      where: { token: payload.jti },
+      where: { token: tokenHash },
       data: { revokedAt: new Date() },
     });
   } catch {

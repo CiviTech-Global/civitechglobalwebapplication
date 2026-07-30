@@ -1,7 +1,7 @@
 # Layer 13 — Availability & Recovery
 
-**Score:** 2 / 5  
-**Status:** 🔴 Not Started  
+**Score:** 3 / 5  
+**Status:** 🟡 In Progress (Wave A complete; backups & incident response pending)  
 **Owner:** SRE, Incident Response Commander
 
 ## Executive summary
@@ -20,27 +20,31 @@ Basic availability primitives exist (graceful shutdown, shallow health endpoints
 
 ### Gaps / risks (with evidence)
 
-- [ ] **Shallow health checks** — `/api/health` only returns a static string; does not verify Postgres/Prisma. Bot `/health` does not verify Telegram API or DB.
-- [ ] **No Docker HEALTHCHECK** — Server and web Dockerfiles lack `HEALTHCHECK`; Compose uses `condition: service_started` for API/bot.
-- [ ] **Graceful shutdown incomplete** — Does not disconnect Prisma or drain in-flight requests with a timeout (`src/config/database.ts:5`).
-- [ ] **No uncaughtException/unhandledRejection handlers** — Crashes from unhandled promises exit abruptly.
+- [x] **Deep readiness/liveness checks** — `/api/health/live` is static; `/api/health/ready` verifies Prisma and Redis. Bot `/health` still to be extended.
+  - Evidence: `src/index.ts`.
+- [x] **Docker HEALTHCHECK** — Added to server, bot, and web Dockerfiles; Compose depends on `condition: service_healthy` for API/bot.
+  - Evidence: `civitechglobal-server/Dockerfile`, `civitechglobal-web/Dockerfile`, `docker-compose.yml`.
+- [x] **Graceful shutdown hardened** — Closes HTTP server, drains in-flight requests with timeout, disconnects Prisma and Redis, exits cleanly.
+  - Evidence: `src/index.ts`, `src/config/database.ts`, `src/config/redis.ts`.
+- [x] **Global error handlers** — `uncaughtException` and `unhandledRejection` handlers log and trigger graceful shutdown.
+  - Evidence: `src/index.ts`.
 - [ ] **No backup/DR strategy** — Named volume `postgres_data` with no automated backups, WAL archiving, or restore runbook.
 - [ ] **No incident response plan** — No runbooks, severity levels, escalation paths, or communication templates.
 
 ## Recommended actions
 
-- [ ] **1. Implement deep readiness/liveness probes**
+- [x] **1. Implement deep readiness/liveness probes**
   - Add `/api/health/ready` that checks Prisma connectivity.
   - Add `/api/health/live` for liveness.
   - Update bot `/health` to verify DB and Telegram API.
   - Acceptance: orchestrator marks pods/containers unhealthy when DB is down.
 
-- [ ] **2. Add Docker HEALTHCHECK instructions**
+- [x] **2. Add Docker HEALTHCHECK instructions**
   - Add to server and web Dockerfiles.
   - Switch Compose to `condition: service_healthy` for API/bot.
   - Acceptance: unhealthy containers are restarted automatically.
 
-- [ ] **3. Harden graceful shutdown**
+- [x] **3. Harden graceful shutdown**
   - Disconnect Prisma client, drain in-flight requests with a timeout, exit cleanly.
   - Add `uncaughtException`/`unhandledRejection` handlers that log and exit safely.
   - Acceptance: zero connection leaks during rolling restart test.
@@ -56,9 +60,9 @@ Basic availability primitives exist (graceful shutdown, shallow health endpoints
 
 ## Definition of done for this layer
 
-- [ ] Deep health checks active for API and bot.
-- [ ] Docker HEALTHCHECK in place.
-- [ ] Graceful shutdown handles DB disconnect and in-flight requests.
+- [x] Deep health checks active for API (bot health extension pending).
+- [x] Docker HEALTHCHECK in place.
+- [x] Graceful shutdown handles DB disconnect and in-flight requests.
 - [ ] Backup/restore tested and documented.
 - [ ] Incident response runbook published.
 - [ ] Score raised to **4/5** or higher.

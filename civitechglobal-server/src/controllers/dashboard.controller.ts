@@ -6,5 +6,7 @@ export async function getAdminDashboard(_req: Request, res: Response, next: Next
   try {
     const dashboard = await dashboardService.getAdminDashboard();
     successResponse(res, dashboard);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 }

@@ -11,6 +11,12 @@ router.post('/', authenticate, validate(createOrderSchema), orderController.crea
 router.get('/my', authenticate, orderController.getUserOrders);
 router.get('/:id', authenticate, orderController.getOrder);
 router.get('/', authenticate, requirePermission('orders'), orderController.getAllOrders);
-router.put('/:id/status', authenticate, requirePermission('orders'), validate(updateOrderStatusSchema), orderController.updateOrderStatus);
+router.put(
+  '/:id/status',
+  authenticate,
+  requirePermission('orders'),
+  validate(updateOrderStatusSchema),
+  orderController.updateOrderStatus,
+);
 
 export default router;

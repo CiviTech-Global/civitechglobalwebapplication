@@ -1,7 +1,4 @@
-import {
-  leadRepository,
-  type CreateLeadInput,
-} from '../../database/prisma/repositories/lead.repository.js';
+import { leadRepository, type CreateLeadInput } from '../../database/prisma/repositories/lead.repository.js';
 
 export const leadService = {
   createLead: (data: CreateLeadInput) => {

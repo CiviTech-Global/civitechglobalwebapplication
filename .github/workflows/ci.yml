@@ -28,6 +28,15 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
       - name: Checkout
@@ -59,6 +68,7 @@ jobs:
       - name: Type check
         env:
           DATABASE_URL: postgres://user:password@localhost:5432/civitechglobal?schema=public
+          REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-jwt-secret-min-32-chars-long
           JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
           ADMIN_PASSWORD: TestAdminPass123!
@@ -75,6 +85,7 @@ jobs:
       - name: Test
         env:
           DATABASE_URL: postgres://user:password@localhost:5432/civitechglobal?schema=public
+          REDIS_URL: redis://localhost:6379
           JWT_SECRET: test-jwt-secret-min-32-chars-long
           JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
           ADMIN_PASSWORD: TestAdminPass123!

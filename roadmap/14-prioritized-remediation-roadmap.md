@@ -16,18 +16,18 @@
 |---|---|---|---|---|---|---|
 | 1 | Security/RLS | No database-level access control | Enable PostgreSQL RLS policies on tenant-scoped tables | Direct SQL queries from non-owner connection blocked | M | 🔴 |
 | 2 | Security/DB | PII stored in plain text | Encrypt/tokenize phone, email, names, Telegram IDs; mask in list APIs | DB dump reveals no usable PII | L | 🔴 |
-| 3 | Rate Limiting | In-memory rate limits break scaling | Move all rate limiting to Redis | Two API replicas share state; abuse test passes | M | 🔴 |
-| 4 | Auth | Deleted/unverified users can still use tokens | Harden `authenticate.ts` to check `deletedAt`/`emailVerified` | Deleted users receive `401` on protected endpoints | S | 🔴 |
-| 5 | Availability | Health checks are shallow | Add `/ready` and `/live` endpoints verifying DB connectivity | Orchestrator detects DB outage correctly | S | 🔴 |
+| 3 | Rate Limiting | In-memory rate limits break scaling | Move all rate limiting to Redis | Two API replicas share state; abuse test passes | M | 🟢 |
+| 4 | Auth | Deleted/unverified users can still use tokens | Harden `authenticate.ts` to check `deletedAt`/`emailVerified` | Deleted users receive `401` on protected endpoints | S | 🟢 |
+| 5 | Availability | Health checks are shallow | Add `/ready` and `/live` endpoints verifying DB connectivity | Orchestrator detects DB outage correctly | S | 🟢 |
 
 ## P1 — Production Readiness
 
 | # | Layer | Gap | Action | Acceptance Criteria | Effort | Status |
 |---|---|---|---|---|---|---|
-| 6 | Auth | `optionalAuth` bypasses revocation | Apply token-version and account-status checks | Revoked tokens fail on optional routes | S | 🔴 |
-| 7 | Auth | `requirePermission` ignores non-admin permissions | Make permission check role-agnostic with DB fallback | USER with explicit permissions can access permitted resources | S | 🔴 |
-| 8 | Auth | Weak password policy | Enforce 12+ chars, complexity, max length | Zod rejects weak passwords | S | 🔴 |
-| 9 | Auth/DB | Refresh tokens stored plain text | Hash JTIs with SHA-256 before DB storage | DB dump does not reveal usable refresh tokens | S | 🔴 |
+| 6 | Auth | `optionalAuth` bypasses revocation | Apply token-version and account-status checks | Revoked tokens fail on optional routes | S | 🟢 |
+| 7 | Auth | `requirePermission` ignores non-admin permissions | Make permission check role-agnostic with DB fallback | USER with explicit permissions can access permitted resources | S | 🟢 |
+| 8 | Auth | Weak password policy | Enforce 12+ chars, complexity, max length | Zod rejects weak passwords | S | 🟢 |
+| 9 | Auth/DB | Refresh tokens stored plain text | Hash JTIs with SHA-256 before DB storage | DB dump does not reveal usable refresh tokens | S | 🟢 |
 | 10 | Hosting | No CD or production manifests | Create `.github/workflows/cd.yml` and `docker-compose.prod.yml` | Merge to `main` deploys staging | M | 🔴 |
 | 11 | Hosting | Web image bakes API target | Inject API URL at runtime; make image environment-agnostic | One web image deploys to dev/staging/prod | M | 🔴 |
 | 12 | Hosting | Secrets in `.env` only | Externalize secrets (Docker Secrets / Vault / cloud secret manager) | No secrets in repo or CI logs | M | 🔴 |
@@ -37,7 +37,7 @@
 | 16 | DB | Hard deletes exist despite soft-delete field | Replace hard delete with `deletedAt` update | No production `DELETE FROM users` | S | 🔴 |
 | 17 | Frontend | Forms not using installed validation libraries | Migrate all forms to `react-hook-form` + `zod` | All user input validated by Zod | M | 🔴 |
 | 18 | Frontend | Minimal test coverage | Add component/integration tests | ≥ 60% coverage on components/auth pages | M | 🔴 |
-| 19 | Availability | No Docker HEALTHCHECK | Add HEALTHCHECK to Dockerfiles and use `service_healthy` | Unhealthy containers auto-restart | S | 🔴 |
+| 19 | Availability | No Docker HEALTHCHECK | Add HEALTHCHECK to Dockerfiles and use `service_healthy` | Unhealthy containers auto-restart | S | 🟢 |
 
 ## P2 — Scale, Quality & Maintainability
 

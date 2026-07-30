@@ -14,7 +14,7 @@ export function apiResponse(res: Response, options: ApiResponseOptions) {
     success,
     message,
     data,
-    ...meta && { meta },
+    ...(meta && { meta }),
   });
 }
 
@@ -32,7 +32,7 @@ export function paginatedResponse(
   total: number,
   page: number,
   limit: number,
-  message?: string
+  message?: string,
 ) {
   return res.status(200).json({
     success: true,

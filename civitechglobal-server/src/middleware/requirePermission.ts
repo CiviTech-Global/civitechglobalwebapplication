@@ -15,8 +15,8 @@ export function requirePermission(...perms: string[]) {
 
     let userPermissions = req.user.permissions || [];
 
-    // Fallback: if token was issued before permissions were added, fetch from DB
-    if (req.user.role === 'ADMIN' && userPermissions.length === 0) {
+    // Fallback: if token carried no permissions, fetch the latest set from the DB
+    if (userPermissions.length === 0) {
       const user = await prisma.user.findUnique({
         where: { id: req.user.userId },
         select: { permissions: true },
@@ -27,7 +27,7 @@ export function requirePermission(...perms: string[]) {
       }
     }
 
-    if (req.user.role === 'ADMIN' && userPermissions.some((p) => perms.includes(p))) {
+    if (userPermissions.some((p) => perms.includes(p))) {
       next();
       return;
     }
