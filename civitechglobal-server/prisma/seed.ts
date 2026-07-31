@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
+import { assertPasswordStrong } from '../src/utils/passwordPolicy.js';
 import { prisma } from '../src/config/database.js';
 import { runAsSystem } from '../src/utils/requestContext.js';
 import { encrypt, hashForSearch, normalizeEmail } from '../src/utils/pii.js';
@@ -11,6 +12,7 @@ function getSeedCredential(key: string): string {
   if (!value || value.trim() === '') {
     throw new Error(`Missing required seed credential: ${key}. Set it in .env before running prisma db seed.`);
   }
+  assertPasswordStrong(value, key);
   return value;
 }
 

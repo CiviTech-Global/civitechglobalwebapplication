@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { assertPasswordStrong } from '../utils/passwordPolicy.js';
 dotenv.config();
 
 function getEnv(key: string): string {
@@ -58,9 +59,7 @@ warnIfWeakSecret('JWT_SECRET', env.JWT_SECRET);
 warnIfWeakSecret('JWT_REFRESH_SECRET', env.JWT_REFRESH_SECRET);
 
 if (env.isProduction) {
-  if (env.ADMIN_PASSWORD.length < 12) {
-    throw new Error('ADMIN_PASSWORD must be at least 12 characters long in production.');
-  }
+  assertPasswordStrong(env.ADMIN_PASSWORD, 'ADMIN_PASSWORD');
   if (env.PII_ENCRYPTION_KEY.length < 32) {
     throw new Error('PII_ENCRYPTION_KEY must be at least 32 characters long in production.');
   }

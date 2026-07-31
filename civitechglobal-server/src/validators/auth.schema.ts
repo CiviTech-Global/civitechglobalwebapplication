@@ -1,20 +1,21 @@
 import { z } from 'zod';
-
-const PASSWORD_MIN_LENGTH = 12;
-const PASSWORD_MAX_LENGTH = 128;
-// eslint-disable-next-line no-useless-escape
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).*$/;
-
-const passwordMessage =
-  'Password must be 12-128 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character';
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_REQUIREMENTS,
+  PASSWORD_COMPLEXITY_MESSAGE,
+} from '../utils/passwordPolicy.js';
 
 export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z
     .string()
-    .min(PASSWORD_MIN_LENGTH, passwordMessage)
-    .max(PASSWORD_MAX_LENGTH, passwordMessage)
-    .regex(PASSWORD_REGEX, passwordMessage),
+    .min(PASSWORD_MIN_LENGTH, PASSWORD_COMPLEXITY_MESSAGE)
+    .max(PASSWORD_MAX_LENGTH, PASSWORD_COMPLEXITY_MESSAGE)
+    .regex(PASSWORD_REQUIREMENTS.lowercase, PASSWORD_COMPLEXITY_MESSAGE)
+    .regex(PASSWORD_REQUIREMENTS.uppercase, PASSWORD_COMPLEXITY_MESSAGE)
+    .regex(PASSWORD_REQUIREMENTS.digit, PASSWORD_COMPLEXITY_MESSAGE)
+    .regex(PASSWORD_REQUIREMENTS.special, PASSWORD_COMPLEXITY_MESSAGE),
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
 });

@@ -1,6 +1,6 @@
-import crypto from 'node:crypto';
 import { prisma } from '../config/database.js';
 import { hashPassword } from '../utils/password.js';
+import { assertPasswordStrong, generateSecurePassword } from '../utils/passwordPolicy.js';
 import { encryptRequired, hashForSearch, normalizeEmail } from '../utils/pii.js';
 
 const DEMO_TAG = '[DEMO]';
@@ -235,7 +235,15 @@ export async function seedDemoData() {
     return { message: 'Demo data already exists. Clear it first before re-seeding.', seeded: false };
   }
 
-  const rawPassword = process.env.DEMO_PASSWORD || crypto.randomBytes(16).toString('base64url').slice(0, 16);
+  let rawPassword: string;
+  let generatedPassword: string | undefined;
+  if (process.env.DEMO_PASSWORD) {
+    rawPassword = process.env.DEMO_PASSWORD;
+    assertPasswordStrong(rawPassword, 'DEMO_PASSWORD');
+  } else {
+    rawPassword = generateSecurePassword(16);
+    generatedPassword = rawPassword;
+  }
   const hashedPassword = await hashPassword(rawPassword);
 
   const result = await prisma.$transaction(async (tx) => {
@@ -345,6 +353,7 @@ export async function seedDemoData() {
     message: 'Demo data seeded successfully',
     seeded: true,
     counts: result,
+    ...(generatedPassword ? { generatedPassword } : {}),
   };
 }
 

@@ -3,6 +3,7 @@ import { Prisma, Role } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { hashPassword } from '../utils/password.js';
+import { generateSecurePassword } from '../utils/passwordPolicy.js';
 import { encrypt, encryptRequired, hashForSearch, normalizeEmail, normalizePhone } from '../utils/pii.js';
 import { decryptUser, decryptUsers } from '../utils/piiTransform.js';
 
@@ -137,8 +138,8 @@ export async function createAdmin(data: { email: string; firstName: string; last
   const emailPrefix = data.email.split('@')[0];
   const randomDigits = crypto.randomInt(1000, 9999).toString();
   const username = `${emailPrefix}_${randomDigits}`;
-  // Auto-generate a random 12-char password
-  const rawPassword = crypto.randomBytes(9).toString('base64url').slice(0, 12);
+  // Auto-generate a random password that satisfies the platform password policy
+  const rawPassword = generateSecurePassword(16);
   const hashedPassword = await hashPassword(rawPassword);
 
   // If a role is assigned, fetch its permissions
