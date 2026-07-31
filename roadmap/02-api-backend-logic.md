@@ -1,7 +1,7 @@
 # Layer 2 — API & Backend Logic
 
 **Score:** 3 / 5  
-**Status:** 🟡 In Progress  
+**Status:** 🟡 In Progress (structure solid; repository/DTO/contract work still open)  
 **Owner:** Backend Architect, Senior Backend Developer
 
 ## Executive summary
@@ -25,7 +25,14 @@ The API is a well-structured Express application with route/service separation, 
 - [ ] **Client-side filtering caused by API design** — Product edit form fetches all products (`limit=100`) and filters client-side instead of a single-resource endpoint.
   - Evidence: `ProductFormPage.tsx:40-42`.
 - [ ] **Manual query parsing** — `lead.service.ts:getAllLeads` parses `page`, `limit`, and `status` manually instead of using a typed DTO.
-- [ ] **Error logs may carry PII** — `errorHandler.ts:16` logs the entire `err` object, which can include request bodies.
+- [x] **Error logs redacted for PII** — Pino redacts `password`, `token`, `refreshToken`, `email`, `phone`, `phoneNumber`, and request-body fields; error handlers log only names/messages.
+  - Evidence: `src/config/logger.ts`, `src/middleware/errorHandler.ts`.
+- [ ] **Validation middleware is body-only** — `validate.ts` only parses `req.body`; query params and route params are not validated, enabling the manual parsing gaps above.
+  - Evidence: `src/middleware/validate.ts:7`.
+- [ ] **Dead dependency** — `fastify` is listed in `package.json` but the API is Express-only; the bot uses Fastify separately.
+  - Evidence: `civitechglobal-server/package.json:42`.
+- [ ] **Sensitive credential returned in admin creation response** — `createAdmin` returns the generated plaintext password in the API payload.
+  - Evidence: `src/services/user.service.ts:173`.
 - [ ] **No API contract tests** — No OpenAPI spec or generated client; frontend and backend types are manually kept in sync.
 
 ## Recommended actions

@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 import { prisma } from '../config/database.js';
 import { hashPassword } from '../utils/password.js';
+import { encryptRequired, hashForSearch, normalizeEmail } from '../utils/pii.js';
 
-const DEMO_EMAIL_DOMAIN = '@demo.civitechglobal.com';
 const DEMO_TAG = '[DEMO]';
 
 const DEMO_USERS = [
@@ -229,7 +229,7 @@ const DEMO_OPPORTUNITIES = [
 export async function seedDemoData() {
   // Check if demo data already exists
   const existingDemoUsers = await prisma.user.count({
-    where: { email: { endsWith: DEMO_EMAIL_DOMAIN } },
+    where: { username: { startsWith: 'demo_' } },
   });
   if (existingDemoUsers > 0) {
     return { message: 'Demo data already exists. Clear it first before re-seeding.', seeded: false };
@@ -241,11 +241,19 @@ export async function seedDemoData() {
   const result = await prisma.$transaction(async (tx) => {
     // 1. Seed demo users
     const users = await Promise.all(
-      DEMO_USERS.map((u) =>
-        tx.user.create({
-          data: { ...u, password: hashedPassword },
-        }),
-      ),
+      DEMO_USERS.map((u) => {
+        const emailHash = hashForSearch(normalizeEmail(u.email));
+        return tx.user.create({
+          data: {
+            ...u,
+            email: encryptRequired(u.email),
+            emailHash,
+            firstName: encryptRequired(u.firstName),
+            lastName: encryptRequired(u.lastName),
+            password: hashedPassword,
+          },
+        });
+      }),
     );
 
     // 2. Seed demo products (only if none exist)
@@ -313,7 +321,8 @@ export async function seedDemoData() {
         data: {
           userId,
           subject: `${DEMO_TAG} ${ticketSubjects[i]}`,
-          email: demoUser.email,
+          email: encryptRequired(demoUser.email),
+          emailHash: hashForSearch(normalizeEmail(demoUser.email)),
           category: i % 2 === 0 ? 'SUPPORT' : 'SALES',
           status: ticketStatuses[i % ticketStatuses.length],
           priority: ticketPriorities[i % ticketPriorities.length],
@@ -343,7 +352,7 @@ export async function clearDemoData() {
   const result = await prisma.$transaction(async (tx) => {
     // Get demo user IDs for cascading cleanup
     const demoUsers = await tx.user.findMany({
-      where: { email: { endsWith: DEMO_EMAIL_DOMAIN } },
+      where: { username: { startsWith: 'demo_' } },
       select: { id: true },
     });
     const demoUserIds = demoUsers.map((u) => u.id);
@@ -380,7 +389,7 @@ export async function clearDemoData() {
 
     // Delete demo users
     const deletedUsers = await tx.user.deleteMany({
-      where: { email: { endsWith: DEMO_EMAIL_DOMAIN } },
+      where: { username: { startsWith: 'demo_' } },
     });
 
     return {
@@ -399,7 +408,7 @@ export async function clearDemoData() {
 
 export async function getDemoStatus() {
   const [demoUsers, demoProducts, demoOrders, demoTickets, demoOpportunities, demoServices] = await Promise.all([
-    prisma.user.count({ where: { email: { endsWith: DEMO_EMAIL_DOMAIN } } }),
+    prisma.user.count({ where: { username: { startsWith: 'demo_' } } }),
     prisma.product.count({ where: { description: { contains: DEMO_TAG } } }),
     prisma.order.count({ where: { notes: { contains: DEMO_TAG } } }),
     prisma.ticket.count({ where: { subject: { contains: DEMO_TAG } } }),

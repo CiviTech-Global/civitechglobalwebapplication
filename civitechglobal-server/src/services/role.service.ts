@@ -40,5 +40,5 @@ export async function deleteRole(id: string) {
   });
   if (!role) throw new AppError('Role not found', 404);
   if (role._count.users > 0) throw new AppError('Cannot delete role with assigned users', 400);
-  return prisma.adminRole.delete({ where: { id } });
+  return prisma.adminRole.update({ where: { id }, data: { deletedAt: new Date() } });
 }

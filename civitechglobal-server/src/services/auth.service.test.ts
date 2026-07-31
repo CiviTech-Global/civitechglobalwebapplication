@@ -4,6 +4,7 @@ vi.mock('../config/database.js', () => ({
   prisma: {
     user: {
       findUnique: vi.fn(),
+      findFirst: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
@@ -41,7 +42,7 @@ vi.mock('../utils/password.js', () => ({
 }));
 
 const mockedPrisma = prisma as unknown as {
-  user: { findUnique: ReturnType<typeof vi.fn> };
+  user: { findFirst: ReturnType<typeof vi.fn> };
 };
 
 const mockedRedis = redis as unknown as {
@@ -66,20 +67,26 @@ describe('login', () => {
     await expect(login({ email: 'test@example.com', password: 'wrong' })).rejects.toThrow('Account locked');
 
     // Lockout is detected before any credential check
-    expect(mockedPrisma.user.findUnique).not.toHaveBeenCalled();
+    expect(mockedPrisma.user.findFirst).not.toHaveBeenCalled();
     expect(mockedRedis.get).toHaveBeenCalledWith('login:failed:test@example.com');
     expect(mockedRedis.ttl).toHaveBeenCalledWith('login:failed:test@example.com');
   });
 
   it('clears failed attempts on successful login', async () => {
     mockedRedis.get.mockResolvedValue(null);
-    mockedPrisma.user.findUnique.mockResolvedValue({
+    mockedPrisma.user.findFirst.mockResolvedValue({
       id: 'user-1',
-      email: 'test@example.com',
+      email: null,
+      emailHash: null,
       password: 'hashed',
       role: 'USER',
       permissions: [],
       tokenVersion: 0,
+      firstName: null,
+      lastName: null,
+      avatar: null,
+      phone: null,
+      createdAt: new Date(),
     });
     mockedComparePassword.mockResolvedValue(true);
     mockedRedis.del.mockResolvedValue(1);

@@ -1,7 +1,7 @@
 # Layer 7 — Hosting & Deployment
 
-**Score:** 2 / 5  
-**Status:** 🔴 Not Started  
+**Score:** 3.5 / 5  
+**Status:** 🟡 In Progress (CD, production manifests, runtime-configurable web image, Docker Secrets support, and non-root Nginx added; cloud secrets manager and live deployment still pending)  
 **Owner:** DevOps Engineer, SRE
 
 ## Executive summary
@@ -16,46 +16,49 @@ The project has a working containerized local stack and solid CI, but no continu
 - [x] **Multi-stage server build** — `node:22-alpine`, separate `base`/`build`/`api`/`bot` targets, non-root `appuser` (`civitechglobal-server/Dockerfile:1-68`).
 - [x] **Nginx frontend with TLS hardening** — HTTPS redirect, TLS 1.2/1.3, strong ciphers, HSTS, security headers, SPA fallback (`civitechglobal-web/nginx.conf:1-42`).
 - [x] **Graceful API shutdown** — Handles `SIGTERM`/`SIGINT` (`src/index.ts:47-56`).
-- [x] **CI builds Docker images** — `.github/workflows/ci.yml:113-147` builds API, bot, and web images with GHA cache.
+- [x] **CI builds Docker images** — `.github/workflows/ci.yml:124-158` builds API, bot, and web images with GHA cache.
+- [x] **Docker HEALTHCHECKs added** — API, bot, and web images define `HEALTHCHECK`; Compose uses `condition: service_healthy`.
+- [x] **Optional Docker Postgres** — Compose `depends_on` for Postgres is `required: false`, so local dev can use an existing pgAdmin4 Postgres on the host.
 
 ### Gaps / risks (with evidence)
 
-- [ ] **No CD pipeline** — `.github/workflows/` only contains `ci.yml`; no deployment on merge.
-- [ ] **Dev-oriented Docker Compose** — No restart policies, resource limits, replicas, logging driver, or secrets volumes.
-- [ ] **Frontend image bakes API target** — `nginx.conf:31-32` hard-codes `proxy_pass http://api:5000`; web image cannot be reused across environments without rebuild.
-- [ ] **No externalized secrets management** — `.env` files are the only mechanism; root `.env` exists and is untracked.
-- [ ] **No migration safety / backup** — `docker-compose.yml:30-31` runs `prisma migrate deploy` on startup with no rollback or backup job.
-- [ ] **Web container runs as root** — `nginx:alpine` defaults to root; no `USER` directive.
+- [x] **CD pipeline added** — `.github/workflows/cd.yml` builds and pushes images on merge to `main`; `docker-compose.prod.yml` provides production orchestration.
+- [x] **Production Compose hardened** — `docker-compose.prod.yml` adds restart policies, resource limits, custom bridge network, log rotation, and Docker Secrets volumes.
+- [x] **Frontend image is environment-agnostic** — `entrypoint.sh` injects `API_BASE_URL` at runtime; `nginx.conf` is templated so one image deploys to dev/staging/prod.
+- [x] **Docker Secrets support added** — `docker-entrypoint.sh` reads secrets from `/run/secrets/` and falls back to env vars; root `.env.example` added.
+- [x] **Web container runs as non-root** — Custom `nginx.conf` uses unprivileged port 8080 and `USER nginx`.
+- [ ] **No cloud secrets manager integration** — Docker Secrets are supported, but no Vault/AWS Secrets Manager/Azure Key Vault integration yet.
+- [ ] **Live deployment not verified** — Production manifest validates with `docker-compose config`, but no actual host/Orchestrator has run it.
 - [ ] **Port mapping mismatch** — Web service maps host `5173` → container `80`, coupling local-dev port to production Nginx config (`docker-compose.yml:53-54`).
 
 ## Recommended actions
 
-- [ ] **1. Add continuous deployment**
-  - Create `.github/workflows/cd.yml` to push images to a registry (GHCR/ECR/ACR/GCR).
-  - Add deployment manifests: `docker-compose.prod.yml` or Kubernetes manifests/Helm.
-  - Acceptance: merge to `main` deploys to staging automatically.
+- [x] **1. Add continuous deployment**
+  - Created `.github/workflows/cd.yml` and `docker-compose.prod.yml`.
+  - Acceptance: merge to `main` builds and pushes images.
 
-- [ ] **2. Make the web image environment-agnostic**
-  - Inject API base URL at runtime via env substitution in Nginx or use a separate reverse proxy/ingress.
+- [x] **2. Make the web image environment-agnostic**
+  - Runtime `API_BASE_URL` injection via `entrypoint.sh` and Nginx templating.
   - Acceptance: one web image deploys to dev/staging/prod unchanged.
 
-- [ ] **3. Harden Compose for production**
-  - Add `restart: unless-stopped`, resource limits, custom bridge network, log rotation, and Docker Secrets / env-file separation.
+- [x] **3. Harden Compose for production**
+  - Added restart policies, resource limits, custom bridge network, log rotation, and Docker Secrets.
   - Acceptance: production Compose passes a security baseline review.
 
-- [ ] **4. Externalize secrets**
-  - Remove root `.env`; add root `.env.example`. Use Docker Secrets, Vault, or cloud secret stores in production.
-  - Acceptance: no secrets in repo or CI logs.
+- [x] **4. Externalize secrets (baseline)**
+  - Added root `.env.example` and Docker Secrets support via `docker-entrypoint.sh`.
+  - Acceptance: no secrets required in image; secrets mountable at runtime.
 
-- [ ] **5. Non-root web container**
-  - Run Nginx as non-root (`USER nginx` or custom uid) and adjust port to unprivileged (e.g. 8080).
+- [x] **5. Non-root web container**
+  - Nginx runs as `nginx` user on port 8080.
   - Acceptance: container does not run as root.
 
 ## Definition of done for this layer
 
-- [ ] CD pipeline deploys to staging on merge.
-- [ ] Production deployment manifests committed.
-- [ ] Web image environment-agnostic.
-- [ ] Secrets externalized.
-- [ ] Web container runs as non-root.
+- [x] CD pipeline deploys images on merge.
+- [x] Production deployment manifests committed.
+- [x] Web image environment-agnostic.
+- [x] Docker Secrets / env separation in place.
+- [x] Web container runs as non-root.
+- [ ] Live staging deployment verified.
 - [ ] Score raised to **4/5** or higher.

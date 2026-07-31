@@ -1,15 +1,21 @@
 import { leadRepository, type CreateLeadInput } from '../../database/prisma/repositories/lead.repository.js';
+import { decryptLead, decryptLeads } from '../../utils/piiTransform.js';
 
 export const leadService = {
-  createLead: (data: CreateLeadInput) => {
-    return leadRepository.create(data);
+  createLead: async (data: CreateLeadInput) => {
+    const lead = await leadRepository.create(data);
+    const decrypted = decryptLead(lead);
+    if (!decrypted) throw new Error('Failed to decrypt created lead');
+    return decrypted;
   },
 
-  getLeadById: (id: string) => {
-    return leadRepository.findById(id);
+  getLeadById: async (id: string) => {
+    const lead = await leadRepository.findById(id);
+    return lead ? decryptLead(lead) : null;
   },
 
-  getLeadsByTelegramUserId: (telegramUserId: string) => {
-    return leadRepository.findByTelegramUserId(telegramUserId);
+  getLeadsByTelegramUserId: async (telegramUserId: string) => {
+    const leads = await leadRepository.findByTelegramUserId(telegramUserId);
+    return decryptLeads(leads);
   },
 };

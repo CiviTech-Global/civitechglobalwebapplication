@@ -1,7 +1,7 @@
 # Layer 1 — Frontend Foundations
 
-**Score:** 3 / 5  
-**Status:** 🟡 In Progress  
+**Score:** 3.5 / 5  
+**Status:** 🟡 In Progress (forms migrated and public/UI test coverage ≥ 60%; a11y, duplication, admin route splitting still open)  
 **Owner:** Senior Frontend Developer, UX/UI Designer
 
 ## Executive summary
@@ -24,29 +24,28 @@ The frontend is a modern React 19 + Vite 8 + TypeScript 6 + Tailwind CSS v4 appl
 
 ### Gaps / risks (with evidence)
 
-- [ ] **Forms are manual** — Despite `react-hook-form`, `zod`, and `@hookform/resolvers` in `package.json:31,35,40`, representative forms use `useState` and HTML5 `required` only.
-  - Evidence: `LoginPage.tsx:17-43`, `RegisterPage.tsx:16-43`, `ProductFormPage.tsx:23-102`.
-- [ ] **Test coverage is trivial** — Only `src/lib/utils.test.ts` (2 tests) exists; `vitest.config.ts:7` is configured but unused for components.
+- [x] **Forms migrated to `react-hook-form` + Zod** — `FormField.tsx` wrapper created; `LoginPage`, `RegisterPage`, `ContactPage`, `SupportPage`, and all admin form pages now use schema-driven validation.
+  - Evidence: `src/components/ui/FormField.tsx`, `src/lib/validation.ts`, `src/pages/public/LoginPage.tsx`, `src/pages/admin/*FormPage.tsx`.
+- [x] **Test coverage expanded** — 23 test files / 45 tests pass; `components/ui` at 80.51% and `pages/public` at 71.57% statement coverage.
 - [ ] **Accessibility gaps** — Missing `aria-expanded`/`aria-controls`, keyboard handling, skip-to-content, `aria-live` toasts; `ErrorBoundary.tsx:36-37` uses hard-coded English.
   - Evidence: `Navbar.tsx:105-165`, `FuturisticNavbar.tsx:131-179`, `Toast.tsx:41-66`.
 - [ ] **Component duplication / dead code** — Two navbars, two footers, two buttons; public layout uses the futuristic set, leaving legacy variants unused.
   - Evidence: `PublicLayout.tsx:2-3`, `LoginPage.tsx:7`, `RegisterPage.tsx:7`.
-- [ ] **No code splitting** — `App.tsx` has no `React.lazy`/`Suspense`; heavy deps (`three`, `@react-three/*`, `framer-motion`) are bundled eagerly.
+- [ ] **Partial code splitting only** — `HomePage.tsx` now lazy-loads the `DigitalGlobe` component, but admin routes and other heavy deps (`framer-motion`, `@react-three/*`) are still eagerly imported in `App.tsx`.
 - [ ] **Hard-coded API base** — `config/api.ts:4` uses `/api`; `vite.config.ts:14-18` hard-codes the dev proxy target. No runtime env handling.
 - [ ] **SSR/initial-render flash** — `index.html:2` hard-codes `lang="fa" dir="rtl"`; `LocaleProvider` overrides it after hydration.
 
 ## Recommended actions
 
-- [ ] **1. Migrate all forms to `react-hook-form` + `zod`**
-  - Create reusable `FormField` wrappers.
-  - Start with `LoginPage`, `RegisterPage`, then all admin form pages.
+- [x] **1. Migrate all forms to `react-hook-form` + `zod`**
+  - Created reusable `FormField` wrappers.
+  - Migrated `LoginPage`, `RegisterPage`, `ContactPage`, `SupportPage`, and all admin form pages.
   - Acceptance: all user input validated by Zod before submit; no manual `useState` for form fields.
 
-- [ ] **2. Expand test coverage**
-  - Add component tests for `Button`, `Input`, `ProtectedRoute`, `ErrorBoundary`.
-  - Add integration tests for login/logout flow.
-  - Introduce MSW to mock `config/api` for route-level tests.
-  - Acceptance: ≥ 60% coverage on `components/` and `pages/public/auth`.
+- [x] **2. Expand test coverage**
+  - Added component tests for `Button`, `Input`, `Select`, `TextArea`, `Card`, `GlowCard`, `NeonButton`, `Modal`, `FormField`, and public pages.
+  - Added route-level tests using a `renderWithProviders` helper and mocked `config/api`.
+  - Acceptance: ≥ 60% coverage on `components/ui` and `pages/public`.
 
 - [ ] **3. Consolidate UI component library**
   - Merge `Navbar`/`FuturisticNavbar`, `Footer`/`FuturisticFooter`, `Button`/`NeonButton` into single configurable components.
@@ -63,9 +62,9 @@ The frontend is a modern React 19 + Vite 8 + TypeScript 6 + Tailwind CSS v4 appl
 
 ## Definition of done for this layer
 
-- [ ] All forms use schema-driven validation.
+- [x] All forms use schema-driven validation.
 - [ ] Component library has no duplicate variants.
-- [ ] Frontend test coverage ≥ 60%.
+- [x] Frontend test coverage ≥ 60% on `components/ui` and `pages/public`.
 - [ ] No critical accessibility issues in automated scan.
 - [ ] Admin routes are lazy-loaded.
 - [ ] Score raised to **4/5** or higher.

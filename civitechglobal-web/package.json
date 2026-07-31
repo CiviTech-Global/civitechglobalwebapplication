@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "type-check": "tsc -b",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -21,6 +22,7 @@
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@sentry/react": "^10.69.0",
     "@tanstack/react-query": "^5.100.5",
     "axios": "^1.15.2",
     "clsx": "^2.1.1",
@@ -49,6 +51,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.184.1",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^2.1.9",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^10.2.1",
     "eslint-plugin-react-hooks": "^7.1.1",

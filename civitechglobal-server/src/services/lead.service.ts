@@ -1,6 +1,7 @@
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import type { LeadStatus } from '@prisma/client';
+import { decryptLead, decryptLeads } from '../utils/piiTransform.js';
 
 export async function getAllLeads(query: Record<string, unknown>) {
   const page = Math.max(1, parseInt(String(query.page || '1'), 10));
@@ -25,7 +26,7 @@ export async function getAllLeads(query: Record<string, unknown>) {
     prisma.lead.count({ where }),
   ]);
 
-  return { leads, total, page, limit };
+  return { leads: decryptLeads(leads), total, page, limit };
 }
 
 export async function getLeadById(id: string) {
@@ -38,14 +39,14 @@ export async function getLeadById(id: string) {
   });
 
   if (!lead) throw new AppError('Lead not found', 404);
-  return lead;
+  return decryptLead(lead);
 }
 
 export async function updateLeadStatus(id: string, status: LeadStatus) {
   const lead = await prisma.lead.findUnique({ where: { id } });
   if (!lead) throw new AppError('Lead not found', 404);
 
-  return prisma.lead.update({
+  const updated = await prisma.lead.update({
     where: { id },
     data: { status },
     include: {
@@ -53,6 +54,7 @@ export async function updateLeadStatus(id: string, status: LeadStatus) {
       subcategory: { select: { id: true, title: true } },
     },
   });
+  return decryptLead(updated);
 }
 
 export async function getLeadStats() {

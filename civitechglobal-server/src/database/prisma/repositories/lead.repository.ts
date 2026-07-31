@@ -1,5 +1,6 @@
 import { prisma } from '../../../config/database.js';
 import type { LeadStatus } from '@prisma/client';
+import { encrypt, encryptRequired, hashForSearch, normalizePhone } from '../../../utils/pii.js';
 
 export interface CreateLeadInput {
   telegramUserId: string;
@@ -15,22 +16,27 @@ export interface CreateLeadInput {
   status?: LeadStatus;
 }
 
+function encryptLeadData(data: CreateLeadInput) {
+  return {
+    telegramUserId: data.telegramUserId,
+    telegramUsername: data.telegramUsername ? encrypt(data.telegramUsername) : null,
+    telegramFirstName: data.telegramFirstName ? encrypt(data.telegramFirstName) : null,
+    categoryId: data.categoryId,
+    subcategoryId: data.subcategoryId,
+    fullName: encryptRequired(data.fullName),
+    phoneNumber: encryptRequired(data.phoneNumber),
+    phoneNumberHash: hashForSearch(normalizePhone(data.phoneNumber)),
+    city: encryptRequired(data.city),
+    preferredContactTime: data.preferredContactTime,
+    notes: data.notes,
+    status: data.status || 'NEW',
+  };
+}
+
 export const leadRepository = {
   create: (data: CreateLeadInput) => {
     return prisma.lead.create({
-      data: {
-        telegramUserId: data.telegramUserId,
-        telegramUsername: data.telegramUsername,
-        telegramFirstName: data.telegramFirstName,
-        categoryId: data.categoryId,
-        subcategoryId: data.subcategoryId,
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-        city: data.city,
-        preferredContactTime: data.preferredContactTime,
-        notes: data.notes,
-        status: data.status || 'NEW',
-      },
+      data: encryptLeadData(data),
       include: {
         category: true,
         subcategory: true,

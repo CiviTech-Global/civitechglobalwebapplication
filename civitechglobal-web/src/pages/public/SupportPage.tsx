@@ -1,27 +1,57 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { z } from "zod";
 import api from "../../config/api";
 import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { TextArea } from "../../components/ui/TextArea";
-import { Select } from "../../components/ui/Select";
 import { Card } from "../../components/ui/Card";
+import { FormField } from "../../components/ui/FormField";
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../hooks/useAuth";
 import { useLocale } from "../../hooks/useLocale";
+import { requiredString, emailSchema } from "../../lib/validation";
+
+const supportSchema = z.object({
+  name: requiredString(),
+  email: emailSchema(),
+  subject: requiredString(),
+  description: requiredString(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
+});
+
+type SupportForm = z.infer<typeof supportSchema>;
+
+const EMPTY_FORM: SupportForm = {
+  name: "",
+  email: "",
+  subject: "",
+  description: "",
+  priority: "MEDIUM",
+};
 
 export default function SupportPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useLocale();
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    name: user ? `${user.firstName} ${user.lastName}` : "",
-    email: user?.email || "",
-    subject: "",
-    description: "",
-    priority: "MEDIUM",
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<SupportForm>({
+    resolver: zodResolver(supportSchema),
+    defaultValues: EMPTY_FORM,
   });
+
+  useEffect(() => {
+    reset({
+      ...EMPTY_FORM,
+      name: user ? `${user.firstName} ${user.lastName}` : "",
+      email: user?.email || "",
+    });
+  }, [user, reset]);
 
   const priorityOptions = [
     { value: "LOW", label: t.support.priorities.LOW },
@@ -30,34 +60,15 @@ export default function SupportPage() {
     { value: "URGENT", label: t.support.priorities.URGENT },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (data: SupportForm) => {
     try {
-      await api.post("/tickets", form);
+      await api.post("/tickets", data);
       toast(t.support.submitSuccess, "success");
-      setForm({
-        name: "",
-        email: "",
-        subject: "",
-        description: "",
-        priority: "MEDIUM",
-      });
+      reset(EMPTY_FORM);
     } catch {
       toast(t.support.submitFailed, "error");
-    } finally {
-      setLoading(false);
     }
   };
-
-  const update =
-    (key: string) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >,
-    ) =>
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -78,45 +89,46 @@ export default function SupportPage() {
         transition={{ delay: 0.1 }}
       >
         <Card>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
-              <Input
+              <FormField
+                control={control}
+                name="name"
                 label={t.support.name}
-                value={form.name}
-                onChange={update("name")}
-                placeholder={t.support.namePlaceholder}
-                required
+                inputProps={{ placeholder: t.support.namePlaceholder }}
               />
-              <Input
+              <FormField
+                control={control}
+                name="email"
+                type="input"
                 label={t.support.email}
-                type="email"
-                value={form.email}
-                onChange={update("email")}
-                placeholder={t.support.emailPlaceholder}
-                required
+                inputProps={{
+                  type: "email",
+                  placeholder: t.support.emailPlaceholder,
+                }}
               />
             </div>
-            <Input
+            <FormField
+              control={control}
+              name="subject"
               label={t.support.subject}
-              value={form.subject}
-              onChange={update("subject")}
-              placeholder={t.support.subjectPlaceholder}
-              required
+              inputProps={{ placeholder: t.support.subjectPlaceholder }}
             />
-            <TextArea
+            <FormField
+              control={control}
+              name="description"
+              type="textarea"
               label={t.support.description_field}
-              value={form.description}
-              onChange={update("description")}
-              placeholder={t.support.descriptionPlaceholder}
-              required
+              textAreaProps={{ placeholder: t.support.descriptionPlaceholder }}
             />
-            <Select
+            <FormField
+              control={control}
+              name="priority"
+              type="select"
               label={t.support.priority}
-              value={form.priority}
-              onChange={update("priority")}
               options={priorityOptions}
             />
-            <Button type="submit" isLoading={loading} className="w-full">
+            <Button type="submit" isLoading={isSubmitting} className="w-full">
               {t.support.submitTicket}
             </Button>
           </form>

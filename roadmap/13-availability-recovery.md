@@ -1,7 +1,7 @@
 # Layer 13 — Availability & Recovery
 
-**Score:** 3 / 5  
-**Status:** 🟡 In Progress (Wave A complete; backups & incident response pending)  
+**Score:** 3.5 / 5  
+**Status:** 🟡 In Progress (deep health checks, Docker HEALTHCHECKs, graceful shutdown complete; backup restore and incident runbook pending)  
 **Owner:** SRE, Incident Response Commander
 
 ## Executive summary
@@ -28,7 +28,8 @@ Basic availability primitives exist (graceful shutdown, shallow health endpoints
   - Evidence: `src/index.ts`, `src/config/database.ts`, `src/config/redis.ts`.
 - [x] **Global error handlers** — `uncaughtException` and `unhandledRejection` handlers log and trigger graceful shutdown.
   - Evidence: `src/index.ts`.
-- [ ] **No backup/DR strategy** — Named volume `postgres_data` with no automated backups, WAL archiving, or restore runbook.
+- [x] **Backup script created** — `scripts/backup.sh` automates `pg_dump`; `scripts/retention-cleanup.ts` purges stale data.
+- [ ] **Restore not tested / no DR runbook** — Backup restore has not been exercised; RTO/RPO not documented.
 - [ ] **No incident response plan** — No runbooks, severity levels, escalation paths, or communication templates.
 
 ## Recommended actions
@@ -49,8 +50,8 @@ Basic availability primitives exist (graceful shutdown, shallow health endpoints
   - Add `uncaughtException`/`unhandledRejection` handlers that log and exit safely.
   - Acceptance: zero connection leaks during rolling restart test.
 
-- [ ] **4. Establish backups and DR**
-  - Automate daily `pg_dump` or WAL-G to object storage.
+- [x] **4. Establish backups and DR (scripts)**
+  - Added `scripts/backup.sh` and `scripts/retention-cleanup.ts`.
   - Document RTO/RPO and test restores quarterly.
   - Acceptance: successful restore demonstrated from backup.
 
@@ -63,6 +64,7 @@ Basic availability primitives exist (graceful shutdown, shallow health endpoints
 - [x] Deep health checks active for API (bot health extension pending).
 - [x] Docker HEALTHCHECK in place.
 - [x] Graceful shutdown handles DB disconnect and in-flight requests.
+- [x] Backup/retention scripts in place.
 - [ ] Backup/restore tested and documented.
 - [ ] Incident response runbook published.
 - [ ] Score raised to **4/5** or higher.

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import * as Sentry from '@sentry/node';
 import { logger } from '../config/logger.js';
 
 export class AppError extends Error {
@@ -12,8 +13,16 @@ export class AppError extends Error {
   }
 }
 
-export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  logger.error({ err }, 'Unhandled error');
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction) {
+  Sentry.captureException(err, {
+    user: req.user ? { id: req.user.userId } : undefined,
+    tags: { route: req.route?.path || req.path },
+  });
+
+  logger.error(
+    { type: err.name, message: err.message, statusCode: (err as { statusCode?: number }).statusCode },
+    'Unhandled error',
+  );
 
   if (err instanceof AppError) {
     const response: Record<string, unknown> = {

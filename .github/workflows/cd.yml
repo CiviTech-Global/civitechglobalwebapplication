@@ -1,0 +1,207 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for server
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/civitechglobal-server
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Extract metadata for web
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/civitechglobal-web
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Extract metadata for bot
+        id: meta-bot
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/civitechglobal-bot
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Build and push server API image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-server
+          target: api
+          push: true
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push server bot image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-server
+          target: bot
+          push: true
+          tags: ${{ steps.meta-bot.outputs.tags }}
+          labels: ${{ steps.meta-bot.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./civitechglobal-web
+          push: true
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  migrate:
+    name: Deploy Database Migrations
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ./civitechglobal-server/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./civitechglobal-server
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: ./civitechglobal-server
+        run: npx prisma generate
+
+      - name: Run migrations
+        working-directory: ./civitechglobal-server
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+  smoke-test:
+    name: Smoke Test Production Stack
+    runs-on: ubuntu-latest
+    needs: migrate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create prod env files
+        run: |
+          mkdir -p secrets/ssl
+          printf '${{ secrets.POSTGRES_USER || 'civitechglobal' }}' > secrets/postgres_user.txt
+          printf '${{ secrets.POSTGRES_PASSWORD || 'ci-password' }}' > secrets/postgres_password.txt
+          printf '${{ secrets.POSTGRES_DB || 'civitechglobal' }}' > secrets/postgres_db.txt
+          printf '${{ secrets.DATABASE_URL }}' > secrets/database_url.txt
+          printf '${{ secrets.REDIS_URL || 'redis://redis:6379' }}' > secrets/redis_url.txt
+          printf '${{ secrets.JWT_SECRET || 'ci-jwt-secret-min-32-chars-long!!' }}' > secrets/jwt_secret.txt
+          printf '${{ secrets.JWT_REFRESH_SECRET || 'ci-refresh-secret-min-32-chars!!' }}' > secrets/jwt_refresh_secret.txt
+          printf '${{ secrets.PII_ENCRYPTION_KEY || 'ci-pii-encryption-key-min-32-chars!!' }}' > secrets/pii_encryption_key.txt
+          printf '${{ secrets.PII_HMAC_KEY || 'ci-pii-hmac-key-min-32-chars!!!!!!' }}' > secrets/pii_hmac_key.txt
+          printf '${{ secrets.ADMIN_EMAIL || 'superadmin@civitechglobal.com' }}' > secrets/admin_email.txt
+          printf '${{ secrets.ADMIN_PASSWORD || 'CiAdminPass123!' }}' > secrets/admin_password.txt
+          printf '${{ secrets.ADMIN_FIRST_NAME || 'Super' }}' > secrets/admin_first_name.txt
+          printf '${{ secrets.ADMIN_LAST_NAME || 'Admin' }}' > secrets/admin_last_name.txt
+          printf '' > secrets/telegram_bot_token.txt
+          printf '' > secrets/telegram_webhook_secret.txt
+          printf '' > secrets/telegram_admin_user_ids.txt
+          printf '${{ secrets.SENTRY_DSN || '' }}' > secrets/sentry_dsn.txt
+          openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+            -keyout secrets/ssl/privkey.pem \
+            -out secrets/ssl/fullchain.pem \
+            -subj "/CN=localhost" 2>/dev/null
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build images locally
+        run: |
+          docker compose -f docker-compose.prod.yml build
+        env:
+          IMAGE_TAG: ci-${{ github.sha }}
+          CLIENT_URL: https://localhost
+          NGINX_UPSTREAM: api:5000
+
+      - name: Start services
+        run: |
+          docker compose -f docker-compose.prod.yml up -d
+        env:
+          IMAGE_TAG: ci-${{ github.sha }}
+          CLIENT_URL: https://localhost
+          NGINX_UPSTREAM: api:5000
+
+      - name: Run migrations
+        run: |
+          docker compose -f docker-compose.prod.yml run --rm init-migrations
+        env:
+          IMAGE_TAG: ci-${{ github.sha }}
+          CLIENT_URL: https://localhost
+          NGINX_UPSTREAM: api:5000
+
+      - name: Wait for readiness
+        run: |
+          for i in {1..30}; do
+            if wget -qO- --no-check-certificate https://localhost/api/health/ready; then
+              echo "Ready"
+              exit 0
+            fi
+            echo "Waiting for API... ($i)"
+            sleep 5
+          done
+          echo "API did not become ready in time"
+          docker compose -f docker-compose.prod.yml logs api
+          exit 1
+
+      - name: Collect logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.prod.yml logs

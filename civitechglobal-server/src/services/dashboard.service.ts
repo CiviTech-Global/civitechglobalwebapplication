@@ -1,4 +1,5 @@
 import { prisma } from '../config/database.js';
+import { decryptUser, decryptTicket, decryptLead } from '../utils/piiTransform.js';
 
 export async function getAdminDashboard() {
   const [
@@ -62,8 +63,14 @@ export async function getAdminDashboard() {
       openTickets,
       totalRevenue: revenue._sum.total || 0,
     },
-    recentOrders,
-    recentTickets,
-    recentLeads,
+    recentOrders: recentOrders.map((o) => ({
+      ...o,
+      user: o.user ? decryptUser(o.user) : null,
+    })),
+    recentTickets: recentTickets.map((t) => ({
+      ...decryptTicket(t),
+      user: t.user ? decryptUser(t.user) : null,
+    })),
+    recentLeads: recentLeads.map((l) => decryptLead(l)),
   };
 }

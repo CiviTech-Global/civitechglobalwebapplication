@@ -1,6 +1,7 @@
 import { OrderStatus } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { decryptUser } from '../utils/piiTransform.js';
 
 export async function createOrder(
   userId: string,
@@ -71,7 +72,12 @@ export async function getAllOrders(query: Record<string, unknown>) {
     prisma.order.count({ where }),
   ]);
 
-  return { orders, total, page, limit };
+  return {
+    orders: orders.map((o) => ({ ...o, user: o.user ? decryptUser(o.user) : null })),
+    total,
+    page,
+    limit,
+  };
 }
 
 export async function getOrderById(id: string, userId?: string) {
@@ -86,7 +92,7 @@ export async function getOrderById(id: string, userId?: string) {
     },
   });
   if (!order) throw new AppError('Order not found', 404);
-  return order;
+  return { ...order, user: order.user ? decryptUser(order.user) : null };
 }
 
 export async function updateOrderStatus(id: string, status: string) {

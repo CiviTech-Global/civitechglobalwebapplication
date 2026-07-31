@@ -1,16 +1,45 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { z } from "zod";
 import api from "../../config/api";
 import type { Opportunity } from "../../types";
 import { Card } from "../../components/ui/Card";
-import { Input } from "../../components/ui/Input";
-import { TextArea } from "../../components/ui/TextArea";
 import { Button } from "../../components/ui/Button";
+import { FormField } from "../../components/ui/FormField";
 import { Spinner } from "../../components/ui/Spinner";
 import { useToast } from "../../hooks/useToast";
 import { slugify } from "../../lib/utils";
 import { useLocale } from "../../hooks/useLocale";
+import { requiredString, slugSchema } from "../../lib/validation";
+
+const opportunitySchema = z.object({
+  title: requiredString(),
+  slug: slugSchema().or(z.literal("")),
+  description: requiredString(),
+  requirements: z.string(),
+  duration: requiredString(),
+  location: requiredString(),
+  type: z.string().optional(),
+  opportunityType: z.enum(["INTERNSHIP", "JOB"]),
+  isOpen: z.boolean(),
+});
+
+type OpportunityForm = z.infer<typeof opportunitySchema>;
+
+const EMPTY_FORM: OpportunityForm = {
+  title: "",
+  slug: "",
+  description: "",
+  requirements: "",
+  duration: "",
+  location: "",
+  type: "Remote",
+  opportunityType: "INTERNSHIP",
+  isOpen: true,
+};
 
 export default function OpportunityFormPage() {
   const { t, isRtl } = useLocale();
@@ -18,59 +47,60 @@ export default function OpportunityFormPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isEdit = !!id;
-  const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(isEdit);
-  const [form, setForm] = useState({
-    title: "",
-    slug: "",
-    description: "",
-    requirements: "",
-    duration: "",
-    location: "",
-    type: "Remote",
-    opportunityType: "INTERNSHIP",
-    isOpen: true,
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { isSubmitting },
+  } = useForm<OpportunityForm>({
+    resolver: zodResolver(opportunitySchema),
+    defaultValues: EMPTY_FORM,
   });
+
+  const titleValue = watch("title");
+  const slugValue = watch("slug");
+
+  useEffect(() => {
+    if (!slugValue && titleValue) {
+      setValue("slug", slugify(titleValue), { shouldValidate: false });
+    }
+  }, [titleValue, slugValue, setValue]);
 
   const BackArrow = isRtl ? ArrowRight : ArrowLeft;
 
   useEffect(() => {
     if (isEdit) {
-      api
-        .get(`/opportunities/admin/all?limit=100`)
-        .then(({ data }) => {
-          const item = data.data.find((i: Opportunity) => i.id === id);
-          if (item) {
-            setForm({
-              title: item.title,
-              slug: item.slug,
-              description: item.description,
-              requirements: item.requirements.join(", "),
-              duration: item.duration,
-              location: item.location,
-              type: item.type,
-              opportunityType: item.opportunityType || "INTERNSHIP",
-              isOpen: item.isOpen,
-            });
-          }
-        })
-        .finally(() => setFetching(false));
+      api.get(`/opportunities/admin/all?limit=100`).then(({ data }) => {
+        const item = data.data.find((i: Opportunity) => i.id === id);
+        if (item) {
+          reset({
+            title: item.title,
+            slug: item.slug,
+            description: item.description,
+            requirements: item.requirements.join(", "),
+            duration: item.duration,
+            location: item.location,
+            type: item.type,
+            opportunityType: item.opportunityType || "INTERNSHIP",
+            isOpen: item.isOpen,
+          });
+        }
+      });
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (form: OpportunityForm) => {
     const body = {
       title: form.title,
       slug: form.slug || slugify(form.title),
       description: form.description,
       requirements: form.requirements
-        ? form.requirements
-            .split(",")
-            .map((r) => r.trim())
-            .filter(Boolean)
-        : [],
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
       duration: form.duration,
       location: form.location,
       type: form.type,
@@ -80,32 +110,21 @@ export default function OpportunityFormPage() {
     try {
       if (isEdit) {
         await api.put(`/opportunities/${id}`, body);
-        toast(t.admin.opportunityForm.saveSuccess, "success");
       } else {
         await api.post("/opportunities", body);
-        toast(t.admin.opportunityForm.saveSuccess, "success");
       }
+      toast(t.admin.opportunityForm.saveSuccess, "success");
       navigate("/admin/opportunities");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } }).response?.data
           ?.message || t.admin.opportunityForm.saveFailed;
       toast(message, "error");
-    } finally {
-      setLoading(false);
     }
   };
 
-  const update =
-    (field: string) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >,
-    ) =>
-      setForm((p) => ({ ...p, [field]: e.target.value }));
-
-  if (fetching) return <Spinner size="lg" />;
+  if (isEdit && titleValue === "" && slugValue === "")
+    return <Spinner size="lg" />;
 
   return (
     <div>
@@ -122,82 +141,88 @@ export default function OpportunityFormPage() {
       </h1>
 
       <Card className="max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={control}
+            name="title"
             label={t.admin.opportunityForm.title}
-            value={form.title}
-            onChange={update("title")}
-            required
           />
-          <Input
+          <FormField
+            control={control}
+            name="slug"
             label={t.admin.opportunityForm.slug}
-            value={form.slug}
-            onChange={update("slug")}
-            placeholder={t.admin.opportunityForm.slugPlaceholder}
+            inputProps={{
+              placeholder: t.admin.opportunityForm.slugPlaceholder,
+            }}
           />
-          <TextArea
+          <FormField
+            control={control}
+            name="description"
+            type="textarea"
             label={t.admin.opportunityForm.description}
-            value={form.description}
-            onChange={update("description")}
-            required
           />
-          <Input
+          <FormField
+            control={control}
+            name="requirements"
             label={t.admin.opportunityForm.requirements}
-            value={form.requirements}
-            onChange={update("requirements")}
           />
           <div className="grid grid-cols-2 gap-4">
-            <Input
+            <FormField
+              control={control}
+              name="duration"
               label={t.admin.opportunityForm.duration}
-              value={form.duration}
-              onChange={update("duration")}
-              placeholder={t.admin.opportunityForm.durationPlaceholder}
-              required
+              inputProps={{
+                placeholder: t.admin.opportunityForm.durationPlaceholder,
+              }}
             />
-            <Input
+            <FormField
+              control={control}
+              name="location"
               label={t.admin.opportunityForm.location}
-              value={form.location}
-              onChange={update("location")}
-              placeholder={t.admin.opportunityForm.locationPlaceholder}
-              required
+              inputProps={{
+                placeholder: t.admin.opportunityForm.locationPlaceholder,
+              }}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Input
+            <FormField
+              control={control}
+              name="type"
               label={t.admin.opportunityForm.type}
-              value={form.type}
-              onChange={update("type")}
-              placeholder={t.admin.opportunityForm.typePlaceholder}
+              inputProps={{
+                placeholder: t.admin.opportunityForm.typePlaceholder,
+              }}
             />
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">
-                {t.admin.opportunityForm.opportunityType}
-              </label>
-              <select
-                value={form.opportunityType}
-                onChange={update("opportunityType")}
-                className="w-full px-3 py-2 rounded-lg border border-border-strong bg-surface-200 text-text-primary focus:ring-2 focus:ring-brand-green-500"
-              >
-                <option value="INTERNSHIP">{t.opportunities.internship}</option>
-                <option value="JOB">{t.opportunities.job}</option>
-              </select>
-            </div>
+            <FormField
+              control={control}
+              name="opportunityType"
+              type="select"
+              label={t.admin.opportunityForm.opportunityType}
+              options={[
+                { value: "INTERNSHIP", label: t.opportunities.internship },
+                { value: "JOB", label: t.opportunities.job },
+              ]}
+            />
           </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={form.isOpen}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, isOpen: e.target.checked }))
-              }
-              className="rounded"
-            />
-            <span className="text-text-secondary">
-              {t.admin.opportunityForm.isOpen}
-            </span>
-          </label>
+          <Controller
+            name="isOpen"
+            control={control}
+            render={({ field }) => (
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-text-secondary">
+                  {t.admin.opportunityForm.isOpen}
+                </span>
+              </label>
+            )}
+          />
           <div className="flex gap-3">
-            <Button type="submit" isLoading={loading}>
+            <Button type="submit" isLoading={isSubmitting}>
               {isEdit ? t.edit : t.create}
             </Button>
             <Link to="/admin/opportunities">

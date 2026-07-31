@@ -56,19 +56,23 @@ enum LeadStatus {
 }
 
 model AdminRole {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String    @id @default(cuid())
+  name        String    @unique
   permissions String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
   users       User[]
 
+  @@index([deletedAt])
   @@map("admin_roles")
 }
 
 model User {
   id             String    @id @default(cuid())
-  email          String    @unique
+  // email, firstName, lastName, and phone are encrypted at rest via application-layer encryption.
+  email          String
+  emailHash      String?   @unique @map("email_hash")
   username       String?   @unique
   password       String
   firstName      String
@@ -77,6 +81,7 @@ model User {
   permissions    String[]  @default([])
   avatar         String?
   phone          String?
+  phoneHash      String?   @map("phone_hash")
   emailVerified  Boolean   @default(false)
   adminRoleId    String?
   tokenVersion   Int       @default(0)
@@ -94,6 +99,7 @@ model User {
   @@index([role])
   @@index([createdAt])
   @@index([deletedAt])
+  @@index([emailHash])
   @@map("users")
 }
 
@@ -114,9 +120,9 @@ model RefreshToken {
 }
 
 model Product {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String
-  slug           String   @unique
+  slug           String    @unique
   description    String
   price          Float?
   image          String?
@@ -124,35 +130,39 @@ model Product {
   features       String[]
   githubUrl      String?
   landingPageUrl String?
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
   orderItems OrderItem[]
 
   @@index([category])
   @@index([isActive])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("products")
 }
 
 model Service {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String    @unique
   description String
   price       Float?
   image       String?
   category    String?
-  serviceType String?  @default("CUSTOM")
+  serviceType String?   @default("CUSTOM")
   features    String[]
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   @@index([category])
   @@index([isActive])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("services")
 }
 
@@ -169,12 +179,14 @@ model Opportunity {
   isOpen          Boolean         @default(true)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
 
   applications OpportunityApplication[]
 
   @@index([isOpen])
   @@index([opportunityType])
   @@index([createdAt])
+  @@index([deletedAt])
   @@map("opportunities")
 }
 
@@ -232,7 +244,9 @@ model Ticket {
   id        String         @id @default(cuid())
   userId    String?
   subject   String
+  // email is encrypted at rest.
   email     String
+  emailHash String?        @map("email_hash")
   category  String?        @default("SUPPORT")
   status    TicketStatus   @default(OPEN)
   priority  TicketPriority @default(MEDIUM)
@@ -245,6 +259,7 @@ model Ticket {
   @@index([status])
   @@index([priority])
   @@index([createdAt])
+  @@index([emailHash])
   @@map("tickets")
 }
 
@@ -302,12 +317,14 @@ model InsuranceSubcategory {
 model Lead {
   id                   String     @id @default(cuid())
   telegramUserId       String     @map("telegram_user_id")
+  // telegramUsername, telegramFirstName, fullName, phoneNumber, and city are encrypted at rest.
   telegramUsername     String?    @map("telegram_username")
   telegramFirstName    String?    @map("telegram_first_name")
   categoryId           String     @map("category_id")
   subcategoryId        String     @map("subcategory_id")
   fullName             String     @map("full_name")
   phoneNumber          String     @map("phone_number")
+  phoneNumberHash      String?    @map("phone_number_hash")
   city                 String
   preferredContactTime String     @map("preferred_contact_time")
   notes                String?
@@ -320,5 +337,6 @@ model Lead {
 
   @@index([status])
   @@index([createdAt])
+  @@index([phoneNumberHash])
   @@map("leads")
 }

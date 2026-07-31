@@ -1,0 +1,290 @@
+# Production Compose stack for CiviTech Global.
+#
+# Secrets can be provided two ways:
+#   1. Env file (simplest for local prod testing):
+#      cp .env.example .env && docker compose -f docker-compose.prod.yml up -d
+#   2. Docker Secrets (recommended for real production):
+#      Create files under ./secrets/ and either:
+#        - use `docker secret create` in a Swarm cluster, or
+#        - bind-mount them via `secrets:` below (file mode) for Compose standalone.
+#
+# Migrations are intentionally NOT run by the API container. Run them first:
+#   docker compose -f docker-compose.prod.yml run --rm init-migrations
+# or in CI/CD before deploying the API.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: civitechglobal-prod-postgres
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+    secrets:
+      - postgres_user
+      - postgres_password
+      - postgres_db
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$(cat /run/secrets/postgres_user) -d $$(cat /run/secrets/postgres_db)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  redis:
+    image: redis:7-alpine
+    container_name: civitechglobal-prod-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+  init-migrations:
+    image: ghcr.io/OWNER/civitechglobal-server:${IMAGE_TAG:-latest}
+    container_name: civitechglobal-prod-init-migrations
+    profiles:
+      - init
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+    secrets:
+      - database_url
+    networks:
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma migrate deploy"
+    deploy:
+      restart_policy:
+        condition: none
+
+  api:
+    image: ghcr.io/OWNER/civitechglobal-server:${IMAGE_TAG:-latest}
+    container_name: civitechglobal-prod-api
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+      REDIS_URL_FILE: /run/secrets/redis_url
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      JWT_REFRESH_SECRET_FILE: /run/secrets/jwt_refresh_secret
+      PII_ENCRYPTION_KEY_FILE: /run/secrets/pii_encryption_key
+      PII_HMAC_KEY_FILE: /run/secrets/pii_hmac_key
+      ADMIN_EMAIL_FILE: /run/secrets/admin_email
+      ADMIN_PASSWORD_FILE: /run/secrets/admin_password
+      ADMIN_FIRST_NAME_FILE: /run/secrets/admin_first_name
+      ADMIN_LAST_NAME_FILE: /run/secrets/admin_last_name
+      CLIENT_URL: ${CLIENT_URL:-https://localhost}
+      NODE_ENV: production
+      PORT: 5000
+      TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+      TELEGRAM_BOT_MODE: ${TELEGRAM_BOT_MODE:-polling}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-}
+      TELEGRAM_WEBHOOK_SECRET_FILE: /run/secrets/telegram_webhook_secret
+      TELEGRAM_ADMIN_USER_IDS_FILE: /run/secrets/telegram_admin_user_ids
+      SENTRY_DSN_FILE: /run/secrets/sentry_dsn
+      METRICS_ENABLED: ${METRICS_ENABLED:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    secrets:
+      - database_url
+      - redis_url
+      - jwt_secret
+      - jwt_refresh_secret
+      - pii_encryption_key
+      - pii_hmac_key
+      - admin_email
+      - admin_password
+      - admin_first_name
+      - admin_last_name
+      - telegram_bot_token
+      - telegram_webhook_secret
+      - telegram_admin_user_ids
+      - sentry_dsn
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+  bot:
+    image: ghcr.io/OWNER/civitechglobal-server:${IMAGE_TAG:-latest}
+    container_name: civitechglobal-prod-bot
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+      REDIS_URL_FILE: /run/secrets/redis_url
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      JWT_REFRESH_SECRET_FILE: /run/secrets/jwt_refresh_secret
+      PII_ENCRYPTION_KEY_FILE: /run/secrets/pii_encryption_key
+      PII_HMAC_KEY_FILE: /run/secrets/pii_hmac_key
+      TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+      TELEGRAM_BOT_MODE: ${TELEGRAM_BOT_MODE:-polling}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-}
+      TELEGRAM_WEBHOOK_SECRET_FILE: /run/secrets/telegram_webhook_secret
+      TELEGRAM_ADMIN_USER_IDS_FILE: /run/secrets/telegram_admin_user_ids
+      TELEGRAM_BOT_PORT: 4000
+      NODE_ENV: production
+      SENTRY_DSN_FILE: /run/secrets/sentry_dsn
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    secrets:
+      - database_url
+      - redis_url
+      - jwt_secret
+      - jwt_refresh_secret
+      - pii_encryption_key
+      - pii_hmac_key
+      - telegram_bot_token
+      - telegram_webhook_secret
+      - telegram_admin_user_ids
+      - sentry_dsn
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health/live || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+
+  web:
+    image: ghcr.io/OWNER/civitechglobal-web:${IMAGE_TAG:-latest}
+    container_name: civitechglobal-prod-web
+    environment:
+      NGINX_UPSTREAM: ${NGINX_UPSTREAM:-api:5000}
+      API_BASE_URL: ${API_BASE_URL:-/api}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      NODE_ENV: production
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./secrets/ssl/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
+      - ./secrets/ssl/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
+    networks:
+      - frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- --no-check-certificate https://localhost/ || wget -qO- http://localhost/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres_user.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
+  postgres_db:
+    file: ./secrets/postgres_db.txt
+  database_url:
+    file: ./secrets/database_url.txt
+  redis_url:
+    file: ./secrets/redis_url.txt
+  jwt_secret:
+    file: ./secrets/jwt_secret.txt
+  jwt_refresh_secret:
+    file: ./secrets/jwt_refresh_secret.txt
+  pii_encryption_key:
+    file: ./secrets/pii_encryption_key.txt
+  pii_hmac_key:
+    file: ./secrets/pii_hmac_key.txt
+  admin_email:
+    file: ./secrets/admin_email.txt
+  admin_password:
+    file: ./secrets/admin_password.txt
+  admin_first_name:
+    file: ./secrets/admin_first_name.txt
+  admin_last_name:
+    file: ./secrets/admin_last_name.txt
+  telegram_bot_token:
+    file: ./secrets/telegram_bot_token.txt
+  telegram_webhook_secret:
+    file: ./secrets/telegram_webhook_secret.txt
+  telegram_admin_user_ids:
+    file: ./secrets/telegram_admin_user_ids.txt
+  sentry_dsn:
+    file: ./secrets/sentry_dsn.txt
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

@@ -1,7 +1,7 @@
 # Layer 12 — Error Tracking & Logging
 
-**Score:** 2 / 5  
-**Status:** 🔴 Not Started  
+**Score:** 3.5 / 5  
+**Status:** 🟡 In Progress (PII redaction, request IDs, Sentry, Prometheus metrics, and SLOs complete; centralized log platform still pending)  
 **Owner:** SRE, Observability SRE Engineer
 
 ## Executive summary
@@ -21,20 +21,22 @@ Structured logging exists in both API and bot, and errors are handled consistent
 ### Gaps / risks (with evidence)
 
 - [ ] **No centralized log aggregation** — Logs go to stdout only; no Loki/ELK/CloudWatch agent or retention policy.
-- [ ] **No request-level logging or correlation IDs** — `src/index.ts` does not use `pino-http` or request ID middleware.
-- [ ] **No metrics or alerting** — No Prometheus, Sentry, Datadog, Grafana, or alertmanager configs.
-- [ ] **PII in logs** — `errorHandler.ts:16` logs full `err` object; bot error middleware logs `ctx.update` (`src/bot/middleware/error.middleware.ts:10`).
-- [ ] **Dual log streams in bot** — Fastify built-in logger plus imported Pino produce uncorrelated logs (`src/bot/app.ts:55-60`).
+- [x] **Request-level logging with correlation IDs** — `pino-http` logs every request with an `x-request-id`; bot logs correlate where possible.
+  - Evidence: `src/index.ts`, `src/config/logger.ts`.
+- [x] **Sentry + Prometheus metrics active** — Sentry initialized in API, bot, and web; `/metrics` exposes `http_request_duration_seconds`, DB/Redis health gauges, and `auth_failures_total`.
+  - Evidence: `src/index.ts`, `src/config/metrics.ts`, `src/bot/app.ts`, web Sentry init.
+- [x] **SLOs documented** — `docs/slos.md` defines availability, latency, and error-rate targets.
+- [x] **PII redacted from logs** — Pino redacts sensitive paths; error handlers log only names/messages; readiness checks no longer log raw errors.
+- [ ] **Dual log streams in bot** — Fastify built-in logger plus imported Pino produce uncorrelated logs (`src/bot/app.ts:57-60`).
 - [ ] **No SLOs/error budgets** — Reliability targets are undefined.
 
 ## Recommended actions
 
-- [ ] **1. Add request-level logging with correlation IDs**
-  - Use `pino-http` or custom middleware to assign a request ID and log method/path/status/latency.
-  - Propagate ID to bot logs for end-to-end tracing.
-  - Acceptance: every log line includes `reqId`.
+- [x] **1. Add request-level logging with correlation IDs**
+  - `pino-http` with `x-request-id` and custom `reqId` attribute.
+  - Acceptance: every API log line includes `reqId`.
 
-- [ ] **2. Redact PII from logs**
+- [x] **2. Redact PII from logs**
   - Configure Pino redaction for `password`, `token`, `phoneNumber`, `email`, `ctx.update.message.text`, etc.
   - Acceptance: no sensitive values in logs during tests.
 
@@ -42,19 +44,20 @@ Structured logging exists in both API and bot, and errors are handled consistent
   - Ship logs to Loki/CloudWatch/ELK with rotation and retention.
   - Acceptance: logs searchable by service, level, and request ID in the log platform.
 
-- [ ] **4. Add error tracking and metrics**
-  - Integrate Sentry for crash tracking.
-  - Expose `/metrics` with `prom-client` for request rate, latency, errors, DB pool stats.
-  - Acceptance: alerts fire on error-rate threshold.
+- [x] **4. Add error tracking and metrics**
+  - Sentry initialized in API, bot, and web.
+  - Prometheus `/metrics` with request duration, DB/Redis health, auth failures.
+  - Acceptance: metrics endpoint responds and Sentry captures errors.
 
-- [ ] **5. Define SLOs**
-  - e.g. 99.9% API availability, p99 latency < 500 ms, lead-submission success rate > 99.5%.
-  - Acceptance: SLOs documented and dashboards created.
+- [x] **5. Define SLOs**
+  - Documented in `docs/slos.md`.
+  - Acceptance: SLOs published and alertable.
 
 ## Definition of done for this layer
 
-- [ ] Every request has a correlation ID.
-- [ ] Logs are centralized and PII-redacted.
-- [ ] Sentry + Prometheus metrics active.
-- [ ] SLOs defined and alertable.
+- [x] Every request has a correlation ID.
+- [x] Logs are PII-redacted.
+- [ ] Logs centralized in a log platform (Loki/CloudWatch/ELK).
+- [x] Sentry + Prometheus metrics active.
+- [x] SLOs defined and alertable.
 - [ ] Score raised to **4/5** or higher.

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { Role } from '@prisma/client';
 import { prisma } from '../config/database.js';
+import { runAsSystem } from '../utils/requestContext.js';
 
 async function loadUserFromToken(token: string) {
   const payload = verifyAccessToken(token);
@@ -40,7 +41,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   }
 
   const token = authHeader.split(' ')[1];
-  loadUserFromToken(token)
+  runAsSystem(() => loadUserFromToken(token))
     .then((user) => {
       req.user = user;
       next();
@@ -54,7 +55,7 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
-    loadUserFromToken(token)
+    runAsSystem(() => loadUserFromToken(token))
       .then((user) => {
         req.user = user;
         next();

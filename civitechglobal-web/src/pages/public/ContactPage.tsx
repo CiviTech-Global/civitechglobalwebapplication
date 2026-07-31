@@ -1,29 +1,66 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { Mail, MapPin, Send } from "lucide-react";
+import { z } from "zod";
 import api from "../../config/api";
 import { NeonButton } from "../../components/ui/NeonButton";
-import { Input } from "../../components/ui/Input";
-import { TextArea } from "../../components/ui/TextArea";
-import { Select } from "../../components/ui/Select";
+import { FormField } from "../../components/ui/FormField";
 import { GlowCard } from "../../components/ui/GlowCard";
 import { AnimatedSection } from "../../components/ui/AnimatedSection";
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../hooks/useAuth";
 import { useLocale } from "../../hooks/useLocale";
+import { requiredString, emailSchema } from "../../lib/validation";
+
+const contactSchema = z.object({
+  name: requiredString(),
+  email: emailSchema(),
+  subject: requiredString(),
+  category: z.enum([
+    "SUPPORT",
+    "SALES",
+    "DEMO_REQUEST",
+    "PARTNERSHIP",
+    "OTHER",
+  ]),
+  description: requiredString(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
+});
+
+type ContactForm = z.infer<typeof contactSchema>;
+
+const EMPTY_FORM: ContactForm = {
+  name: "",
+  email: "",
+  subject: "",
+  category: "SUPPORT",
+  description: "",
+  priority: "MEDIUM",
+};
 
 export default function ContactPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useLocale();
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    name: user ? `${user.firstName} ${user.lastName}` : "",
-    email: user?.email || "",
-    subject: "",
-    category: "SUPPORT",
-    description: "",
-    priority: "MEDIUM",
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<ContactForm>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: EMPTY_FORM,
   });
+
+  useEffect(() => {
+    reset({
+      ...EMPTY_FORM,
+      name: user ? `${user.firstName} ${user.lastName}` : "",
+      email: user?.email || "",
+    });
+  }, [user, reset]);
 
   const categoryOptions = [
     { value: "SUPPORT", label: t.contact.categories.SUPPORT },
@@ -33,35 +70,15 @@ export default function ContactPage() {
     { value: "OTHER", label: t.contact.categories.OTHER },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (data: ContactForm) => {
     try {
-      await api.post("/tickets", form);
+      await api.post("/tickets", data);
       toast(t.contact.submitSuccess, "success");
-      setForm({
-        name: "",
-        email: "",
-        subject: "",
-        category: "SUPPORT",
-        description: "",
-        priority: "MEDIUM",
-      });
+      reset(EMPTY_FORM);
     } catch {
       toast(t.contact.submitFailed, "error");
-    } finally {
-      setLoading(false);
     }
   };
-
-  const update =
-    (key: string) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >,
-    ) =>
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -78,49 +95,50 @@ export default function ContactPage() {
         <div className="md:col-span-2">
           <AnimatedSection delay={0.1}>
             <GlowCard hover={false}>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <Input
+                  <FormField
+                    control={control}
+                    name="name"
                     label={t.contact.name}
-                    value={form.name}
-                    onChange={update("name")}
-                    placeholder={t.contact.namePlaceholder}
-                    required
+                    inputProps={{ placeholder: t.contact.namePlaceholder }}
                   />
-                  <Input
+                  <FormField
+                    control={control}
+                    name="email"
+                    type="input"
                     label={t.contact.email}
-                    type="email"
-                    value={form.email}
-                    onChange={update("email")}
-                    placeholder={t.contact.emailPlaceholder}
-                    required
+                    inputProps={{
+                      type: "email",
+                      placeholder: t.contact.emailPlaceholder,
+                    }}
                   />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <Input
+                  <FormField
+                    control={control}
+                    name="subject"
                     label={t.contact.subject}
-                    value={form.subject}
-                    onChange={update("subject")}
-                    placeholder={t.contact.subjectPlaceholder}
-                    required
+                    inputProps={{ placeholder: t.contact.subjectPlaceholder }}
                   />
-                  <Select
+                  <FormField
+                    control={control}
+                    name="category"
+                    type="select"
                     label={t.contact.category}
-                    value={form.category}
-                    onChange={update("category")}
                     options={categoryOptions}
                   />
                 </div>
-                <TextArea
+                <FormField
+                  control={control}
+                  name="description"
+                  type="textarea"
                   label={t.contact.message}
-                  value={form.description}
-                  onChange={update("description")}
-                  placeholder={t.contact.messagePlaceholder}
-                  required
+                  textAreaProps={{ placeholder: t.contact.messagePlaceholder }}
                 />
                 <NeonButton
                   type="submit"
-                  isLoading={loading}
+                  isLoading={isSubmitting}
                   className="w-full gap-2"
                 >
                   <Send className="w-4 h-4" /> {t.contact.submit}

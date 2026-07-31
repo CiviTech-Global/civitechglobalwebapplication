@@ -1,14 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Check } from "lucide-react";
+import { z } from "zod";
 import api from "../../config/api";
 import type { AdminRole, ApiResponse } from "../../types";
 import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
-import { Select } from "../../components/ui/Select";
+import { FormField } from "../../components/ui/FormField";
 import { useToast } from "../../hooks/useToast";
 import { useLocale } from "../../hooks/useLocale";
+import { emailSchema, requiredString } from "../../lib/validation";
+
+const adminSchema = z.object({
+  email: emailSchema(),
+  firstName: requiredString(),
+  lastName: requiredString(),
+  adminRoleId: z.string().optional(),
+});
+
+type AdminForm = z.infer<typeof adminSchema>;
 
 export default function AdminFormPage() {
   const navigate = useNavigate();
@@ -16,11 +28,19 @@ export default function AdminFormPage() {
   const { t } = useLocale();
   const [copied, setCopied] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    adminRoleId: "",
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<AdminForm>({
+    resolver: zodResolver(adminSchema),
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      adminRoleId: "",
+    },
   });
 
   const [credentials, setCredentials] = useState<{
@@ -38,7 +58,7 @@ export default function AdminFormPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (form: AdminForm) => {
       const payload: Record<string, string> = {
         email: form.email,
         firstName: form.firstName,
@@ -63,15 +83,12 @@ export default function AdminFormPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const update =
-    (key: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
-
   const roleOptions = [
     { value: "", label: t.admin.adminForm.selectRole },
     ...(rolesData?.map((r) => ({ value: r.id, label: r.name })) || []),
   ];
+
+  const onSubmit = (data: AdminForm) => mutation.mutate(data);
 
   if (credentials) {
     return (
@@ -138,12 +155,7 @@ export default function AdminFormPage() {
             variant="outline"
             onClick={() => {
               setCredentials(null);
-              setForm({
-                email: "",
-                firstName: "",
-                lastName: "",
-                adminRoleId: "",
-              });
+              reset();
             }}
           >
             {t.admin.addNew}
@@ -166,44 +178,39 @@ export default function AdminFormPage() {
         {t.admin.adminForm.createTitle}
       </h1>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          mutation.mutate();
-        }}
-        className="space-y-4"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Input
+          <FormField
+            control={control}
+            name="firstName"
             label={t.admin.adminForm.firstName}
-            value={form.firstName}
-            onChange={update("firstName")}
-            required
           />
-          <Input
+          <FormField
+            control={control}
+            name="lastName"
             label={t.admin.adminForm.lastName}
-            value={form.lastName}
-            onChange={update("lastName")}
-            required
           />
         </div>
-        <Input
+        <FormField
+          control={control}
+          name="email"
+          type="input"
           label={t.admin.adminForm.email}
-          type="email"
-          value={form.email}
-          onChange={update("email")}
-          placeholder={t.admin.adminForm.emailPlaceholder}
-          required
+          inputProps={{
+            type: "email",
+            placeholder: t.admin.adminForm.emailPlaceholder,
+          }}
         />
-        <Select
+        <FormField
+          control={control}
+          name="adminRoleId"
+          type="select"
           label={t.admin.adminForm.role}
-          value={form.adminRoleId}
-          onChange={update("adminRoleId")}
           options={roleOptions}
         />
 
         <div className="flex gap-3">
-          <Button type="submit" isLoading={mutation.isPending}>
+          <Button type="submit" isLoading={isSubmitting || mutation.isPending}>
             {t.create}
           </Button>
           <Button

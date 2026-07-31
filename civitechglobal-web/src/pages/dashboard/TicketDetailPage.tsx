@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import api from "../../config/api";
 import type { Ticket, ApiResponse } from "../../types";
@@ -8,7 +10,7 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Spinner } from "../../components/ui/Spinner";
 import { Button } from "../../components/ui/Button";
-import { TextArea } from "../../components/ui/TextArea";
+import { FormField } from "../../components/ui/FormField";
 import { useToast } from "../../hooks/useToast";
 import { useAuth } from "../../hooks/useAuth";
 import { formatDate } from "../../lib/utils";
@@ -31,8 +33,6 @@ export default function TicketDetailPage() {
   const queryClient = useQueryClient();
   const { t, isRtl } = useLocale();
   const BackIcon = isRtl ? ArrowRight : ArrowLeft;
-  const [message, setMessage] = useState("");
-
   const { data: ticket, isLoading } = useQuery({
     queryKey: ["ticket", id],
     queryFn: async () => {
@@ -41,12 +41,27 @@ export default function TicketDetailPage() {
     },
   });
 
+  const messageSchema = z.object({
+    content: z.string().min(1, "Message is required"),
+  });
+  type MessageForm = z.infer<typeof messageSchema>;
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<MessageForm>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: { content: "" },
+  });
+
   const sendMessage = useMutation({
-    mutationFn: async () => {
-      await api.post(`/tickets/${id}/messages`, { content: message });
+    mutationFn: async (form: MessageForm) => {
+      await api.post(`/tickets/${id}/messages`, form);
     },
     onSuccess: () => {
-      setMessage("");
+      reset();
       queryClient.invalidateQueries({ queryKey: ["ticket", id] });
     },
     onError: () => toast(t.sendMessageError, "error"),
@@ -117,22 +132,27 @@ export default function TicketDetailPage() {
         </div>
 
         {ticket.status !== "CLOSED" && (
-          <div className="mt-4 flex gap-2">
-            <TextArea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={t.tickets.messagePlaceholder}
-              className="flex-1"
+          <form
+            onSubmit={handleSubmit((form) => sendMessage.mutate(form))}
+            className="mt-4 flex gap-2"
+          >
+            <FormField
+              control={control}
+              name="content"
+              type="textarea"
+              inputProps={{
+                placeholder: t.tickets.messagePlaceholder,
+                className: "flex-1",
+              }}
             />
             <Button
-              onClick={() => sendMessage.mutate()}
-              disabled={!message.trim()}
-              isLoading={sendMessage.isPending}
+              type="submit"
+              isLoading={isSubmitting || sendMessage.isPending}
               className="self-end"
             >
               <Send className="w-4 h-4" />
             </Button>
-          </div>
+          </form>
         )}
       </Card>
     </div>

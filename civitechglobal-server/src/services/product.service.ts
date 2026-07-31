@@ -40,5 +40,5 @@ export async function updateProduct(id: string, data: Record<string, unknown>) {
 export async function deleteProduct(id: string) {
   const product = await prisma.product.findUnique({ where: { id } });
   if (!product) throw new AppError('Product not found', 404);
-  return prisma.product.delete({ where: { id } });
+  return prisma.product.update({ where: { id }, data: { deletedAt: new Date() } });
 }

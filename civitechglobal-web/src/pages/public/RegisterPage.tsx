@@ -1,31 +1,52 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
+import { z } from "zod";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { useLocale } from "../../hooks/useLocale";
 import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
+import { FormField } from "../../components/ui/FormField";
+import {
+  emailSchema,
+  passwordSchema,
+  requiredString,
+} from "../../lib/validation";
 import { Card } from "../../components/ui/Card";
+
+const registerSchema = z.object({
+  firstName: requiredString(),
+  lastName: requiredString(),
+  email: emailSchema(),
+  password: passwordSchema(),
+});
+
+type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLocale();
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-  });
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (data: RegisterForm) => {
     try {
-      const user = await register(form);
+      const user = await register(data);
       toast(t.auth.registerSuccess, "success");
       const redirectTo =
         user.role === "ADMIN" || user.role === "SUPER_ADMIN"
@@ -37,13 +58,8 @@ export default function RegisterPage() {
         (err as { response?: { data?: { message?: string } } }).response?.data
           ?.message || t.auth.invalidCredentials;
       toast(message, "error");
-    } finally {
-      setLoading(false);
     }
   };
-
-  const update = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
@@ -63,38 +79,40 @@ export default function RegisterPage() {
             <p className="text-sm text-text-muted mt-1">{t.auth.signUpTitle}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <Input
+              <FormField
+                control={control}
+                name="firstName"
                 label={t.auth.firstName}
-                value={form.firstName}
-                onChange={update("firstName")}
-                required
               />
-              <Input
+              <FormField
+                control={control}
+                name="lastName"
                 label={t.auth.lastName}
-                value={form.lastName}
-                onChange={update("lastName")}
-                required
               />
             </div>
-            <Input
+            <FormField
+              control={control}
+              name="email"
+              type="input"
               label={t.auth.email}
-              type="email"
-              placeholder={t.auth.emailPlaceholder}
-              value={form.email}
-              onChange={update("email")}
-              required
+              inputProps={{
+                type: "email",
+                placeholder: t.auth.emailPlaceholder,
+              }}
             />
-            <Input
+            <FormField
+              control={control}
+              name="password"
+              type="input"
               label={t.auth.password}
-              type="password"
-              placeholder={t.auth.passwordPlaceholder}
-              value={form.password}
-              onChange={update("password")}
-              required
+              inputProps={{
+                type: "password",
+                placeholder: t.auth.passwordPlaceholder,
+              }}
             />
-            <Button type="submit" isLoading={loading} className="w-full">
+            <Button type="submit" isLoading={isSubmitting} className="w-full">
               {t.auth.signUp}
             </Button>
           </form>

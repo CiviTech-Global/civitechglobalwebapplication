@@ -1,7 +1,7 @@
 # Layer 9 — CI/CD & Version Control
 
-**Score:** 3 / 5  
-**Status:** 🟡 In Progress (Redis service added to CI for Wave A)  
+**Score:** 3.5 / 5  
+**Status:** 🟡 In Progress (CI + pre-commit solid; CD added; container scanning/signing/branch protection still missing)  
 **Owner:** DevOps Engineer, Git Workflow Master
 
 ## Executive summary
@@ -19,7 +19,8 @@ CI is solid: GitHub Actions runs server checks against a real Postgres service, 
 
 ### Gaps / risks (with evidence)
 
-- [ ] **No CD** — Only `ci.yml`; nothing deploys images or infrastructure.
+- [x] **CD workflow added** — `.github/workflows/cd.yml` builds and pushes API/bot/web images to GHCR on merge to `main`.
+- [ ] **No container scanning** — Docker build job does not run Trivy/Grype or generate SBOMs.
 - [ ] **No container scanning** — Docker build job does not run Trivy/Grype or generate SBOMs.
 - [ ] **No signed images** — No cosign/sigstore signing.
 - [ ] **No branch protection codified** — No `.github/settings.yml` or documented required-review policy.
@@ -28,7 +29,7 @@ CI is solid: GitHub Actions runs server checks against a real Postgres service, 
 
 ## Recommended actions
 
-- [ ] **1. Add CD workflow**
+- [x] **1. Add CD workflow**
   - Build and push images on merge to `main`; deploy to staging automatically.
   - Acceptance: every merged PR produces a deployed staging build.
 
@@ -50,7 +51,7 @@ CI is solid: GitHub Actions runs server checks against a real Postgres service, 
 
 ## Definition of done for this layer
 
-- [ ] CD deploys to staging on every merge.
+- [x] CD builds and pushes images on every merge.
 - [ ] Container scans block high/critical CVEs.
 - [ ] Images signed.
 - [ ] Branch protection enforced.

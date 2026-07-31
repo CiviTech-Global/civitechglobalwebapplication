@@ -6,14 +6,21 @@ export const errorMiddleware: MiddlewareFn<Context> = async (ctx, next) => {
     await next();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorStack = error instanceof Error ? error.stack : undefined;
-    logger.error({ errorMessage, errorStack, error, update: ctx.update }, 'Unhandled bot error');
+    logger.error(
+      {
+        errorMessage,
+        chatId: ctx.chat?.id,
+        userId: ctx.from?.id,
+        updateType: (ctx as { updateType?: string }).updateType,
+      },
+      'Unhandled bot error',
+    );
 
     try {
       await ctx.reply('متأسفانه خطایی رخ داد. لطفا دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.');
     } catch (replyError) {
       const replyErrorMessage = replyError instanceof Error ? replyError.message : String(replyError);
-      logger.error({ replyErrorMessage, replyError }, 'Failed to send error reply');
+      logger.error({ replyErrorMessage }, 'Failed to send error reply');
     }
   }
 };

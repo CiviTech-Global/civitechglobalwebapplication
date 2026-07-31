@@ -1,6 +1,7 @@
 import { Prisma, ApplicationStatus } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { decryptUser } from '../utils/piiTransform.js';
 
 export async function getOpportunities(query: Record<string, unknown>) {
   const page = Math.max(1, parseInt(String(query.page || '1'), 10));
@@ -56,7 +57,7 @@ export async function updateOpportunity(id: string, data: Record<string, unknown
 export async function deleteOpportunity(id: string) {
   const opportunity = await prisma.opportunity.findUnique({ where: { id } });
   if (!opportunity) throw new AppError('Opportunity not found', 404);
-  return prisma.opportunity.delete({ where: { id } });
+  return prisma.opportunity.update({ where: { id }, data: { deletedAt: new Date() } });
 }
 
 export async function applyToOpportunity(
@@ -102,7 +103,12 @@ export async function getApplications(query: Record<string, unknown>) {
     prisma.opportunityApplication.count({ where }),
   ]);
 
-  return { applications, total, page, limit };
+  return {
+    applications: applications.map((a) => ({ ...a, user: a.user ? decryptUser(a.user) : null })),
+    total,
+    page,
+    limit,
+  };
 }
 
 export async function getUserApplications(userId: string) {

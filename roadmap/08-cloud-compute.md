@@ -1,7 +1,7 @@
 # Layer 8 — Cloud & Compute
 
 **Score:** 2 / 5  
-**Status:** 🔴 Not Started  
+**Status:** 🔴 Not Started (containers ready; no IaC, managed services, scaling, or scanning)  
 **Owner:** Cloud Security Architect, DevOps Engineer
 
 ## Executive summary

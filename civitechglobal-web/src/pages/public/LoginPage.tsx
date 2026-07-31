@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, useLocation } from "react-router";
 import { motion } from "framer-motion";
+import { z } from "zod";
 import { useAuth } from "../../hooks/useAuth";
 import { useToast } from "../../hooks/useToast";
 import { useLocale } from "../../hooks/useLocale";
 import { NeonButton } from "../../components/ui/NeonButton";
-import { Input } from "../../components/ui/Input";
+import { FormField } from "../../components/ui/FormField";
+import { emailSchema, passwordSchema } from "../../lib/validation";
 import logoSrc from "../../assets/logos/concept logo - no bg - white.png";
+
+const loginSchema = z.object({
+  email: emailSchema(),
+  password: passwordSchema(),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -14,19 +24,23 @@ export default function LoginPage() {
   const location = useLocation();
   const { toast } = useToast();
   const { t } = useLocale();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
   const from =
     (location.state as { from?: { pathname?: string } } | undefined)?.from
       ?.pathname || "/dashboard";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const onSubmit = async (data: LoginForm) => {
     try {
-      const user = await login(email, password);
+      const user = await login(data.email, data.password);
       toast(t.auth.loginSuccess, "success");
       const redirectTo =
         user.role === "ADMIN" || user.role === "SUPER_ADMIN"
@@ -38,8 +52,6 @@ export default function LoginPage() {
         (err as { response?: { data?: { message?: string } } }).response?.data
           ?.message || t.auth.invalidCredentials;
       toast(message, "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -66,24 +78,32 @@ export default function LoginPage() {
             <p className="text-sm text-text-muted mt-1">{t.auth.signInTitle}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormField
+              control={control}
+              name="email"
+              type="input"
               label={t.auth.email}
-              type="email"
-              placeholder={t.auth.emailPlaceholder}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              inputProps={{
+                type: "email",
+                placeholder: t.auth.emailPlaceholder,
+              }}
             />
-            <Input
+            <FormField
+              control={control}
+              name="password"
+              type="input"
               label={t.auth.password}
-              type="password"
-              placeholder={t.auth.passwordPlaceholder}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              inputProps={{
+                type: "password",
+                placeholder: t.auth.passwordPlaceholder,
+              }}
             />
-            <NeonButton type="submit" isLoading={loading} className="w-full">
+            <NeonButton
+              type="submit"
+              isLoading={isSubmitting}
+              className="w-full"
+            >
               {t.auth.signIn}
             </NeonButton>
           </form>

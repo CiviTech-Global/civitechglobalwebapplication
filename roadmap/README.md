@@ -23,28 +23,28 @@ This folder breaks the platform-wide technical assessment into **per-layer gap d
 
 | Metric | Value |
 |---|---|
-| Overall maturity | **3 / 5** |
-| Strongest layers | Frontend foundations, API/backend logic, CI/CD |
-| Weakest layers | Caching & CDN, Load balancing & scaling, Security/RLS, Observability |
-| Biggest risks | Plain-text PII, no RLS, in-memory rate limits, no backups/CD/observability |
+| Overall maturity | **3.3 / 5** |
+| Strongest layers | Security/RLS, Auth & Permissions, Rate Limiting, Frontend foundations |
+| Weakest layers | Cloud & Compute, Caching & CDN, Load Balancing & Scaling, API contract/backend DTOs |
+| Biggest risks | Backup/restore not tested, no CDN/auto-scaling/IaC, partial repository/DTO coverage, frontend layout/3D coverage still low |
 
 ## File index
 
 | # | Layer | Score | File |
 |---|---|---|---|
-| 1 | Frontend Foundations | 3/5 | [01-frontend-foundations.md](./01-frontend-foundations.md) |
+| 1 | Frontend Foundations | 3.5/5 | [01-frontend-foundations.md](./01-frontend-foundations.md) |
 | 2 | API & Backend Logic | 3/5 | [02-api-backend-logic.md](./02-api-backend-logic.md) |
 | 3 | Auth & Permissions | 4/5 | [03-auth-permissions.md](./03-auth-permissions.md) |
-| 4 | Security & Row-Level Security | 2.5/5 | [04-security-row-level-security.md](./04-security-row-level-security.md) |
-| 5 | Rate Limiting | 3/5 | [05-rate-limiting.md](./05-rate-limiting.md) |
-| 6 | Database & Storage | 2.5/5 | [06-database-storage.md](./06-database-storage.md) |
-| 7 | Hosting & Deployment | 2/5 | [07-hosting-deployment.md](./07-hosting-deployment.md) |
+| 4 | Security & Row-Level Security | 4/5 | [04-security-row-level-security.md](./04-security-row-level-security.md) |
+| 5 | Rate Limiting | 4/5 | [05-rate-limiting.md](./05-rate-limiting.md) |
+| 6 | Database & Storage | 3.5/5 | [06-database-storage.md](./06-database-storage.md) |
+| 7 | Hosting & Deployment | 3.5/5 | [07-hosting-deployment.md](./07-hosting-deployment.md) |
 | 8 | Cloud & Compute | 2/5 | [08-cloud-compute.md](./08-cloud-compute.md) |
-| 9 | CI/CD & Version Control | 3/5 | [09-cicd-version-control.md](./09-cicd-version-control.md) |
-| 10 | Caching & CDN | 1/5 | [10-caching-cdn.md](./10-caching-cdn.md) |
-| 11 | Load Balancing & Scaling | 1.5/5 | [11-load-balancing-scaling.md](./11-load-balancing-scaling.md) |
-| 12 | Error Tracking & Logging | 2/5 | [12-error-tracking-logging.md](./12-error-tracking-logging.md) |
-| 13 | Availability & Recovery | 3/5 | [13-availability-recovery.md](./13-availability-recovery.md) |
+| 9 | CI/CD & Version Control | 3.5/5 | [09-cicd-version-control.md](./09-cicd-version-control.md) |
+| 10 | Caching & CDN | 2.5/5 | [10-caching-cdn.md](./10-caching-cdn.md) |
+| 11 | Load Balancing & Scaling | 2.5/5 | [11-load-balancing-scaling.md](./11-load-balancing-scaling.md) |
+| 12 | Error Tracking & Logging | 3.5/5 | [12-error-tracking-logging.md](./12-error-tracking-logging.md) |
+| 13 | Availability & Recovery | 3.5/5 | [13-availability-recovery.md](./13-availability-recovery.md) |
 | 14 | Prioritized Remediation Roadmap | — | [14-prioritized-remediation-roadmap.md](./14-prioritized-remediation-roadmap.md) |
 
 ## How to use

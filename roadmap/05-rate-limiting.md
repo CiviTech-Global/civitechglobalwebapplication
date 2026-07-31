@@ -1,7 +1,7 @@
 # Layer 5 — Rate Limiting
 
-**Score:** 3 / 5  
-**Status:** 🟡 In Progress (Wave A Redis consolidation complete; bot webhook & graduated penalties pending)  
+**Score:** 4 / 5  
+**Status:** 🟢 Done (Wave A + Wave B: Redis-backed API limits and per-IP bot webhook throttling in place; graduated penalties remain a future enhancement)  
 **Owner:** Backend Architect, Security Architect
 
 ## Executive summary
@@ -23,7 +23,7 @@ Rate limiting exists for the Express API but is implemented in process memory, m
   - Note: two API replicas now share state; abuse test passes locally.
 - [x] **Consolidated auth limiter** — Auth routes import `authRateLimiter` from `rateLimit.ts` (5 requests / 15 min).
   - Evidence: `src/routes/auth.routes.ts`, `src/middleware/rateLimit.ts`.
-- [ ] **No bot/webhook rate limiting** — `src/bot/app.ts:65-79` accepts webhook updates without throttling or IP allowlisting.
+- [x] **Bot/webhook rate-limited** — Redis-backed per-IP limiter (`webhook:ip:<ip>`) blocks bursts beyond 60 req/min; verified with 70-request burst test.
 - [x] **Per-user limits** — `keyGenerator` uses `req.user.userId` when authenticated, falling back to `ipKeyGenerator(req.ip)` for anonymous requests.
   - Evidence: `src/middleware/rateLimit.ts`.
 - [ ] **No burst or slow-down behavior** — Hard block after threshold; no graduated penalties.
@@ -40,7 +40,7 @@ Rate limiting exists for the Express API but is implemented in process memory, m
   - Set stricter limits on `/login`, `/register`, `/refresh`.
   - Acceptance: one source of truth for auth rate limits.
 
-- [ ] **3. Add bot webhook rate limiting**
+- [x] **3. Add bot webhook rate limiting**
   - Limit `/webhook` by IP and/or Telegram update ID window.
   - Return `429` for excessive requests.
   - Acceptance: webhook rejects bursts beyond configured threshold.
@@ -57,6 +57,6 @@ Rate limiting exists for the Express API but is implemented in process memory, m
 
 - [x] Redis-backed rate limiting for all API routes.
 - [x] Single consolidated auth limiter.
-- [ ] Bot webhook rate-limited.
+- [x] Bot webhook rate-limited.
 - [x] Per-user limits on sensitive endpoints.
-- [ ] Score raised to **4/5** or higher.
+- [x] Score raised to **4/5** or higher.
