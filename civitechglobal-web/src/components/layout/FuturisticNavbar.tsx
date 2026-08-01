@@ -41,6 +41,7 @@ export function FuturisticNavbar() {
     { to: "/services", label: t.nav.services },
     { to: "/careers", label: t.nav.careers },
     { to: "/contact", label: t.nav.contact },
+    { to: "/login", label: t.nav.login },
   ];
 
   const handleLogout = async () => {

@@ -2,6 +2,7 @@ import { prisma } from './database.js';
 import { env } from './env.js';
 import { logger } from './logger.js';
 import { hashPassword } from '../utils/password.js';
+import { encryptRequired, hashForSearch, normalizeEmail } from '../utils/pii.js';
 import { runAsSystem } from '../utils/requestContext.js';
 
 /**
@@ -15,20 +16,38 @@ import { runAsSystem } from '../utils/requestContext.js';
 export async function bootstrapSuperAdmin(): Promise<void> {
   return runAsSystem(async () => {
     try {
+      const emailHash = hashForSearch(normalizeEmail(env.ADMIN_EMAIL));
+
       const existing = await prisma.user.findFirst({
         where: { role: 'SUPER_ADMIN', deletedAt: null },
       });
 
-      if (existing) return;
+      if (existing) {
+        // Backfill PII fields for users created before emailHash encryption was required.
+        if (!existing.emailHash && emailHash) {
+          await prisma.user.update({
+            where: { id: existing.id },
+            data: {
+              email: encryptRequired(env.ADMIN_EMAIL),
+              emailHash,
+              firstName: encryptRequired(env.ADMIN_FIRST_NAME),
+              lastName: encryptRequired(env.ADMIN_LAST_NAME),
+            },
+          });
+          logger.info('Backfilled encrypted PII fields for existing Super Admin');
+        }
+        return;
+      }
 
       const hashed = await hashPassword(env.ADMIN_PASSWORD);
 
       await prisma.user.create({
         data: {
-          email: env.ADMIN_EMAIL,
+          email: encryptRequired(env.ADMIN_EMAIL),
+          emailHash,
           password: hashed,
-          firstName: env.ADMIN_FIRST_NAME,
-          lastName: env.ADMIN_LAST_NAME,
+          firstName: encryptRequired(env.ADMIN_FIRST_NAME),
+          lastName: encryptRequired(env.ADMIN_LAST_NAME),
           role: 'SUPER_ADMIN',
           permissions: [
             'products',

@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import bcrypt from 'bcryptjs';
 import { assertPasswordStrong } from '../src/utils/passwordPolicy.js';
 import { prisma } from '../src/config/database.js';
 import { runAsSystem } from '../src/utils/requestContext.js';
 import { encrypt, hashForSearch, normalizeEmail } from '../src/utils/pii.js';
+import { hashPassword } from '../src/utils/password.js';
 
 // Configurable seed credentials from environment variables
 // IMPORTANT: Do not commit real passwords. Set these via .env before seeding.
@@ -72,7 +72,7 @@ async function main() {
     console.log('Created role: Support Agent');
 
     // Create Super Admin
-    const superAdminHashed = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 12);
+    const superAdminHashed = await hashPassword(SUPER_ADMIN_PASSWORD);
     const superAdminEmailHash = hashForSearch(normalizeEmail(SUPER_ADMIN_EMAIL));
     let superAdmin = await prisma.user.findFirst({ where: { emailHash: superAdminEmailHash ?? undefined } });
     if (!superAdmin) {
@@ -93,7 +93,7 @@ async function main() {
     console.log('Created super admin');
 
     // Create Demo Admin (limited permissions)
-    const adminHashed = await bcrypt.hash(DEMO_ADMIN_PASSWORD, 12);
+    const adminHashed = await hashPassword(DEMO_ADMIN_PASSWORD);
     const demoAdminEmailHash = hashForSearch(normalizeEmail(DEMO_ADMIN_EMAIL));
     let demoAdmin = await prisma.user.findFirst({ where: { emailHash: demoAdminEmailHash ?? undefined } });
     if (!demoAdmin) {
@@ -114,7 +114,7 @@ async function main() {
     console.log('Created demo admin');
 
     // Create demo user
-    const userPassword = await bcrypt.hash(USER_PASSWORD, 12);
+    const userPassword = await hashPassword(USER_PASSWORD);
     const demoUserEmailHash = hashForSearch(normalizeEmail(USER_EMAIL));
     let demoUser = await prisma.user.findFirst({ where: { emailHash: demoUserEmailHash ?? undefined } });
     if (!demoUser) {

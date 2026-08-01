@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: '/api',
-  headers: { 'Content-Type': 'application/json' },
+  baseURL: "/api",
+  headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
@@ -24,7 +24,10 @@ api.interceptors.request.use((config) => {
 });
 
 let isRefreshing = false;
-let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
 
 function processQueue(error: unknown, token: string | null = null) {
   failedQueue.forEach((prom) => {
@@ -39,7 +42,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const requestUrl = originalRequest.url ?? "";
+    const isAuthEndpoint = /\/auth\/(login|register|refresh)(?:\?|$)/.test(
+      requestUrl,
+    );
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -53,7 +65,11 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+        const { data } = await axios.post(
+          "/api/auth/refresh",
+          {},
+          { withCredentials: true },
+        );
         const newToken = data.data.accessToken;
         setAccessToken(newToken);
         processQueue(null, newToken);
@@ -69,7 +85,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
