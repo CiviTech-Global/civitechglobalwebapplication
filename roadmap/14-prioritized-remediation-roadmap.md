@@ -46,8 +46,8 @@
 | 20 | Frontend | Duplicate UI variants | Consolidate navbars, footers, buttons | One component per abstraction | S | 🔴 |
 | 21 | Frontend | No code splitting | Lazy-load admin routes and 3D globe | Reduced initial bundle | S | 🔴 |
 | 22 | Frontend | Accessibility gaps | Add ARIA attributes, keyboard handling, localized ErrorBoundary | Pass axe-core scan | M | 🔴 |
-| 23 | API | Repository pattern incomplete | Add repositories for all entities | Services do not import Prisma directly | M | 🔴 |
-| 24 | API | Typed query DTOs missing | Validate all list/query params with Zod | All list endpoints validate query input | S | 🔴 |
+| 23 | API | Repository pattern complete | Repositories added for all entities; services/middleware consume repositories instead of `prisma` directly | Services do not import Prisma directly | M | 🟢 |
+| 24 | API | Typed query DTOs complete | `paginationQuerySchema`, `uuidParamSchema`, `slugParamSchema`, and per-endpoint list schemas wired | All list endpoints validate query input | S | 🟢 |
 | 25 | API | Error logs may contain PII | Configure Pino redaction | No PII in test error logs | S | 🟢 |
 | 26 | Security | Bot webhook unthrottled | Add body-size and per-IP rate limits on `/webhook` | Webhook rejects bursts | S | 🟢 |
 | 27 | Caching/CDN | No cache/CDN | Add Redis cache, HTTP cache headers, CDN for static assets | Assets served from CDN | M | 🔴 |

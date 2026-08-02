@@ -24,17 +24,17 @@ This folder breaks the platform-wide technical assessment into **per-layer gap d
 
 | Metric | Value |
 |---|---|
-| Overall maturity | **3.3 / 5** |
+| Overall maturity | **3.4 / 5** |
 | Strongest layers | Security/RLS, Auth & Permissions, Rate Limiting, Frontend foundations |
-| Weakest layers | Cloud & Compute, Caching & CDN, Load Balancing & Scaling, API contract/backend DTOs |
-| Biggest risks | Backup/restore not tested, no CDN/auto-scaling/IaC, partial repository/DTO coverage, frontend layout/3D coverage still low |
+| Weakest layers | Cloud & Compute, Caching & CDN, Load Balancing & Scaling, API contract docs, frontend accessibility/code-splitting |
+| Biggest risks | Backup/restore not tested, no CDN/auto-scaling/IaC, no OpenAPI contract, frontend accessibility/code-splitting still low |
 
 ## File index
 
 | # | Layer | Score | File |
 |---|---|---|---|
 | 1 | Frontend Foundations | 3.5/5 | [01-frontend-foundations.md](./01-frontend-foundations.md) |
-| 2 | API & Backend Logic | 3/5 | [02-api-backend-logic.md](./02-api-backend-logic.md) |
+| 2 | API & Backend Logic | 4/5 | [02-api-backend-logic.md](./02-api-backend-logic.md) |
 | 3 | Auth & Permissions | 4/5 | [03-auth-permissions.md](./03-auth-permissions.md) |
 | 4 | Security & Row-Level Security | 4/5 | [04-security-row-level-security.md](./04-security-row-level-security.md) |
 | 5 | Rate Limiting | 4/5 | [05-rate-limiting.md](./05-rate-limiting.md) |
