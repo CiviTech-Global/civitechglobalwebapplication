@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as productService from '../services/product.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type { ProductListQuery } from '../validators/product.schema.js';
 
 export async function getProducts(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await productService.getProducts(req.query as Record<string, unknown>);
+    const result = await productService.getProducts(req.query as unknown as ProductListQuery);
     paginatedResponse(res, result.products, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

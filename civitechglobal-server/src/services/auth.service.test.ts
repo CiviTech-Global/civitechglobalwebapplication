@@ -3,20 +3,34 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('../config/database.js', () => ({
   prisma: {
     user: {
+      findMany: vi.fn(),
+      count: vi.fn(),
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
+      deleteMany: vi.fn(),
+      delete: vi.fn(),
     },
     refreshToken: {
-      create: vi.fn(),
-      findUnique: vi.fn(),
       findMany: vi.fn(),
+      count: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
       delete: vi.fn(),
       deleteMany: vi.fn(),
+    },
+    adminRole: {
+      findMany: vi.fn(),
+      count: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
   },
 }));

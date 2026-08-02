@@ -1,4 +1,11 @@
 import { z } from 'zod';
+import { paginationQuerySchema } from './common.schema.js';
+
+export const serviceListQuerySchema = paginationQuerySchema.extend({
+  category: z.preprocess((val) => (Array.isArray(val) ? val[0] : val), z.string().trim().max(100)).optional(),
+});
+
+export type ServiceListQuery = z.infer<typeof serviceListQuerySchema>;
 
 export const createServiceSchema = z.object({
   name: z.string().min(1, 'Name is required'),

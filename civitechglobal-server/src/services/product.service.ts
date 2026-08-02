@@ -1,44 +1,45 @@
 import { Prisma } from '@prisma/client';
-import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { productRepository } from '../database/prisma/repositories/product.repository.js';
+import type { ProductListQuery } from '../validators/product.schema.js';
 
-export async function getProducts(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getProducts(query: ProductListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const category = query.category as string | undefined;
-  const search = query.search as string | undefined;
+  const category = query.category;
+  const search = query.search;
 
   const where: Record<string, unknown> = { isActive: true };
   if (category) where.category = category;
   if (search) where.name = { contains: search, mode: 'insensitive' };
 
   const [products, total] = await Promise.all([
-    prisma.product.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
-    prisma.product.count({ where }),
+    productRepository.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
+    productRepository.count({ where }),
   ]);
 
   return { products, total, page, limit };
 }
 
 export async function getProductBySlug(slug: string) {
-  const product = await prisma.product.findUnique({ where: { slug } });
+  const product = await productRepository.findUnique({ where: { slug } });
   if (!product) throw new AppError('Product not found', 404);
   return product;
 }
 
 export async function createProduct(data: Record<string, unknown>) {
-  return prisma.product.create({ data: data as Prisma.ProductCreateInput });
+  return productRepository.create({ data: data as Prisma.ProductCreateInput });
 }
 
 export async function updateProduct(id: string, data: Record<string, unknown>) {
-  const product = await prisma.product.findUnique({ where: { id } });
+  const product = await productRepository.findUnique({ where: { id } });
   if (!product) throw new AppError('Product not found', 404);
-  return prisma.product.update({ where: { id }, data: data as Prisma.ProductUpdateInput });
+  return productRepository.update({ where: { id }, data: data as Prisma.ProductUpdateInput });
 }
 
 export async function deleteProduct(id: string) {
-  const product = await prisma.product.findUnique({ where: { id } });
+  const product = await productRepository.findUnique({ where: { id } });
   if (!product) throw new AppError('Product not found', 404);
-  return prisma.product.update({ where: { id }, data: { deletedAt: new Date() } });
+  return productRepository.update({ where: { id }, data: { deletedAt: new Date() } });
 }

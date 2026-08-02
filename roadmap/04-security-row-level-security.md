@@ -24,10 +24,10 @@ Basic application security is in place (helmet, CORS, input sanitization, bcrypt
 - [x] **PII encrypted at rest with search hashes** — AES-256-GCM encryption in application layer; deterministic HMAC-SHA256 hashes on `email_hash`, `phone_hash`, `phone_number_hash`, and `ticket.email_hash` allow login/lookup without leaking plaintext.
 - [x] **Refresh-token JTIs hashed at rest** — `auth.service.ts` stores `SHA-256(jti)` in `RefreshToken.token`; the Wave A migration cleared legacy raw tokens.
   - Evidence: `src/services/auth.service.ts:23-25`, `prisma/migrations/20260730080000_hash_refresh_tokens/migration.sql`.
-- [ ] **`trust proxy` hard-coded to `1`** — Misconfigured infra can let clients spoof `req.ip`, breaking rate limiting and logs (`src/index.ts:18`).
+- [x] **`trust proxy` configurable via `TRUST_PROXY` env var** — Express reads `TRUST_PROXY` (number, IPs, or boolean); defaults to 1 for single-proxy local setups (`src/index.ts`, `src/config/env.ts`).
 - [x] **Bot webhook hardened** — 1 MB body limit, `TELEGRAM_WEBHOOK_SECRET` required in production, and Redis-backed per-IP rate limiting (60/min) verified with a 70-request burst test.
 - [x] **PII redacted from logs** — Pino redacts `password`, `token`, `refreshToken`, `email`, `phone`, `phoneNumber`, `ctx.update.message.text`, and request-body fields; error handlers log only names/messages.
-- [ ] **Super-admin bootstrap uses env defaults** — Weak local secrets can leak into deployed environments (`src/config/env.ts:36-49`).
+- [x] **Super-admin bootstrap requires explicit credentials** — `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_FIRST_NAME`, and `ADMIN_LAST_NAME` have no code defaults; seed script validates them (`src/config/env.ts`, `prisma/seed.ts`).
 
 ## Recommended actions
 
@@ -49,7 +49,7 @@ Basic application security is in place (helmet, CORS, input sanitization, bcrypt
   - Add body-size limit and per-IP rate limiting to `/webhook`.
   - Require `webhookSecret` in production.
   - Acceptance: bot webhook rejects oversized/unauthorized requests.
-- [ ] **4b. Make proxy trust configurable**
+- [x] **4b. Make proxy trust configurable**
   - Make `trust proxy` configurable via env and document reverse-proxy requirements.
   - Acceptance: `src/index.ts` does not hard-code `trust proxy`.
 
@@ -64,6 +64,6 @@ Basic application security is in place (helmet, CORS, input sanitization, bcrypt
 - [x] Refresh-token identifiers are hashed at rest.
 - [x] Production bot webhook requires a secret and is rate-limited.
 - [x] Logs redact sensitive fields.
-- [ ] `trust proxy` is configurable.
-- [ ] Super-admin bootstrap secrets are not env defaults.
+- [x] `trust proxy` is configurable.
+- [x] Super-admin bootstrap secrets are not env defaults.
 - [x] Score raised to **4/5** or higher.

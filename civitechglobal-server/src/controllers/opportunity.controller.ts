@@ -1,10 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import * as opportunityService from '../services/opportunity.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type {
+  OpportunityListQuery,
+  AdminOpportunityListQuery,
+  ApplicationListQuery,
+} from '../validators/opportunity.schema.js';
 
 export async function getOpportunities(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await opportunityService.getOpportunities(req.query as Record<string, unknown>);
+    const result = await opportunityService.getOpportunities(req.query as unknown as OpportunityListQuery);
     paginatedResponse(res, result.opportunities, result.total, result.page, result.limit);
   } catch (error) {
     next(error);
@@ -13,7 +18,7 @@ export async function getOpportunities(req: Request, res: Response, next: NextFu
 
 export async function getAllOpportunities(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await opportunityService.getAllOpportunities(req.query as Record<string, unknown>);
+    const result = await opportunityService.getAllOpportunities(req.query as unknown as AdminOpportunityListQuery);
     paginatedResponse(res, result.opportunities, result.total, result.page, result.limit);
   } catch (error) {
     next(error);
@@ -71,7 +76,7 @@ export async function apply(req: Request, res: Response, next: NextFunction) {
 
 export async function getApplications(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await opportunityService.getApplications(req.query as Record<string, unknown>);
+    const result = await opportunityService.getApplications(req.query as unknown as ApplicationListQuery);
     paginatedResponse(res, result.applications, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

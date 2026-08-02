@@ -29,8 +29,9 @@ if (env.SENTRY_DSN) {
 
 const app = express();
 
-// Trust first proxy (nginx) for correct req.ip and rate limiting
-app.set('trust proxy', 1);
+// Trust proxy configuration for correct req.ip and rate limiting.
+// Set TRUST_PROXY env var to number, comma-separated IPs, or boolean.
+app.set('trust proxy', env.TRUST_PROXY);
 
 // Security
 app.use(

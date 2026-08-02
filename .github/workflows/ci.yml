@@ -62,7 +62,10 @@ jobs:
           JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
           PII_ENCRYPTION_KEY: test-pii-encryption-key-min-32-chars!
           PII_HMAC_KEY: test-pii-hmac-key-min-32-chars!!!!!
+          ADMIN_EMAIL: superadmin@civitechglobal.com
           ADMIN_PASSWORD: TestAdminPass123!
+          ADMIN_FIRST_NAME: Super
+          ADMIN_LAST_NAME: Admin
           DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
           USER_PASSWORD: TestUserPass123!
         run: npx prisma migrate deploy
@@ -75,7 +78,10 @@ jobs:
           JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
           PII_ENCRYPTION_KEY: test-pii-encryption-key-min-32-chars!
           PII_HMAC_KEY: test-pii-hmac-key-min-32-chars!!!!!
+          ADMIN_EMAIL: superadmin@civitechglobal.com
           ADMIN_PASSWORD: TestAdminPass123!
+          ADMIN_FIRST_NAME: Super
+          ADMIN_LAST_NAME: Admin
           DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
           USER_PASSWORD: TestUserPass123!
         run: npm run type-check
@@ -94,7 +100,10 @@ jobs:
           JWT_REFRESH_SECRET: test-refresh-secret-min-32-chars
           PII_ENCRYPTION_KEY: test-pii-encryption-key-min-32-chars!
           PII_HMAC_KEY: test-pii-hmac-key-min-32-chars!!!!!
+          ADMIN_EMAIL: superadmin@civitechglobal.com
           ADMIN_PASSWORD: TestAdminPass123!
+          ADMIN_FIRST_NAME: Super
+          ADMIN_LAST_NAME: Admin
           DEMO_ADMIN_PASSWORD: TestDemoAdmin123!
           USER_PASSWORD: TestUserPass123!
           TELEGRAM_BOT_TOKEN: test-token

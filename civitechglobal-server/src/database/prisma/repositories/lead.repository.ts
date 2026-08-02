@@ -1,5 +1,6 @@
-import { prisma } from '../../../config/database.js';
+import { Prisma } from '@prisma/client';
 import type { LeadStatus } from '@prisma/client';
+import { prisma } from '../../../config/database.js';
 import { encrypt, encryptRequired, hashForSearch, normalizePhone } from '../../../utils/pii.js';
 
 export interface CreateLeadInput {
@@ -34,13 +35,19 @@ function encryptLeadData(data: CreateLeadInput) {
 }
 
 export const leadRepository = {
-  create: (data: CreateLeadInput) => {
+  // Generic Prisma wrappers used by services
+  findMany: (args?: Prisma.LeadFindManyArgs) => prisma.lead.findMany(args),
+  count: (args?: Prisma.LeadCountArgs) => prisma.lead.count(args),
+  findUnique: (args: Prisma.LeadFindUniqueArgs) => prisma.lead.findUnique(args),
+  findFirst: (args: Prisma.LeadFindFirstArgs) => prisma.lead.findFirst(args),
+  create: (args: Prisma.LeadCreateArgs) => prisma.lead.create(args),
+  update: (args: Prisma.LeadUpdateArgs) => prisma.lead.update(args),
+
+  // Bot-specific helpers
+  createFromBot: (data: CreateLeadInput) => {
     return prisma.lead.create({
       data: encryptLeadData(data),
-      include: {
-        category: true,
-        subcategory: true,
-      },
+      include: { category: true, subcategory: true },
     });
   },
 
@@ -60,9 +67,6 @@ export const leadRepository = {
   },
 
   updateStatus: (id: string, status: LeadStatus) => {
-    return prisma.lead.update({
-      where: { id },
-      data: { status },
-    });
+    return prisma.lead.update({ where: { id }, data: { status } });
   },
 };

@@ -1,10 +1,11 @@
 import crypto from 'node:crypto';
 import { Prisma, Role } from '@prisma/client';
-import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { hashPassword } from '../utils/password.js';
-import { generateSecurePassword } from '../utils/passwordPolicy.js';
+import { assertPasswordStrong } from '../utils/passwordPolicy.js';
 import { encrypt, encryptRequired, hashForSearch, normalizeEmail, normalizePhone } from '../utils/pii.js';
+import { userRepository, adminRoleRepository } from '../database/prisma/repositories/user.repository.js';
+import type { UserListQuery } from '../validators/user.schema.js';
 import { decryptUser, decryptUsers } from '../utils/piiTransform.js';
 
 function isEmail(value: string): boolean {
@@ -28,12 +29,12 @@ function userSelect() {
   } as const;
 }
 
-export async function getUsers(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getUsers(query: UserListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const search = query.search as string | undefined;
-  const role = query.role as string | undefined;
+  const search = query.search;
+  const role = query.role;
 
   const where: Record<string, unknown> = {};
   if (role) {
@@ -49,21 +50,21 @@ export async function getUsers(query: Record<string, unknown>) {
   }
 
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
+    userRepository.findMany({
       where,
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
       select: userSelect(),
     }),
-    prisma.user.count({ where }),
+    userRepository.count({ where }),
   ]);
 
   return { users: decryptUsers(users), total, page, limit };
 }
 
 export async function getUserById(id: string) {
-  const user = await prisma.user.findUnique({
+  const user = await userRepository.findUnique({
     where: { id },
     select: {
       ...userSelect(),
@@ -85,7 +86,7 @@ export async function updateProfile(id: string, data: Record<string, unknown>) {
   }
   if (data.avatar !== undefined) allowedFields.avatar = data.avatar;
 
-  const user = await prisma.user.update({
+  const user = await userRepository.update({
     where: { id },
     data: allowedFields as Prisma.UserUpdateInput,
     select: userSelect(),
@@ -95,12 +96,12 @@ export async function updateProfile(id: string, data: Record<string, unknown>) {
 }
 
 export async function updateUserRole(id: string, role: string) {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await userRepository.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
   // Revoke all tokens when role changes
   const { revokeAllUserRefreshTokens } = await import('./auth.service.js');
   await revokeAllUserRefreshTokens(id);
-  const updated = await prisma.user.update({
+  const updated = await userRepository.update({
     where: { id },
     data: { role: role as Role },
     select: userSelect(),
@@ -109,12 +110,12 @@ export async function updateUserRole(id: string, role: string) {
 }
 
 export async function updateUserPermissions(id: string, permissions: string[]) {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await userRepository.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
   // Revoke all tokens when permissions change
   const { revokeAllUserRefreshTokens } = await import('./auth.service.js');
   await revokeAllUserRefreshTokens(id);
-  const updated = await prisma.user.update({
+  const updated = await userRepository.update({
     where: { id },
     data: { permissions },
     select: userSelect(),
@@ -123,33 +124,39 @@ export async function updateUserPermissions(id: string, permissions: string[]) {
 }
 
 export async function deleteUser(id: string) {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await userRepository.findUnique({ where: { id } });
   if (!user) throw new AppError('User not found', 404);
-  await prisma.user.update({ where: { id }, data: { deletedAt: new Date() } });
+  await userRepository.update({ where: { id }, data: { deletedAt: new Date() } });
   return { success: true };
 }
 
-export async function createAdmin(data: { email: string; firstName: string; lastName: string; adminRoleId?: string }) {
+export async function createAdmin(data: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  adminRoleId?: string;
+}) {
+  assertPasswordStrong(data.password, 'password');
+
   const emailHash = hashForSearch(normalizeEmail(data.email));
-  const existing = await prisma.user.findFirst({ where: { emailHash: emailHash ?? undefined } });
+  const existing = await userRepository.findFirst({ where: { emailHash: emailHash ?? undefined } });
   if (existing) throw new AppError('Email already in use', 409);
 
   // Auto-generate username from email prefix + random digits
   const emailPrefix = data.email.split('@')[0];
   const randomDigits = crypto.randomInt(1000, 9999).toString();
   const username = `${emailPrefix}_${randomDigits}`;
-  // Auto-generate a random password that satisfies the platform password policy
-  const rawPassword = generateSecurePassword(16);
-  const hashedPassword = await hashPassword(rawPassword);
+  const hashedPassword = await hashPassword(data.password);
 
   // If a role is assigned, fetch its permissions
   let permissions: string[] = [];
   if (data.adminRoleId) {
-    const role = await prisma.adminRole.findUnique({ where: { id: data.adminRoleId } });
+    const role = await adminRoleRepository.findUnique({ where: { id: data.adminRoleId } });
     if (role) permissions = role.permissions;
   }
 
-  const user = await prisma.user.create({
+  const user = await userRepository.create({
     data: {
       email: encryptRequired(data.email),
       emailHash,
@@ -170,17 +177,17 @@ export async function createAdmin(data: { email: string; firstName: string; last
   const decryptedUser = decryptUser(user);
   if (!decryptedUser) throw new AppError('Failed to create admin', 500);
 
-  return { ...decryptedUser, generatedPassword: rawPassword };
+  return decryptedUser;
 }
 
 export async function assignAdminRole(userId: string, adminRoleId: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await userRepository.findUnique({ where: { id: userId } });
   if (!user) throw new AppError('User not found', 404);
 
-  const role = await prisma.adminRole.findUnique({ where: { id: adminRoleId } });
+  const role = await adminRoleRepository.findUnique({ where: { id: adminRoleId } });
   if (!role) throw new AppError('Role not found', 404);
 
-  const updated = await prisma.user.update({
+  const updated = await userRepository.update({
     where: { id: userId },
     data: { adminRoleId, permissions: role.permissions },
     select: {

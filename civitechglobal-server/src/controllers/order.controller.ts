@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import * as orderService from '../services/order.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type { PaginationQuery } from '../validators/common.schema.js';
+import type { OrderListQuery } from '../validators/order.schema.js';
 
 export async function createOrder(req: Request, res: Response, next: NextFunction) {
   try {
@@ -13,7 +15,7 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
 
 export async function getUserOrders(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await orderService.getUserOrders(req.user!.userId, req.query as Record<string, unknown>);
+    const result = await orderService.getUserOrders(req.user!.userId, req.query as unknown as PaginationQuery);
     paginatedResponse(res, result.orders, result.total, result.page, result.limit);
   } catch (error) {
     next(error);
@@ -22,7 +24,7 @@ export async function getUserOrders(req: Request, res: Response, next: NextFunct
 
 export async function getAllOrders(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await orderService.getAllOrders(req.query as Record<string, unknown>);
+    const result = await orderService.getAllOrders(req.query as unknown as OrderListQuery);
     paginatedResponse(res, result.orders, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

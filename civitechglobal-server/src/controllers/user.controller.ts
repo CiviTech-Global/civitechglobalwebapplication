@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userService from '../services/user.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type { UserListQuery } from '../validators/user.schema.js';
 
 export async function getUsers(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await userService.getUsers(req.query as Record<string, unknown>);
+    const result = await userService.getUsers(req.query as unknown as UserListQuery);
     paginatedResponse(res, result.users, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

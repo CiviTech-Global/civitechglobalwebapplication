@@ -1,5 +1,12 @@
-import { prisma } from '../config/database.js';
 import { decryptUser, decryptTicket, decryptLead } from '../utils/piiTransform.js';
+import { userRepository } from '../database/prisma/repositories/user.repository.js';
+import { orderRepository } from '../database/prisma/repositories/order.repository.js';
+import { ticketRepository } from '../database/prisma/repositories/ticket.repository.js';
+import { productRepository } from '../database/prisma/repositories/product.repository.js';
+import { serviceRepository } from '../database/prisma/repositories/service.repository.js';
+import { opportunityRepository } from '../database/prisma/repositories/opportunity.repository.js';
+import { opportunityApplicationRepository } from '../database/prisma/repositories/opportunity.repository.js';
+import { leadRepository } from '../database/prisma/repositories/lead.repository.js';
 
 export async function getAdminDashboard() {
   const [
@@ -18,32 +25,32 @@ export async function getAdminDashboard() {
     recentLeads,
     revenue,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.order.count(),
-    prisma.ticket.count(),
-    prisma.product.count(),
-    prisma.service.count(),
-    prisma.opportunity.count(),
-    prisma.lead.count(),
-    prisma.lead.count({ where: { status: 'NEW' } }),
-    prisma.opportunityApplication.count({ where: { status: 'PENDING' } }),
-    prisma.ticket.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
-    prisma.order.findMany({
+    userRepository.count(),
+    orderRepository.count(),
+    ticketRepository.count(),
+    productRepository.count(),
+    serviceRepository.count(),
+    opportunityRepository.count(),
+    leadRepository.count(),
+    leadRepository.count({ where: { status: 'NEW' } }),
+    opportunityApplicationRepository.count({ where: { status: 'PENDING' } }),
+    ticketRepository.count({ where: { status: { in: ['OPEN', 'IN_PROGRESS'] } } }),
+    orderRepository.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { firstName: true, lastName: true } } },
     }),
-    prisma.ticket.findMany({
+    ticketRepository.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { firstName: true, lastName: true } } },
     }),
-    prisma.lead.findMany({
+    leadRepository.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: { category: { select: { title: true } }, subcategory: { select: { title: true } } },
     }),
-    prisma.order.aggregate({
+    orderRepository.aggregate({
       _sum: { total: true },
       where: { status: { in: ['COMPLETED', 'CONFIRMED', 'IN_PROGRESS'] } },
     }),

@@ -10,13 +10,27 @@ import {
   createAdminSchema,
   updatePermissionsSchema,
   assignAdminRoleSchema,
+  userListQuerySchema,
 } from '../validators/user.schema.js';
+import { uuidParamSchema } from '../validators/common.schema.js';
 
 const router = Router();
 
 router.put('/profile', authenticate, validate(updateProfileSchema), userController.updateProfile);
-router.get('/', authenticate, requirePermission('users'), userController.getUsers);
-router.get('/:id', authenticate, requirePermission('users'), userController.getUser);
+router.get(
+  '/',
+  authenticate,
+  requirePermission('users'),
+  validate({ query: userListQuerySchema }),
+  userController.getUsers,
+);
+router.get(
+  '/:id',
+  authenticate,
+  requirePermission('users'),
+  validate({ params: uuidParamSchema }),
+  userController.getUser,
+);
 router.put(
   '/:id',
   authenticate,

@@ -1,4 +1,16 @@
 import { z } from 'zod';
+import { paginationQuerySchema } from './common.schema.js';
+
+export const orderListQuerySchema = paginationQuerySchema.extend({
+  status: z
+    .preprocess(
+      (val) => (Array.isArray(val) ? val[0] : val),
+      z.enum(['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
+    )
+    .optional(),
+});
+
+export type OrderListQuery = z.infer<typeof orderListQuerySchema>;
 
 export const createOrderSchema = z.object({
   items: z

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../config/database.js';
+import { userRepository } from '../database/prisma/repositories/user.repository.js';
 
 export function requirePermission(...perms: string[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +17,7 @@ export function requirePermission(...perms: string[]) {
 
     // Fallback: if token carried no permissions, fetch the latest set from the DB
     if (userPermissions.length === 0) {
-      const user = await prisma.user.findUnique({
+      const user = await userRepository.findUnique({
         where: { id: req.user.userId },
         select: { permissions: true },
       });

@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { Role } from '@prisma/client';
-import { prisma } from '../config/database.js';
+import { userRepository } from '../database/prisma/repositories/user.repository.js';
 import { runAsSystem } from '../utils/requestContext.js';
 
 async function loadUserFromToken(token: string) {
   const payload = verifyAccessToken(token);
-  const user = await prisma.user.findUnique({
+  const user = await userRepository.findUnique({
     where: { id: payload.userId },
     select: {
       id: true,

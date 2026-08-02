@@ -102,6 +102,7 @@ services:
       ADMIN_PASSWORD_FILE: /run/secrets/admin_password
       ADMIN_FIRST_NAME_FILE: /run/secrets/admin_first_name
       ADMIN_LAST_NAME_FILE: /run/secrets/admin_last_name
+      TRUST_PROXY: ${TRUST_PROXY:-1}
       CLIENT_URL: ${CLIENT_URL:-https://localhost}
       NODE_ENV: production
       PORT: 5000

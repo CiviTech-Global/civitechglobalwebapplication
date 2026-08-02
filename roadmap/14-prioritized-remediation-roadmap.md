@@ -26,7 +26,7 @@
 |---|---|---|---|---|---|---|
 | 6 | Auth | `optionalAuth` bypasses revocation | Apply token-version and account-status checks | Revoked tokens fail on optional routes | S | 🟢 |
 | 7 | Auth | `requirePermission` ignores non-admin permissions | Make permission check role-agnostic with DB fallback | USER with explicit permissions can access permitted resources | S | 🟢 |
-| 8 | Auth | Weak password policy | Enforce 12+ chars, complexity, max length | Zod rejects weak passwords | S | 🟢 |
+| 8 | Auth | Weak password policy | Enforce 12+ chars, complexity, max length; align seed/demo/generated credentials | Zod rejects weak passwords; seed/demo/admin passwords are policy-compliant | S | 🟢 |
 | 9 | Auth/DB | Refresh tokens stored plain text | Hash JTIs with SHA-256 before DB storage | DB dump does not reveal usable refresh tokens | S | 🟢 |
 | 10 | Hosting | No CD or production manifests | Create `.github/workflows/cd.yml` and `docker-compose.prod.yml` | Merge to `main` deploys staging | M | 🟢 |
 | 11 | Hosting | Web image bakes API target | Inject API URL at runtime; make image environment-agnostic | One web image deploys to dev/staging/prod | M | 🟢 |

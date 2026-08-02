@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
-import { prisma } from '../config/database.js';
 import { redis } from '../config/redis.js';
+import { userRepository } from '../database/prisma/repositories/user.repository.js';
+import { refreshTokenRepository } from '../database/prisma/repositories/refresh-token.repository.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -80,13 +81,13 @@ function userResponseFields() {
 export async function register(input: RegisterInput) {
   return runAsSystem(async () => {
     const emailHash = userEmailHash(input.email);
-    const existing = await prisma.user.findFirst({
+    const existing = await userRepository.findFirst({
       where: { emailHash: emailHash ?? undefined },
     });
     if (existing) throw new AppError('Email already registered', 409);
 
     const hashed = await hashPassword(input.password);
-    const user = await prisma.user.create({
+    const user = await userRepository.create({
       data: {
         email: encryptRequired(input.email),
         emailHash,
@@ -113,7 +114,7 @@ export async function register(input: RegisterInput) {
       tokenVersion: decryptedUser.tokenVersion,
     });
 
-    await prisma.refreshToken.create({
+    await refreshTokenRepository.create({
       data: {
         token: hashJti(jti),
         userId: decryptedUser.id,
@@ -130,7 +131,7 @@ export async function login(input: LoginInput) {
     await checkLockout(input.email);
 
     const emailHash = userEmailHash(input.email);
-    const user = await prisma.user.findFirst({
+    const user = await userRepository.findFirst({
       where: { emailHash: emailHash ?? undefined },
     });
     if (!user) {
@@ -164,7 +165,7 @@ export async function login(input: LoginInput) {
       tokenVersion: decryptedUser.tokenVersion,
     });
 
-    await prisma.refreshToken.create({
+    await refreshTokenRepository.create({
       data: {
         token: hashJti(jti),
         userId: decryptedUser.id,
@@ -182,7 +183,7 @@ export async function refreshTokens(oldRefreshToken: string) {
     const payload = verifyRefreshToken(oldRefreshToken);
     const tokenHash = hashJti(payload.jti);
 
-    const storedToken = await prisma.refreshToken.findUnique({
+    const storedToken = await refreshTokenRepository.findUnique({
       where: { token: tokenHash },
     });
 
@@ -190,7 +191,7 @@ export async function refreshTokens(oldRefreshToken: string) {
     if (storedToken.revokedAt) throw new AppError('Refresh token revoked', 401);
     if (storedToken.expiresAt < new Date()) throw new AppError('Refresh token expired', 401);
 
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    const user = await userRepository.findUnique({ where: { id: payload.userId } });
     if (!user) throw new AppError('User not found', 404);
 
     // Check token version hasn't been invalidated
@@ -202,7 +203,7 @@ export async function refreshTokens(oldRefreshToken: string) {
     if (!decryptedUser) throw new AppError('Failed to load user', 500);
 
     // Rotate: revoke old token and issue a new one
-    await prisma.refreshToken.update({
+    await refreshTokenRepository.update({
       where: { id: storedToken.id },
       data: { revokedAt: new Date() },
     });
@@ -220,7 +221,7 @@ export async function refreshTokens(oldRefreshToken: string) {
       tokenVersion: decryptedUser.tokenVersion,
     });
 
-    await prisma.refreshToken.create({
+    await refreshTokenRepository.create({
       data: {
         token: hashJti(jti),
         userId: decryptedUser.id,
@@ -237,7 +238,7 @@ export async function revokeRefreshToken(refreshToken: string) {
     try {
       const payload = verifyRefreshToken(refreshToken);
       const tokenHash = hashJti(payload.jti);
-      await prisma.refreshToken.updateMany({
+      await refreshTokenRepository.updateMany({
         where: { token: tokenHash },
         data: { revokedAt: new Date() },
       });
@@ -249,12 +250,12 @@ export async function revokeRefreshToken(refreshToken: string) {
 
 export async function revokeAllUserRefreshTokens(userId: string) {
   return runAsSystem(async () => {
-    await prisma.refreshToken.updateMany({
+    await refreshTokenRepository.updateMany({
       where: { userId },
       data: { revokedAt: new Date() },
     });
     // Increment token version to invalidate all outstanding access tokens
-    await prisma.user.update({
+    await userRepository.update({
       where: { id: userId },
       data: { tokenVersion: { increment: 1 } },
     });
@@ -262,7 +263,7 @@ export async function revokeAllUserRefreshTokens(userId: string) {
 }
 
 export async function getMe(userId: string) {
-  const user = await prisma.user.findUnique({
+  const user = await userRepository.findUnique({
     where: { id: userId },
     select: userResponseFields(),
   });

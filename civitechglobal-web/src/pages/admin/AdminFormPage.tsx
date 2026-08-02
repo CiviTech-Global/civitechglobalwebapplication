@@ -11,22 +11,34 @@ import { Button } from "../../components/ui/Button";
 import { FormField } from "../../components/ui/FormField";
 import { useToast } from "../../hooks/useToast";
 import { useLocale } from "../../hooks/useLocale";
-import { emailSchema, requiredString } from "../../lib/validation";
-
-const adminSchema = z.object({
-  email: emailSchema(),
-  firstName: requiredString(),
-  lastName: requiredString(),
-  adminRoleId: z.string().optional(),
-});
-
-type AdminForm = z.infer<typeof adminSchema>;
+import {
+  emailSchema,
+  requiredString,
+  passwordSchema,
+} from "../../lib/validation";
 
 export default function AdminFormPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLocale();
   const [copied, setCopied] = useState<string | null>(null);
+  const [createdUsername, setCreatedUsername] = useState<string | null>(null);
+
+  const adminSchema = z
+    .object({
+      email: emailSchema(),
+      firstName: requiredString(),
+      lastName: requiredString(),
+      adminRoleId: z.string().optional(),
+      password: passwordSchema(),
+      confirmPassword: requiredString(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t.admin.adminForm.passwordMismatch,
+      path: ["confirmPassword"],
+    });
+
+  type AdminForm = z.infer<typeof adminSchema>;
 
   const {
     control,
@@ -40,13 +52,10 @@ export default function AdminFormPage() {
       firstName: "",
       lastName: "",
       adminRoleId: "",
+      password: "",
+      confirmPassword: "",
     },
   });
-
-  const [credentials, setCredentials] = useState<{
-    username: string;
-    password: string;
-  } | null>(null);
 
   const { data: rolesData } = useQuery({
     queryKey: ["roles-list"],
@@ -63,15 +72,17 @@ export default function AdminFormPage() {
         email: form.email,
         firstName: form.firstName,
         lastName: form.lastName,
+        password: form.password,
       };
       if (form.adminRoleId) payload.adminRoleId = form.adminRoleId;
-      const { data } = await api.post<
-        ApiResponse<{ username: string; password: string }>
-      >("/users/admin", payload);
+      const { data } = await api.post<ApiResponse<{ username: string }>>(
+        "/users/admin",
+        payload,
+      );
       return data.data;
     },
     onSuccess: (data) => {
-      setCredentials(data);
+      setCreatedUsername(data.username);
       toast(t.admin.adminForm.createSuccess, "success");
     },
     onError: () => toast(t.admin.adminForm.createFailed, "error"),
@@ -90,7 +101,7 @@ export default function AdminFormPage() {
 
   const onSubmit = (data: AdminForm) => mutation.mutate(data);
 
-  if (credentials) {
+  if (createdUsername) {
     return (
       <div className="max-w-lg">
         <h1 className="text-2xl font-bold text-text-primary mb-6">
@@ -104,38 +115,13 @@ export default function AdminFormPage() {
             </label>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
-                {credentials.username}
+                {createdUsername}
               </code>
               <button
-                onClick={() =>
-                  copyToClipboard(credentials.username, "username")
-                }
+                onClick={() => copyToClipboard(createdUsername, "username")}
                 className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
               >
                 {copied === "username" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs text-text-muted mb-1">
-              {t.admin.adminForm.password}
-            </label>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 bg-surface-100 px-3 py-2 rounded-lg text-brand-green-500 text-sm font-mono">
-                {credentials.password}
-              </code>
-              <button
-                onClick={() =>
-                  copyToClipboard(credentials.password, "password")
-                }
-                className="p-2 rounded-lg hover:bg-surface-300 text-text-muted hover:text-text-primary transition-colors"
-              >
-                {copied === "password" ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -154,7 +140,7 @@ export default function AdminFormPage() {
           <Button
             variant="outline"
             onClick={() => {
-              setCredentials(null);
+              setCreatedUsername(null);
               reset();
             }}
           >
@@ -200,6 +186,20 @@ export default function AdminFormPage() {
             type: "email",
             placeholder: t.admin.adminForm.emailPlaceholder,
           }}
+        />
+        <FormField
+          control={control}
+          name="password"
+          type="input"
+          label={t.admin.adminForm.password}
+          inputProps={{ type: "password", autoComplete: "new-password" }}
+        />
+        <FormField
+          control={control}
+          name="confirmPassword"
+          type="input"
+          label={t.admin.adminForm.confirmPassword}
+          inputProps={{ type: "password", autoComplete: "new-password" }}
         />
         <FormField
           control={control}

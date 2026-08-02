@@ -1,8 +1,10 @@
 import { Prisma } from '@prisma/client';
-import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { encryptRequired, hashForSearch, normalizeEmail } from '../utils/pii.js';
 import { decryptTicket, decryptTickets, decryptUser } from '../utils/piiTransform.js';
+import { ticketRepository, ticketMessageRepository } from '../database/prisma/repositories/ticket.repository.js';
+import type { PaginationQuery } from '../validators/common.schema.js';
+import type { TicketListQuery } from '../validators/ticket.schema.js';
 
 const userSelect = {
   id: true,
@@ -15,7 +17,7 @@ const userSelect = {
 
 export async function createTicket(data: { subject: string; email: string; message: string }, userId?: string) {
   const email = data.email;
-  const ticket = await prisma.ticket.create({
+  const ticket = await ticketRepository.create({
     data: {
       subject: data.subject,
       email: encryptRequired(email),
@@ -29,38 +31,38 @@ export async function createTicket(data: { subject: string; email: string; messa
   return decryptTicket(ticket);
 }
 
-export async function getUserTickets(userId: string, query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getUserTickets(userId: string, query: PaginationQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
 
   const [tickets, total] = await Promise.all([
-    prisma.ticket.findMany({
+    ticketRepository.findMany({
       where: { userId },
       skip,
       take: limit,
       orderBy: { updatedAt: 'desc' },
       include: { _count: { select: { messages: true } } },
     }),
-    prisma.ticket.count({ where: { userId } }),
+    ticketRepository.count({ where: { userId } }),
   ]);
 
   return { tickets: decryptTickets(tickets), total, page, limit };
 }
 
-export async function getAllTickets(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getAllTickets(query: TicketListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const status = query.status as string | undefined;
-  const priority = query.priority as string | undefined;
+  const status = query.status;
+  const priority = query.priority;
 
   const where: Record<string, unknown> = {};
   if (status) where.status = status;
   if (priority) where.priority = priority;
 
   const [tickets, total] = await Promise.all([
-    prisma.ticket.findMany({
+    ticketRepository.findMany({
       where,
       skip,
       take: limit,
@@ -70,7 +72,7 @@ export async function getAllTickets(query: Record<string, unknown>) {
         _count: { select: { messages: true } },
       },
     }),
-    prisma.ticket.count({ where }),
+    ticketRepository.count({ where }),
   ]);
 
   return {
@@ -88,7 +90,7 @@ export async function getTicketById(id: string, userId?: string) {
   const where: Record<string, unknown> = { id };
   if (userId) where.userId = userId;
 
-  const ticket = await prisma.ticket.findFirst({
+  const ticket = await ticketRepository.findFirst({
     where,
     include: {
       user: { select: userSelect },
@@ -123,14 +125,14 @@ export async function getTicketById(id: string, userId?: string) {
 }
 
 export async function addTicketMessage(ticketId: string, userId: string, content: string, isStaff: boolean) {
-  const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+  const ticket = await ticketRepository.findUnique({ where: { id: ticketId } });
   if (!ticket) throw new AppError('Ticket not found', 404);
 
   if (!isStaff && ticket.userId !== userId) {
     throw new AppError('Access denied', 403);
   }
 
-  const message = await prisma.ticketMessage.create({
+  const message = await ticketMessageRepository.create({
     data: { ticketId, userId, content, isStaff },
     include: { user: { select: { id: true, firstName: true, lastName: true, role: true } } },
   });
@@ -152,8 +154,8 @@ export async function addTicketMessage(ticketId: string, userId: string, content
 }
 
 export async function updateTicketStatus(id: string, data: { status?: string; priority?: string }) {
-  const ticket = await prisma.ticket.findUnique({ where: { id } });
+  const ticket = await ticketRepository.findUnique({ where: { id } });
   if (!ticket) throw new AppError('Ticket not found', 404);
-  const updated = await prisma.ticket.update({ where: { id }, data: data as Prisma.TicketUpdateInput });
+  const updated = await ticketRepository.update({ where: { id }, data: data as Prisma.TicketUpdateInput });
   return decryptTicket(updated);
 }

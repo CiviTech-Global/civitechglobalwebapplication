@@ -1,14 +1,17 @@
 import { OrderStatus } from '@prisma/client';
-import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { decryptUser } from '../utils/piiTransform.js';
+import { productRepository } from '../database/prisma/repositories/product.repository.js';
+import { orderRepository } from '../database/prisma/repositories/order.repository.js';
+import type { OrderListQuery } from '../validators/order.schema.js';
+import type { PaginationQuery } from '../validators/common.schema.js';
 
 export async function createOrder(
   userId: string,
   data: { items: { productId: string; quantity: number }[]; notes?: string },
 ) {
   const productIds = data.items.map((i) => i.productId);
-  const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
+  const products = await productRepository.findMany({ where: { id: { in: productIds } } });
 
   if (products.length !== productIds.length) throw new AppError('One or more products not found', 404);
 
@@ -19,7 +22,7 @@ export async function createOrder(
 
   const total = itemsWithPrices.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  return prisma.order.create({
+  return orderRepository.create({
     data: {
       userId,
       total,
@@ -30,36 +33,36 @@ export async function createOrder(
   });
 }
 
-export async function getUserOrders(userId: string, query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getUserOrders(userId: string, query: PaginationQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
 
   const [orders, total] = await Promise.all([
-    prisma.order.findMany({
+    orderRepository.findMany({
       where: { userId },
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: { items: { include: { product: { select: { id: true, name: true, image: true } } } } },
     }),
-    prisma.order.count({ where: { userId } }),
+    orderRepository.count({ where: { userId } }),
   ]);
 
   return { orders, total, page, limit };
 }
 
-export async function getAllOrders(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getAllOrders(query: OrderListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const status = query.status as string | undefined;
+  const status = query.status;
 
   const where: Record<string, unknown> = {};
   if (status) where.status = status;
 
   const [orders, total] = await Promise.all([
-    prisma.order.findMany({
+    orderRepository.findMany({
       where,
       skip,
       take: limit,
@@ -69,7 +72,7 @@ export async function getAllOrders(query: Record<string, unknown>) {
         items: { include: { product: { select: { id: true, name: true } } } },
       },
     }),
-    prisma.order.count({ where }),
+    orderRepository.count({ where }),
   ]);
 
   return {
@@ -84,7 +87,7 @@ export async function getOrderById(id: string, userId?: string) {
   const where: Record<string, unknown> = { id };
   if (userId) where.userId = userId;
 
-  const order = await prisma.order.findFirst({
+  const order = await orderRepository.findFirst({
     where,
     include: {
       user: { select: { id: true, email: true, firstName: true, lastName: true } },
@@ -96,7 +99,7 @@ export async function getOrderById(id: string, userId?: string) {
 }
 
 export async function updateOrderStatus(id: string, status: string) {
-  const order = await prisma.order.findUnique({ where: { id } });
+  const order = await orderRepository.findUnique({ where: { id } });
   if (!order) throw new AppError('Order not found', 404);
-  return prisma.order.update({ where: { id }, data: { status: status as OrderStatus } });
+  return orderRepository.update({ where: { id }, data: { status: status as OrderStatus } });
 }

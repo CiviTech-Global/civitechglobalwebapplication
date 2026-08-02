@@ -1,15 +1,15 @@
-import { prisma } from '../config/database.js';
+import { siteContentRepository } from '../database/prisma/repositories/site-content.repository.js';
 
 export async function getAllContent() {
-  return prisma.siteContent.findMany();
+  return siteContentRepository.findMany();
 }
 
 export async function getContentByKey(key: string) {
-  return prisma.siteContent.findUnique({ where: { key } });
+  return siteContentRepository.findUnique({ where: { key } });
 }
 
 export async function upsertContent(key: string, value: string) {
-  return prisma.siteContent.upsert({
+  return siteContentRepository.upsert({
     where: { key },
     update: { value },
     create: { key, value },

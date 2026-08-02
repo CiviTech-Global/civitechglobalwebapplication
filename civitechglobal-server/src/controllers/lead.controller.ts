@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as leadService from '../services/lead.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type { LeadListQuery } from '../validators/lead.schema.js';
 
 export async function getAllLeads(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await leadService.getAllLeads(req.query as Record<string, unknown>);
+    const result = await leadService.getAllLeads(req.query as unknown as LeadListQuery);
     paginatedResponse(res, result.leads, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

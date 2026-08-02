@@ -3,7 +3,7 @@ import { decryptLead, decryptLeads } from '../../utils/piiTransform.js';
 
 export const leadService = {
   createLead: async (data: CreateLeadInput) => {
-    const lead = await leadRepository.create(data);
+    const lead = await leadRepository.createFromBot(data);
     const decrypted = decryptLead(lead);
     if (!decrypted) throw new Error('Failed to decrypt created lead');
     return decrypted;

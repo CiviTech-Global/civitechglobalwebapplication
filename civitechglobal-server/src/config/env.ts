@@ -14,6 +14,15 @@ function getEnvOrDefault(key: string, defaultValue: string): string {
   return process.env[key] || defaultValue;
 }
 
+function parseTrustProxy(value: string | undefined): number | boolean | string {
+  if (!value) return 1;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  const num = Number(value);
+  if (!Number.isNaN(num)) return num;
+  return value;
+}
+
 function warnIfWeakSecret(key: string, value: string): void {
   if (value.length < 32) {
     console.warn(`WARNING: ${key} should be at least 32 characters long in production.`);
@@ -36,11 +45,15 @@ export const env = {
   isProduction: getEnvOrDefault('NODE_ENV', 'development') === 'production',
 
   // Initial Super Admin credentials (used on first startup)
-  // In production these must be set to strong, unique values.
-  ADMIN_EMAIL: getEnvOrDefault('ADMIN_EMAIL', 'superadmin@civitechglobal.com'),
+  // These must be set explicitly; no defaults are provided.
+  ADMIN_EMAIL: getEnv('ADMIN_EMAIL'),
   ADMIN_PASSWORD: getEnv('ADMIN_PASSWORD'),
-  ADMIN_FIRST_NAME: getEnvOrDefault('ADMIN_FIRST_NAME', 'Super'),
-  ADMIN_LAST_NAME: getEnvOrDefault('ADMIN_LAST_NAME', 'Admin'),
+  ADMIN_FIRST_NAME: getEnv('ADMIN_FIRST_NAME'),
+  ADMIN_LAST_NAME: getEnv('ADMIN_LAST_NAME'),
+
+  // Reverse proxy configuration
+  // Number of proxies / comma-separated IPs / boolean. Default: 1 (one proxy such as Nginx).
+  TRUST_PROXY: parseTrustProxy(process.env.TRUST_PROXY),
 
   // Telegram Bot Configuration
   TELEGRAM_BOT_TOKEN: getEnvOrDefault('TELEGRAM_BOT_TOKEN', ''),

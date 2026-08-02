@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import * as serviceService from '../services/service.service.js';
 import { successResponse, paginatedResponse } from '../utils/apiResponse.js';
+import type { ServiceListQuery } from '../validators/service.schema.js';
 
 export async function getServices(req: Request, res: Response, next: NextFunction) {
   try {
-    const result = await serviceService.getServices(req.query as Record<string, unknown>);
+    const result = await serviceService.getServices(req.query as unknown as ServiceListQuery);
     paginatedResponse(res, result.services, result.total, result.page, result.limit);
   } catch (error) {
     next(error);

@@ -26,8 +26,9 @@ DATABASE_URL=postgresql://...secret...
    cp .env.example .env
    ```
 
-2. Fill in real values for `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ADMIN_PASSWORD`, and any other empty fields.
+2. Fill in real values for `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_FIRST_NAME`, `ADMIN_LAST_NAME`, and any other empty fields.
    Seed and demo passwords must be 12-128 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character.
+   The server provides **no defaults** for super-admin credentials.
 
 3. Start the development stack:
 
@@ -123,7 +124,10 @@ The CD workflow (`.github/workflows/cd.yml`) expects the following repository se
 | `JWT_REFRESH_SECRET` | Production JWT refresh signing secret (≥32 chars). |
 | `PII_ENCRYPTION_KEY` | AES-256-GCM key for PII encryption (≥32 chars). |
 | `PII_HMAC_KEY` | HMAC key for PII search hashes (≥32 chars). |
+| `ADMIN_EMAIL` | Initial Super Admin email (no code default). |
 | `ADMIN_PASSWORD` | Initial Super Admin password (12-128 chars, uppercase, lowercase, number, special character). |
+| `ADMIN_FIRST_NAME` | Initial Super Admin first name (no code default). |
+| `ADMIN_LAST_NAME` | Initial Super Admin last name (no code default). |
 | `SENTRY_DSN` | Sentry project DSN (optional). |
 
 ### Required repository variables

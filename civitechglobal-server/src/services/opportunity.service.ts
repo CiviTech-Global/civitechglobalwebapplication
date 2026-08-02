@@ -1,63 +1,71 @@
 import { Prisma, ApplicationStatus } from '@prisma/client';
-import { prisma } from '../config/database.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { decryptUser } from '../utils/piiTransform.js';
+import {
+  opportunityRepository,
+  opportunityApplicationRepository,
+} from '../database/prisma/repositories/opportunity.repository.js';
+import type {
+  OpportunityListQuery,
+  AdminOpportunityListQuery,
+  ApplicationListQuery,
+} from '../validators/opportunity.schema.js';
 
-export async function getOpportunities(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getOpportunities(query: OpportunityListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const type = query.type as string | undefined;
+  const type = query.type;
 
   const where: Record<string, unknown> = { isOpen: true };
   if (type) where.opportunityType = type;
 
   const [opportunities, total] = await Promise.all([
-    prisma.opportunity.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
-    prisma.opportunity.count({ where }),
+    opportunityRepository.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
+    opportunityRepository.count({ where }),
   ]);
 
   return { opportunities, total, page, limit };
 }
 
-export async function getAllOpportunities(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getAllOpportunities(query: AdminOpportunityListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
 
   const [opportunities, total] = await Promise.all([
-    prisma.opportunity.findMany({
+    opportunityRepository.findMany({
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: { _count: { select: { applications: true } } },
     }),
-    prisma.opportunity.count(),
+    opportunityRepository.count(),
   ]);
 
   return { opportunities, total, page, limit };
 }
 
 export async function getOpportunityBySlug(slug: string) {
-  const opportunity = await prisma.opportunity.findUnique({ where: { slug } });
+  const opportunity = await opportunityRepository.findUnique({ where: { slug } });
   if (!opportunity) throw new AppError('Opportunity not found', 404);
   return opportunity;
 }
 
 export async function createOpportunity(data: Record<string, unknown>) {
-  return prisma.opportunity.create({ data: data as Prisma.OpportunityCreateInput });
+  return opportunityRepository.create({ data: data as Prisma.OpportunityCreateInput });
 }
 
 export async function updateOpportunity(id: string, data: Record<string, unknown>) {
-  const opportunity = await prisma.opportunity.findUnique({ where: { id } });
+  const opportunity = await opportunityRepository.findUnique({ where: { id } });
   if (!opportunity) throw new AppError('Opportunity not found', 404);
-  return prisma.opportunity.update({ where: { id }, data: data as Prisma.OpportunityUpdateInput });
+  return opportunityRepository.update({ where: { id }, data: data as Prisma.OpportunityUpdateInput });
 }
 
 export async function deleteOpportunity(id: string) {
-  const opportunity = await prisma.opportunity.findUnique({ where: { id } });
+  const opportunity = await opportunityRepository.findUnique({ where: { id } });
   if (!opportunity) throw new AppError('Opportunity not found', 404);
-  return prisma.opportunity.update({ where: { id }, data: { deletedAt: new Date() } });
+  return opportunityRepository.update({ where: { id }, data: { deletedAt: new Date() } });
 }
 
 export async function applyToOpportunity(
@@ -65,32 +73,32 @@ export async function applyToOpportunity(
   opportunityId: string,
   data: { coverLetter: string; resumeUrl?: string },
 ) {
-  const opportunity = await prisma.opportunity.findUnique({ where: { id: opportunityId } });
+  const opportunity = await opportunityRepository.findUnique({ where: { id: opportunityId } });
   if (!opportunity) throw new AppError('Opportunity not found', 404);
   if (!opportunity.isOpen) throw new AppError('This opportunity is no longer accepting applications', 400);
 
-  const existing = await prisma.opportunityApplication.findUnique({
+  const existing = await opportunityApplicationRepository.findUnique({
     where: { userId_opportunityId: { userId, opportunityId } },
   });
   if (existing) throw new AppError('You have already applied to this opportunity', 409);
 
-  return prisma.opportunityApplication.create({
+  return opportunityApplicationRepository.create({
     data: { userId, opportunityId, ...data },
     include: { opportunity: true },
   });
 }
 
-export async function getApplications(query: Record<string, unknown>) {
-  const page = Math.max(1, parseInt(String(query.page || '1'), 10));
-  const limit = Math.min(50, Math.max(1, parseInt(String(query.limit || '10'), 10)));
+export async function getApplications(query: ApplicationListQuery) {
+  const page = Math.max(1, query.page);
+  const limit = Math.min(50, Math.max(1, query.limit));
   const skip = (page - 1) * limit;
-  const status = query.status as string | undefined;
+  const status = query.status;
 
   const where: Record<string, unknown> = {};
   if (status) where.status = status;
 
   const [applications, total] = await Promise.all([
-    prisma.opportunityApplication.findMany({
+    opportunityApplicationRepository.findMany({
       where,
       skip,
       take: limit,
@@ -100,7 +108,7 @@ export async function getApplications(query: Record<string, unknown>) {
         opportunity: { select: { id: true, title: true, opportunityType: true } },
       },
     }),
-    prisma.opportunityApplication.count({ where }),
+    opportunityApplicationRepository.count({ where }),
   ]);
 
   return {
@@ -112,7 +120,7 @@ export async function getApplications(query: Record<string, unknown>) {
 }
 
 export async function getUserApplications(userId: string) {
-  return prisma.opportunityApplication.findMany({
+  return opportunityApplicationRepository.findMany({
     where: { userId },
     include: { opportunity: true },
     orderBy: { createdAt: 'desc' },
@@ -120,7 +128,7 @@ export async function getUserApplications(userId: string) {
 }
 
 export async function updateApplicationStatus(id: string, status: string) {
-  const application = await prisma.opportunityApplication.findUnique({ where: { id } });
+  const application = await opportunityApplicationRepository.findUnique({ where: { id } });
   if (!application) throw new AppError('Application not found', 404);
-  return prisma.opportunityApplication.update({ where: { id }, data: { status: status as ApplicationStatus } });
+  return opportunityApplicationRepository.update({ where: { id }, data: { status: status as ApplicationStatus } });
 }

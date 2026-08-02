@@ -1,7 +1,8 @@
 # CiviTech Global — Platform Engineering Roadmap & Gap Tracker
 
 > Generated: 2026-07-30  
-> Based on: full 263-agent roster + code review + passing unit tests (server 7/7, web 2/2)
+> Last updated: 2026-07-30  
+> Based on: full 263-agent roster + code review + passing unit tests (server 84 tests, web 45 tests)
 
 ## What this directory is
 

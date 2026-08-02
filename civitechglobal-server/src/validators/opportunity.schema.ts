@@ -1,4 +1,22 @@
 import { z } from 'zod';
+import { paginationQuerySchema } from './common.schema.js';
+
+export const opportunityListQuerySchema = paginationQuerySchema.extend({
+  type: z.preprocess((val) => (Array.isArray(val) ? val[0] : val), z.enum(['JOB', 'INTERNSHIP'])).optional(),
+});
+
+export type OpportunityListQuery = z.infer<typeof opportunityListQuerySchema>;
+
+export const adminOpportunityListQuerySchema = paginationQuerySchema;
+export type AdminOpportunityListQuery = z.infer<typeof adminOpportunityListQuerySchema>;
+
+export const applicationListQuerySchema = paginationQuerySchema.extend({
+  status: z
+    .preprocess((val) => (Array.isArray(val) ? val[0] : val), z.enum(['PENDING', 'REVIEWING', 'ACCEPTED', 'REJECTED']))
+    .optional(),
+});
+
+export type ApplicationListQuery = z.infer<typeof applicationListQuerySchema>;
 
 export const createOpportunitySchema = z.object({
   title: z.string().min(1, 'Title is required'),

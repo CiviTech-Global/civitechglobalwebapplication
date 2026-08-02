@@ -7,19 +7,24 @@ import { hashPassword } from '../src/utils/password.js';
 
 // Configurable seed credentials from environment variables
 // IMPORTANT: Do not commit real passwords. Set these via .env before seeding.
-function getSeedCredential(key: string): string {
+function getRequiredEnv(key: string): string {
   const value = process.env[key];
   if (!value || value.trim() === '') {
     throw new Error(`Missing required seed credential: ${key}. Set it in .env before running prisma db seed.`);
   }
+  return value;
+}
+
+function getSeedCredential(key: string): string {
+  const value = getRequiredEnv(key);
   assertPasswordStrong(value, key);
   return value;
 }
 
-const SUPER_ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'superadmin@civitechglobal.com';
+const SUPER_ADMIN_EMAIL = getRequiredEnv('ADMIN_EMAIL');
 const SUPER_ADMIN_PASSWORD = getSeedCredential('ADMIN_PASSWORD');
-const SUPER_ADMIN_FIRST_NAME = process.env.ADMIN_FIRST_NAME || 'Super';
-const SUPER_ADMIN_LAST_NAME = process.env.ADMIN_LAST_NAME || 'Admin';
+const SUPER_ADMIN_FIRST_NAME = getRequiredEnv('ADMIN_FIRST_NAME');
+const SUPER_ADMIN_LAST_NAME = getRequiredEnv('ADMIN_LAST_NAME');
 
 const DEMO_ADMIN_EMAIL = process.env.DEMO_ADMIN_EMAIL || 'admin@civitechglobal.com';
 const DEMO_ADMIN_PASSWORD = getSeedCredential('DEMO_ADMIN_PASSWORD');

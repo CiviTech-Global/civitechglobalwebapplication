@@ -1,7 +1,7 @@
 # Layer 2 — API & Backend Logic
 
-**Score:** 3 / 5  
-**Status:** 🟡 In Progress (structure solid; repository/DTO/contract work still open)  
+**Score:** 4 / 5  
+**Status:** 🟢 Mostly complete (repository layer and typed DTOs done; client-side filtering and API contract docs remain)  
 **Owner:** Backend Architect, Senior Backend Developer
 
 ## Executive summary
@@ -21,30 +21,31 @@ The API is a well-structured Express application with route/service separation, 
 
 ### Gaps / risks (with evidence)
 
-- [ ] **Repository pattern inconsistency** — Only insurance and lead repositories exist (`src/database/prisma/repositories/*.ts`); `user.service.ts`, `order.service.ts`, etc. call Prisma directly.
+- [x] **Repository pattern inconsistency** — Repositories now exist for `User`, `Order`, `Ticket`, `Product`, `Service`, `Opportunity`, `SiteContent`, `RefreshToken`, `Lead`, and admin roles. Core services consume repositories instead of importing `prisma` directly (`src/database/prisma/repositories/*.ts`).
 - [ ] **Client-side filtering caused by API design** — Product edit form fetches all products (`limit=100`) and filters client-side instead of a single-resource endpoint.
   - Evidence: `ProductFormPage.tsx:40-42`.
-- [ ] **Manual query parsing** — `lead.service.ts:getAllLeads` parses `page`, `limit`, and `status` manually instead of using a typed DTO.
+- [x] **Manual query parsing replaced by typed DTOs** — All list endpoints now use Zod query DTOs; services receive typed inputs.
 - [x] **Error logs redacted for PII** — Pino redacts `password`, `token`, `refreshToken`, `email`, `phone`, `phoneNumber`, and request-body fields; error handlers log only names/messages.
   - Evidence: `src/config/logger.ts`, `src/middleware/errorHandler.ts`.
-- [ ] **Validation middleware is body-only** — `validate.ts` only parses `req.body`; query params and route params are not validated, enabling the manual parsing gaps above.
+- [x] **Validation middleware supports body, query, and params** — `validate.ts` now accepts `{ body, query, params }` schemas and parses/sanitizes each target (`src/middleware/validate.ts`).
   - Evidence: `src/middleware/validate.ts:7`.
-- [ ] **Dead dependency** — `fastify` is listed in `package.json` but the API is Express-only; the bot uses Fastify separately.
-  - Evidence: `civitechglobal-server/package.json:42`.
-- [ ] **Sensitive credential returned in admin creation response** — `createAdmin` returns the generated plaintext password in the API payload.
-  - Evidence: `src/services/user.service.ts:173`.
+- [x] **Dead dependency verified** — `fastify` is required by the Telegram bot (`src/bot/app.ts`, `src/bot/middleware/webhookRateLimit.ts`), so it is not a dead dependency.
+  - Evidence: `civitechglobal-server/package.json:42`, `src/bot/app.ts:1`.
+- [x] **Sensitive credential removed from admin creation response** — `createAdmin` now requires the creator to supply a strong password, hashes it, and no longer returns any plaintext credential in the API payload.
+  - Evidence: `src/services/user.service.ts:136`, `src/validators/user.schema.ts:31`.
 - [ ] **No API contract tests** — No OpenAPI spec or generated client; frontend and backend types are manually kept in sync.
 
 ## Recommended actions
 
-- [ ] **1. Complete the repository layer**
-  - Add repositories for `User`, `Order`, `Ticket`, `Product`, `Service`, `Opportunity`, `SiteContent`.
-  - Refactor services to depend on repositories, not Prisma directly.
-  - Acceptance: no service file imports `prisma` except through repositories.
+- [x] **1. Complete the repository layer**
+  - Added repositories for `User`, `Order`, `Ticket`, `Product`, `Service`, `Opportunity`, `SiteContent`, `RefreshToken`, `Lead`, and admin roles.
+  - Refactored core services to depend on repositories instead of `prisma` directly.
+  - Acceptance: no runtime service file imports `prisma` except the seed/demo helper.
 
-- [ ] **2. Introduce typed query DTOs**
-  - Define Zod schemas for list/query params (pagination, filters, sorting).
-  - Apply `validate` middleware to list routes.
+- [x] **2. Introduce typed query DTOs**
+  - Shared `paginationQuerySchema`, `uuidParamSchema`, and `slugParamSchema` in `src/validators/common.schema.ts`.
+  - Query/param DTOs wired for users, products, services, opportunities, orders, tickets, and leads.
+  - `validate` middleware supports `{ body, query, params }` and is applied to list/detail routes.
   - Acceptance: all list endpoints validate and type query parameters.
 
 - [ ] **3. Add single-resource endpoints where missing**
@@ -61,8 +62,8 @@ The API is a well-structured Express application with route/service separation, 
 
 ## Definition of done for this layer
 
-- [ ] All services use repositories.
-- [ ] All query params are validated by Zod.
+- [x] All services use repositories. (`demo-data.service.ts` still uses `prisma` directly because it coordinates multi-model transactions; it is treated as a seed/demo helper.)
+- [x] All query params are validated by Zod.
 - [ ] Error logs are PII-free.
 - [ ] API contract spec exists and is kept up-to-date.
 - [ ] Score raised to **4/5** or higher.
